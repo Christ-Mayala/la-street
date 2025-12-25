@@ -921,7 +921,10 @@ export class RegisterPage {
         telephone: this.telephone,
       });
 
-      // 2. Si professionnel, créer le profil professionnel
+      // 2. Se connecter pour récupérer le token (nécessaire pour les endpoints protégés)
+      await this.auth.login({ email: this.email, password: this.password });
+
+      // 3. Si professionnel, créer le profil professionnel
       if (this.role === 'professional') {
         if (!this.profileImageFile) {
           throw new Error('Photo de profil requise');
