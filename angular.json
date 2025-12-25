@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "fusion-angular-tailwind-starter": {
+    "la-street": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -14,33 +14,17 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "assets": [{"glob": "**/*", "input": "public"}],
+            "styles": ["src/styles.css"],
+            "outputPath": "dist/la-street"
           },
           "configurations": {
             "production": {
               "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
+                {"type": "initial", "maximumWarning": "500kB", "maximumError": "1MB"},
+                {"type": "anyComponentStyle", "maximumWarning": "4kB", "maximumError": "8kB"}
               ],
               "outputHashing": "all"
             },
@@ -55,41 +39,23 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "fusion-angular-tailwind-starter:build:production"
-            },
-            "development": {
-              "buildTarget": "fusion-angular-tailwind-starter:build:development"
-            }
+            "production": {"buildTarget": "la-street:build:production"},
+            "development": {"buildTarget": "la-street:build:development"}
           },
           "defaultConfiguration": "development"
         },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
-        },
+        "extract-i18n": {"builder": "@angular/build:extract-i18n"},
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js","zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "assets": [{"glob": "**/*", "input": "public"}],
+            "styles": ["src/styles.css"]
           }
         }
       }
     }
   },
-  "cli": {
-    "analytics": false
-  }
+  "cli": {"analytics": false}
 }
