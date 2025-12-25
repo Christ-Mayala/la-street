@@ -15,9 +15,11 @@ import { filter, Subscription } from 'rxjs';
         <!-- Logo -->
         <a routerLink="/" class="flex items-center gap-2 font-semibold text-white group">
           <div class="relative">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-black font-bold text-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30">
-              LS
-            </span>
+            <img
+              src="/logo.jpg"
+              alt="La STREET"
+              class="relative z-10 h-9 w-9 rounded-lg object-cover ring-1 ring-primary/30 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
+            />
             <div class="absolute -inset-1 rounded-lg bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
           <span class="text-lg font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
