@@ -3,7 +3,13 @@ const runtime = (globalThis as any)?.__STREET_CONFIG__ || {};
 
 const normalizeApiBaseUrl = (raw: unknown): string => {
   const v = String(raw || '').trim();
-  if (!v) return '';
+
+  if (!v) {
+    if (typeof window === 'undefined') return '';
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:5000';
+    return window.location.origin;
+  }
 
   const noTrailing = v.replace(/\/+$/, '');
 
