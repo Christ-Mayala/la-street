@@ -289,7 +289,7 @@ type Category = { _id: string; name: string; trades: { _id: string; name: string
                       required
                       class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
                     >
-                      <option value="" disabled selected>Sélectionner une ville</option>
+                      <option [ngValue]="''" disabled>Sélectionner une ville</option>
                       <option *ngFor="let v of villes" [value]="v">{{ v }}</option>
                     </select>
                     <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,9 +350,9 @@ type Category = { _id: string; name: string; trades: { _id: string; name: string
                         name="categoryId"
                         required
                         class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
-                        (change)="onCategoryChange()"
+                        (ngModelChange)="onCategoryChange($event)"
                       >
-                        <option value="" disabled selected>Sélectionner une catégorie</option>
+                        <option [ngValue]="''" disabled>Sélectionner une catégorie</option>
                         <option *ngFor="let c of categories" [value]="c._id">{{ c.name }}</option>
                       </select>
                       <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,9 +374,10 @@ type Category = { _id: string; name: string; trades: { _id: string; name: string
                         [(ngModel)]="tradeId"
                         name="tradeId"
                         required
+                        [disabled]="!categoryId"
                         class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
                       >
-                        <option value="" disabled selected>Sélectionner un métier</option>
+                        <option [ngValue]="''" disabled>Sélectionner un métier</option>
                         <option *ngFor="let t of selectedTrades" [value]="t._id">{{ t.name }}</option>
                       </select>
                       <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -794,9 +795,11 @@ export class RegisterPage {
     }
   }
 
-  onCategoryChange() {
-    const c = this.categories.find((x) => x._id === this.categoryId);
-    this.selectedTrades = c?.trades || [];
+  onCategoryChange(nextId?: string) {
+    if (typeof nextId === 'string') this.categoryId = nextId;
+    const c: any = this.categories.find((x: any) => x._id === this.categoryId);
+    const trades = c?.trades || c?.tradeIds || c?.metiers || [];
+    this.selectedTrades = Array.isArray(trades) ? trades : [];
     this.tradeId = '';
   }
 
