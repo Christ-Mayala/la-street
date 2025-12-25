@@ -18,7 +18,7 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [{"glob": "**/*", "input": "public"}],
             "styles": ["src/styles.css"],
-            "outputPath": "dist/la-street/browser"
+            "outputPath": "dist/la-street"
           },
           "configurations": {
             "production": {
