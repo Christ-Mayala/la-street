@@ -16,9 +16,11 @@ import { RouterLink } from '@angular/router';
           <div class="xl:col-span-2">
             <a routerLink="/" class="inline-flex items-center gap-3 group mb-6">
               <div class="relative">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-black font-bold text-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30">
-                  LS
-                </span>
+                <img
+                  src="/logo.jpg"
+                  alt="La STREET"
+                  class="relative z-10 h-12 w-12 rounded-xl object-cover ring-1 ring-primary/30 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
+                />
                 <div class="absolute -inset-1 rounded-xl bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               <div class="flex-1">

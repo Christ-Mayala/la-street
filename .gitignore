@@ -33,6 +33,7 @@ yarn-error.log
 /.angular/cache
 .git.scout-backup/
 .gitscout/
+/Christ-Mayala/
 /dist/
 /node_modules/
 /.angular/cache/

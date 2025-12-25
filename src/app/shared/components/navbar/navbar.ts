@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { filter, Subscription } from 'rxjs';
+import {types} from 'sass';
 
 @Component({
   selector: 'app-navbar',
@@ -15,12 +16,14 @@ import { filter, Subscription } from 'rxjs';
         <!-- Logo -->
         <a routerLink="/" class="flex items-center gap-2 font-semibold text-white group">
           <div class="relative">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-black font-bold text-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30">
-              LS
-            </span>
+            <img
+              src="/logo.jpg"
+              alt="La STREET"
+              class="relative z-10 h-9 w-9 rounded-lg object-cover ring-1 ring-primary/30 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
+            />
             <div class="absolute -inset-1 rounded-lg bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <span class="text-lg font-bold text-white md:bg-gradient-to-r md:from-white md:to-slate-200 md:bg-clip-text md:text-transparent">
+          <span class="text-lg font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
             La STREET
           </span>
         </a>
@@ -28,7 +31,7 @@ import { filter, Subscription } from 'rxjs';
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-8">
           <ng-container *ngIf="auth.user() as u; else normalNav">
-            <a *ngIf="u.role==='admin'"
+            <a *ngIf="String(u.role).toLowerCase()==='admin'"
                routerLink="/admin"
                routerLinkActive="text-primary"
                [routerLinkActiveOptions]="{exact: true}"
@@ -45,7 +48,7 @@ import { filter, Subscription } from 'rxjs';
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
             </a>
 
-            <ng-container *ngIf="u.role!=='admin'">
+            <ng-container *ngIf="String(u.role).toLowerCase()!=='admin'">
               <a routerLink="/"
                  routerLinkActive="text-primary"
                  [routerLinkActiveOptions]="{exact: true}"
@@ -462,4 +465,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .toUpperCase()
       .slice(0, 2);
   }
+
+  protected readonly types = types;
+  protected readonly String = String;
 }
