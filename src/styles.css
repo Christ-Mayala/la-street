@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { font-family: theme('fontFamily.sans'); }
+  body { @apply bg-black text-white; }
+}
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors; }
+  .btn-primary { @apply btn bg-primary text-black hover:bg-primary-300 active:bg-primary-200; }
+.btn-danger { @apply btn bg-red-500 text-white hover:bg-red-400 active:bg-red-600; }
+  .btn-outline { @apply btn border border-slate-700 text-white hover:border-primary hover:text-primary hover:bg-primary/10; }
+  .badge { @apply inline-flex items-center rounded-full bg-primary/10 text-primary border border-primary/25 px-2.5 py-1 text-xs font-medium; }
+  .card { @apply bg-slate-950/60 rounded-xl border border-slate-800 shadow-soft; }
+  .input-modern { @apply w-full rounded-xl border border-slate-700 bg-black/40 px-3 py-2 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary; }
+}
+
+@layer utilities {
+  .glass { @apply bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-black/30; }
+  .hero-bg { background-image: radial-gradient(800px circle at 20% 20%, rgba(250,204,21,0.18), transparent 50%), radial-gradient(700px circle at 80% 30%, rgba(250,204,21,0.12), transparent 45%); }
+  .footer-bg { background-image: radial-gradient(900px circle at 15% 60%, rgba(250,204,21,0.10), transparent 55%); }
+}

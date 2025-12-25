@@ -1,0 +1,13 @@
+{
+  "name": "Tala-Tala",
+  "short_name": "Tala-Tala",
+  "description": "Annuaire des artisans et professionnels fiables du Congo (Brazzaville)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00b4d8",
+  "scope": "/",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon", "purpose": "any" }
+  ]
+}
