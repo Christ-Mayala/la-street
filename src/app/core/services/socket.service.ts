@@ -42,19 +42,18 @@ export class SocketService {
     if (this.socket) return;
     try {
       this.socket = io(url, { transports: ['websocket'], path: '/socket.io', autoConnect: true });
-      this.socket.on('connect', () => { this.connected.set(true); console.log('socket connected', this.socket?.id);
+      this.socket.on('connect', () => { this.connected.set(true);
         this.joinedRooms.forEach(r => this.socket?.emit('join', r));
       });
       this.socket.on('disconnect', () => { this.connected.set(false); });
       this.socket.on('message', (data: any) => this.onChannelMessage(data));
     } catch (e) {
-      console.warn('Socket init failed', e);
       this.socket = undefined;
     }
   }
 
   private ensureConnected() {
-    const url = this.api.baseUrl();
+    const url = this.api.getSafeBaseUrl();
     if (!url) return;
     this.initSocket(url);
   }
