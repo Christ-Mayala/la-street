@@ -19,10 +19,22 @@ export class AuthService {
   private readonly storageKey = 'street_user';
   user = signal<User | null>(this.loadUser());
 
+  private normalizeRole(raw: any): User['role'] {
+    const r = String(raw || 'user').toLowerCase();
+    if (r === 'admin') return 'admin';
+    if (r === 'professional') return 'professional';
+    return 'user';
+  }
+
   private loadUser(): User | null {
     try {
       const raw = localStorage.getItem(this.storageKey);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      if (u && typeof u === 'object') {
+        u.role = this.normalizeRole(u.role);
+      }
+      return u as User;
     } catch {
       return null;
     }
@@ -92,7 +104,7 @@ export class AuthService {
       _id: data.user?._id,
       name: data.user?.name,
       email: data.user?.email,
-      role: (data.user?.role || 'user') as any,
+      role: this.normalizeRole(data.user?.role),
       telephone: data.user?.telephone,
       token: data.token,
     };

@@ -9,8 +9,8 @@ export class AdminGuard implements CanActivate {
 
   canActivate(): boolean {
     const u = this.auth.user();
-    if (u && u.role === 'admin') return true;
-    // redirect to login if not authenticated, or home if authenticated but not admin
+    const isAdmin = String(u?.role || '').toLowerCase() === 'admin';
+    if (u && isAdmin) return true;
     if (!u) this.router.navigate(['/login']);
     else this.router.navigate(['/']);
     return false;

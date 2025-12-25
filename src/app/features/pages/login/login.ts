@@ -241,7 +241,7 @@ export class LoginPage {
     });
 
     const u = this.auth.user();
-    if (u?.role === 'admin') this.router.navigate(['/admin']);
+    if (String(u?.role || '').toLowerCase() === 'admin') this.router.navigate(['/admin']);
     else if (u?.token) this.router.navigate(['/']);
   }
 
@@ -251,7 +251,7 @@ export class LoginPage {
     try {
       const u = await this.auth.login(this.email, this.password);
       this.toast.success('Bienvenue', `Bonjour ${u?.name || ''}`.trim());
-      if (u?.role === 'admin') this.router.navigate(['/admin']);
+      if (String(u?.role || '').toLowerCase() === 'admin') this.router.navigate(['/admin']);
       else this.router.navigate(['/']);
     } catch (e: any) {
       this.error = e?.message || 'Email ou mot de passe incorrect';

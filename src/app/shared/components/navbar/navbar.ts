@@ -30,7 +30,7 @@ import { filter, Subscription } from 'rxjs';
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-8">
           <ng-container *ngIf="auth.user() as u; else normalNav">
-            <a *ngIf="u.role==='admin'"
+            <a *ngIf="String(u.role).toLowerCase()==='admin'"
                routerLink="/admin"
                routerLinkActive="text-primary"
                [routerLinkActiveOptions]="{exact: true}"
@@ -47,7 +47,7 @@ import { filter, Subscription } from 'rxjs';
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
             </a>
 
-            <ng-container *ngIf="u.role!=='admin'">
+            <ng-container *ngIf="String(u.role).toLowerCase()!=='admin'">
               <a routerLink="/"
                  routerLinkActive="text-primary"
                  [routerLinkActiveOptions]="{exact: true}"
