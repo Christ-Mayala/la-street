@@ -1,0 +1,14 @@
+{
+  "name": "La STREET · Talents & métiers du Congo",
+  "short_name": "La STREET",
+  "description": "La STREET est la plateforme urbaine des métiers au Congo. Trouvez un pro par catégorie, métier et localité (ville/quartier).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "scope": "/",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
