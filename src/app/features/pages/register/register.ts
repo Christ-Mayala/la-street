@@ -722,6 +722,13 @@ export class RegisterPage {
   private readonly seo = inject(SeoService);
   private readonly toast = inject(ToastService);
 
+  private scrollToTop() {
+    if (typeof window === 'undefined') return;
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+  }
+
   step = 1;
   role: 'client' | 'professional' = 'client';
 
@@ -851,33 +858,50 @@ export class RegisterPage {
   }
 
   prev() {
-    if (this.step > 1) this.step--;
+    if (this.step > 1) {
+      this.step--;
+      this.scrollToTop();
+    }
   }
 
   async onNextOrSubmit() {
     this.globalError = '';
 
     if (this.step < 5) {
+      if (!this.validateCurrentStep()) {
+        this.toast.error('Erreur', this.globalError || 'Veuillez corriger les champs.');
+        this.scrollToTop();
+        return;
+      }
       this.step++;
+      this.scrollToTop();
       return;
     }
 
     if (!this.acceptRules) {
       this.globalError = 'Vous devez accepter les conditions d\'utilisation.';
+      this.toast.error('Erreur', this.globalError);
+      this.scrollToTop();
       return;
     }
 
     if (this.role === 'professional') {
       if (!this.categoryId || !this.tradeId) {
         this.globalError = 'Veuillez sélectionner une catégorie et un métier.';
+        this.toast.error('Erreur', this.globalError);
+        this.scrollToTop();
         return;
       }
       if (!this.ville) {
         this.globalError = 'Veuillez sélectionner une ville.';
+        this.toast.error('Erreur', this.globalError);
+        this.scrollToTop();
         return;
       }
       if (!this.profileImageFile) {
         this.globalError = 'Veuillez ajouter votre photo de profil.';
+        this.toast.error('Erreur', this.globalError);
+        this.scrollToTop();
         return;
       }
     }
@@ -956,6 +980,7 @@ export class RegisterPage {
       }
 
       this.toast.error('Erreur', this.globalError);
+      this.scrollToTop();
     } finally {
       this.isLoading = false;
     }

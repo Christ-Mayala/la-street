@@ -227,6 +227,13 @@ export class LoginPage {
   error = '';
   showPassword = false;
 
+  private scrollToTop() {
+    if (typeof window === 'undefined') return;
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+  }
+
   constructor() {
     this.seo.setTitle('Connexion · La STREET');
     this.seo.updateTags({
@@ -248,6 +255,8 @@ export class LoginPage {
       else this.router.navigate(['/']);
     } catch (e: any) {
       this.error = e?.message || 'Email ou mot de passe incorrect';
+      this.toast.error('Erreur', this.error);
+      this.scrollToTop();
     } finally {
       this.loading = false;
     }
