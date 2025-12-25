@@ -1,3 +1,3 @@
 window.__STREET_CONFIG__ = {
-  apiBaseUrl: 'dryapi.onrender.com',
+  apiBaseUrl: 'https://dryapi.onrender.com',
 };
