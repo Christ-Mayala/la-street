@@ -20,7 +20,7 @@ import { filter, Subscription } from 'rxjs';
             </span>
             <div class="absolute -inset-1 rounded-lg bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <span class="text-lg font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
+          <span class="text-lg font-bold text-white md:bg-gradient-to-r md:from-white md:to-slate-200 md:bg-clip-text md:text-transparent">
             La STREET
           </span>
         </a>
