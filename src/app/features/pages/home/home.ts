@@ -311,7 +311,7 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     const u = this.auth.user();
-    if (u?.role === 'admin') {
+    if (String(u?.role || '').toLowerCase() === 'admin') {
       this.router.navigate(['/admin']);
       return;
     }
