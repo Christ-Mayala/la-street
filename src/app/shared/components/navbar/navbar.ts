@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { filter, Subscription } from 'rxjs';
-import {types} from 'sass';
 
 @Component({
   selector: 'app-navbar',
@@ -31,7 +30,7 @@ import {types} from 'sass';
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-8">
           <ng-container *ngIf="auth.user() as u; else normalNav">
-            <a *ngIf="String(u.role).toLowerCase()==='admin'"
+            <a *ngIf="isAdmin(u)"
                routerLink="/admin"
                routerLinkActive="text-primary"
                [routerLinkActiveOptions]="{exact: true}"
@@ -48,7 +47,7 @@ import {types} from 'sass';
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
             </a>
 
-            <ng-container *ngIf="String(u.role).toLowerCase()!=='admin'">
+            <ng-container *ngIf="!isAdmin(u)">
               <a routerLink="/"
                  routerLinkActive="text-primary"
                  [routerLinkActiveOptions]="{exact: true}"
@@ -388,6 +387,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private routerSubscription!: Subscription;
   private clickListener!: () => void;
 
+  isAdmin(u: any): boolean {
+    return String(u?.role || '').toLowerCase() === 'admin';
+  }
+
   get favCount() {
     return this.favorites.favs().length;
   }
@@ -465,7 +468,4 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .toUpperCase()
       .slice(0, 2);
   }
-
-  protected readonly types = types;
-  protected readonly String = String;
 }
