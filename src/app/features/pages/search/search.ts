@@ -553,4 +553,3 @@ export class SearchPage implements OnInit {
     return hit?.name || 'Métier';
   }
 }
-}

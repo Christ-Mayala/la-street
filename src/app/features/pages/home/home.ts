@@ -7,6 +7,7 @@ import { Professional } from '../../../core/models/professional.model';
 import { ProfessionalCardComponent } from '../../../shared/components/professional-card/professional-card';
 import { SeoService } from '../../../core/services/seo.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SiteStatsService } from '../../../core/services/site-stats.service';
 
 @Component({
   selector: 'app-home',
@@ -298,6 +299,7 @@ export class HomePage implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
+  private readonly stats = inject(SiteStatsService);
 
   q = '';
   ville = '';
@@ -320,7 +322,13 @@ export class HomePage implements OnInit {
 
     this.loadRecommended();
     this.loadProfessionals();
-    this.loadMetaCounts();
+    this.stats.counts().subscribe({
+      next: (c) => {
+        this.totalCities = c?.totalCities || 0;
+        this.totalTrades = c?.totalTrades || 0;
+        if (!this.totalProfessionals) this.totalProfessionals = c?.totalProfessionals || 0;
+      },
+    });
 
     const seo = inject(SeoService);
     seo.setTitle('La STREET · Plateforme des métiers');
@@ -372,83 +380,6 @@ export class HomePage implements OnInit {
     return this.pros().slice(0, 3);
   }
 
-  loadMetaCounts() {
-    const tradeIds = new Set<string>();
-    const villes = new Set<string>();
-
-    this.api.categories().subscribe({
-      next: (cats: any[]) => {
-        const tradeNameById = new Map<string, string>();
-        for (const c of cats || []) {
-          const trades = (c?.trades || c?.tradeIds || c?.metiers || []) as any[];
-          for (const t of trades || []) {
-            const id = String(t?._id || '').trim();
-            const name = String(t?.name || '').trim();
-            if (id && name) tradeNameById.set(id, name);
-          }
-        }
-
-        const loadPage = (page: number) => {
-          this.api.professionalsPaged({ page, limit: 100 }).subscribe({
-            next: (r) => {
-              for (const p of r?.items || []) {
-                const v = String((p as any)?.ville || '').trim();
-                if (v) villes.add(v);
-
-                const t: any = (p as any)?.tradeId;
-                const id = typeof t === 'string' ? t : String(t?._id || '');
-                if (id) tradeIds.add(id);
-              }
-
-              if ((r?.currentPage || page) < (r?.totalPages || 1)) {
-                loadPage(page + 1);
-                return;
-              }
-
-              this.totalCities = villes.size;
-              this.totalTrades = Array.from(tradeIds).filter((id) => tradeNameById.has(id) || id).length;
-            },
-            error: () => {
-              this.totalCities = villes.size;
-              this.totalTrades = tradeIds.size;
-            },
-          });
-        };
-
-        loadPage(1);
-      },
-      error: () => {
-        const loadPage = (page: number) => {
-          this.api.professionalsPaged({ page, limit: 100 }).subscribe({
-            next: (r) => {
-              for (const p of r?.items || []) {
-                const v = String((p as any)?.ville || '').trim();
-                if (v) villes.add(v);
-
-                const t: any = (p as any)?.tradeId;
-                const id = typeof t === 'string' ? t : String(t?._id || '');
-                if (id) tradeIds.add(id);
-              }
-
-              if ((r?.currentPage || page) < (r?.totalPages || 1)) {
-                loadPage(page + 1);
-                return;
-              }
-
-              this.totalCities = villes.size;
-              this.totalTrades = tradeIds.size;
-            },
-            error: () => {
-              this.totalCities = villes.size;
-              this.totalTrades = tradeIds.size;
-            },
-          });
-        };
-
-        loadPage(1);
-      },
-    });
-  }
 
   retryLoading() {
     this.loadProfessionals();

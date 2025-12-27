@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../../core/services/seo.service';
+import { SiteStatsService } from '../../../core/services/site-stats.service';
 
 @Component({
   selector: 'app-about',
@@ -37,15 +38,15 @@ import { SeoService } from '../../../core/services/seo.service';
           <!-- Stats -->
           <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">+500</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalProfessionals | number) }}</div>
               <div class="text-sm text-slate-400">Professionnels</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">+50</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalTrades | number) }}</div>
               <div class="text-sm text-slate-400">Métiers</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">12</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalCities | number) }}</div>
               <div class="text-sm text-slate-400">Villes</div>
             </div>
             <div class="text-center">
@@ -300,7 +301,7 @@ import { SeoService } from '../../../core/services/seo.service';
         </div>
 
         <p class="mt-8 text-sm text-slate-400">
-          Déjà <span class="text-yellow-300 font-semibold">500+ professionnels</span> nous font confiance. Et vous ?
+          Déjà <span class="text-yellow-300 font-semibold">{{ loadingStats ? '…' : (totalProfessionals | number) }} professionnels</span> nous font confiance. Et vous ?
         </p>
       </div>
     </section>
@@ -325,12 +326,32 @@ import { SeoService } from '../../../core/services/seo.service';
     }
   `]
 })
-export class AboutPage {
-  constructor() {
+export class AboutPage implements OnInit {
+  private readonly stats = inject(SiteStatsService);
+
+  loadingStats = true;
+  totalProfessionals = 0;
+  totalTrades = 0;
+  totalCities = 0;
+
+  ngOnInit() {
     const seo = inject(SeoService);
     seo.setTitle('À propos · La STREET - La vitrine des métiers locaux');
     seo.updateTags({
       description: 'Découvrez La STREET, la plateforme qui connecte les habitants aux meilleurs professionnels et artisans locaux en République du Congo. Simple, rapide et fiable.'
+    });
+
+    this.loadingStats = true;
+    this.stats.counts().subscribe({
+      next: (c) => {
+        this.totalProfessionals = c?.totalProfessionals || 0;
+        this.totalTrades = c?.totalTrades || 0;
+        this.totalCities = c?.totalCities || 0;
+        this.loadingStats = false;
+      },
+      error: () => {
+        this.loadingStats = false;
+      },
     });
   }
 }
