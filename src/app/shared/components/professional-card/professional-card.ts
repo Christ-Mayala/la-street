@@ -23,9 +23,9 @@ import { ToastService } from '../../../core/services/toast.service';
         <div class="min-w-0 flex-1">
           <!-- Header -->
           <div class="mb-2">
-            <div class="flex items-start gap-2 min-w-0">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-2 min-w-0">
               <h3 class="min-w-0 flex-1 text-base font-semibold text-white leading-snug clamp-2 text-anywhere" [title]="pro.name">{{ pro.name }}</h3>
-              <span class="badge shrink-0 whitespace-nowrap" [ngClass]="statusBadgeClass(pro.availabilityStatus)">{{ availabilityLabel(pro.availabilityStatus) }}</span>
+              <span class="badge self-start shrink-0 whitespace-nowrap" [ngClass]="statusBadgeClass(pro.availabilityStatus)">{{ availabilityLabel(pro.availabilityStatus) }}</span>
             </div>
           </div>
 
@@ -36,7 +36,7 @@ import { ToastService } from '../../../core/services/toast.service';
           </p>
 
           <!-- Rating -->
-          <div class="flex items-center gap-3 mb-4">
+          <div class="flex flex-wrap items-center gap-3 mb-4">
             <div class="flex items-center gap-1">
               <button
                 type="button"
@@ -63,9 +63,9 @@ import { ToastService } from '../../../core/services/toast.service';
               </button>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
               <span class="text-sm font-bold text-white">{{ (pro.rating ?? 0) | number:'1.1-1' }}</span>
-              <span class="text-xs text-slate-400">({{ getRatingCount() }})</span>
+              <span class="text-xs text-slate-400 whitespace-nowrap">({{ getRatingCount() }})</span>
 
               <!-- Loading indicator -->
               <div *ngIf="ratingLoading" class="flex items-center gap-1 text-xs text-amber-400">

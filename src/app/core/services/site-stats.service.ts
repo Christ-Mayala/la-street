@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { EMPTY, Observable, catchError, defer, expand, last, map, of, shareReplay, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, defer, expand, last, map, of, shareReplay, tap, timeout } from 'rxjs';
 import { ApiService } from './api.service';
 
 export type SiteCounts = {
@@ -22,18 +22,12 @@ export class SiteStatsService {
     const tradeIds = new Set<string>();
     const villes = new Set<string>();
     let totalProfessionals = 0;
+    const limit = 100;
+    const maxPages = 200;
 
-    return this.api.professionalsPaged({ page: 1, limit: 100 }).pipe(
+    return this.api.professionalsPaged({ page: 1, limit }).pipe(
       tap((r) => {
         totalProfessionals = Number(r?.total || 0);
-      }),
-      expand((r) => {
-        const current = Number(r?.currentPage || 1);
-        const totalPages = Number(r?.totalPages || 1);
-        if (current >= totalPages) return EMPTY;
-        return this.api.professionalsPaged({ page: current + 1, limit: 100 });
-      }),
-      tap((r) => {
         for (const p of r?.items || []) {
           const v = String((p as any)?.ville || '').trim();
           if (v) villes.add(v);
@@ -43,12 +37,22 @@ export class SiteStatsService {
           if (id) tradeIds.add(id);
         }
       }),
+      expand((r, idx) => {
+        if (idx + 1 >= maxPages) return EMPTY;
+        const totalPages = Number(r?.totalPages || 0);
+        const itemsLen = (r?.items || []).length;
+        const nextPage = idx + 2;
+        if (totalPages && nextPage > totalPages) return EMPTY;
+        if (!totalPages && itemsLen < limit) return EMPTY;
+        return this.api.professionalsPaged({ page: nextPage, limit });
+      }),
       last(),
       map(() => ({
         totalProfessionals,
         totalTrades: tradeIds.size,
         totalCities: villes.size,
       })),
+      timeout({ first: 12000 }),
       catchError(() => of({ totalProfessionals: 0, totalTrades: 0, totalCities: 0 })),
     );
   }
