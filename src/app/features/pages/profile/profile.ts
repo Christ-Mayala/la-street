@@ -91,6 +91,24 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
               <h2 class="text-xl font-bold text-white">Informations du compte</h2>
             </div>
 
+            <div class="p-4 rounded-xl bg-black/20 border border-slate-800 mb-6">
+              <div class="flex items-center gap-4">
+                <div class="h-16 w-16 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
+                  <img *ngIf="avatarPreview || u.avatarUrl" [src]="avatarPreview || (u.avatarUrl || '')" alt="" class="h-full w-full object-contain bg-black/40" />
+                  <span *ngIf="!(avatarPreview || u.avatarUrl)" class="text-yellow-300 font-bold">{{ u.name?.slice(0, 1) }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-white">Photo de profil</div>
+                  <div class="text-sm text-slate-400">PNG/JPG · 10MB</div>
+                  <div *ngIf="avatarError" class="text-xs text-red-300 mt-1">{{ avatarError }}</div>
+                </div>
+                <label class="px-4 py-2 bg-black/40 border border-slate-700 text-slate-200 text-sm font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 cursor-pointer">
+                  Changer
+                  <input type="file" accept="image/*" class="hidden" (change)="onAvatarChange($event)" />
+                </label>
+              </div>
+            </div>
+
             <div class="space-y-6">
               <!-- Name -->
               <div class="space-y-2">
@@ -234,6 +252,26 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
 
             <!-- Professional Form -->
             <div *ngIf="!loadingPro() && professional() as p" class="space-y-6">
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-slate-300">Photo de profil</label>
+                <div class="p-4 rounded-xl bg-black/20 border border-slate-800">
+                  <div class="flex items-center gap-4">
+                    <div class="h-20 w-20 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
+                      <img *ngIf="proImagePreview || p.profileImage?.url" [src]="proImagePreview || (p.profileImage?.url || '')" alt="" class="h-full w-full object-contain bg-black/40" />
+                      <span *ngIf="!(proImagePreview || p.profileImage?.url)" class="text-yellow-300 font-bold">{{ (p.name || '').slice(0, 1) }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm text-slate-400">Changer la photo du profil public</div>
+                      <div *ngIf="proImageError" class="text-xs text-red-300 mt-1">{{ proImageError }}</div>
+                    </div>
+                    <label class="px-4 py-2 bg-black/40 border border-slate-700 text-slate-200 text-sm font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 cursor-pointer">
+                      Choisir
+                      <input type="file" accept="image/*" class="hidden" (change)="onProImageChange($event)" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <!-- Availability -->
               <div class="space-y-2">
                 <label class="block text-sm font-medium text-slate-300">Statut de disponibilité</label>
@@ -455,12 +493,19 @@ export class ProfilePage implements OnInit {
 
   name = '';
   telephone = '';
+  avatarFile: File | null = null;
+  avatarError = '';
+  avatarPreview = '';
   savingAccount = signal(false);
 
   professional = signal<Professional | null>(null);
   loadingPro = signal(false);
   savingPro = signal(false);
   proError = '';
+
+  proImageFile: File | null = null;
+  proImageError = '';
+  proImagePreview = '';
 
   availability: Availability = 'available';
   proDescription = '';
@@ -501,6 +546,34 @@ export class ProfilePage implements OnInit {
     return 'Indisponible temporairement';
   }
 
+  private validateImageFile(f: File): string {
+    if (!f.type.startsWith('image/')) return "Fichier invalide (image requise).";
+    if (f.size > 10 * 1024 * 1024) return 'Image trop lourde (max 10MB).';
+    return '';
+  }
+
+  onAvatarChange(e: any) {
+    const file: File | null = e?.target?.files?.[0] || null;
+    this.avatarError = '';
+    this.avatarFile = null;
+    this.avatarPreview = '';
+
+    if (!file) return;
+
+    const err = this.validateImageFile(file);
+    if (err) {
+      this.avatarError = err;
+      return;
+    }
+
+    this.avatarFile = file;
+    try {
+      this.avatarPreview = URL.createObjectURL(file);
+    } catch {
+      this.avatarPreview = '';
+    }
+  }
+
   saveAccount() {
     const u = this.auth.user();
     if (!u) {
@@ -510,13 +583,24 @@ export class ProfilePage implements OnInit {
 
     this.savingAccount.set(true);
 
-    this.api.updateMyAccount({ name: this.name, telephone: this.telephone }).subscribe({
+    const payload: any = this.avatarFile ? (() => {
+      const fd = new FormData();
+      fd.append('name', this.name);
+      fd.append('telephone', this.telephone);
+      fd.append('avatar', this.avatarFile as File, (this.avatarFile as File).name);
+      return fd;
+    })() : { name: this.name, telephone: this.telephone };
+
+    this.api.updateMyAccount(payload).subscribe({
       next: (updated) => {
         this.auth.setUser({
           ...u,
+          ...(updated || {}),
           name: updated?.name || this.name,
           ...(updated?.telephone !== undefined ? { telephone: updated.telephone } : {})
         } as any);
+        this.avatarFile = null;
+        this.avatarPreview = '';
         this.toast.success('Profil mis à jour avec succès');
         this.savingAccount.set(false);
       },
@@ -548,20 +632,56 @@ export class ProfilePage implements OnInit {
     });
   }
 
+  onProImageChange(e: any) {
+    const file: File | null = e?.target?.files?.[0] || null;
+    this.proImageError = '';
+    this.proImageFile = null;
+    this.proImagePreview = '';
+
+    if (!file) return;
+
+    const err = this.validateImageFile(file);
+    if (err) {
+      this.proImageError = err;
+      return;
+    }
+
+    this.proImageFile = file;
+    try {
+      this.proImagePreview = URL.createObjectURL(file);
+    } catch {
+      this.proImagePreview = '';
+    }
+  }
+
   saveProfessional() {
     const p = this.professional();
     if (!p?._id) return;
 
     this.savingPro.set(true);
-    this.api.updateMyProfessional({
+
+    const payload: any = this.proImageFile ? (() => {
+      const fd = new FormData();
+      fd.append('availabilityStatus', this.availability);
+      fd.append('description', this.proDescription || '');
+      fd.append('daysAvailable', this.proDays || '');
+      fd.append('hoursAvailable', this.proHours || '');
+      fd.append('preferredContact', this.proPreferredContact);
+      fd.append('profileImage', this.proImageFile as File, (this.proImageFile as File).name);
+      return fd;
+    })() : {
       availabilityStatus: this.availability,
       description: this.proDescription,
       daysAvailable: this.proDays,
       hoursAvailable: this.proHours,
       preferredContact: this.proPreferredContact,
-    } as any).subscribe({
+    };
+
+    this.api.updateMyProfessional(payload).subscribe({
       next: (updated) => {
         this.professional.set(updated);
+        this.proImageFile = null;
+        this.proImagePreview = '';
         this.toast.success('Profil professionnel mis à jour avec succès');
         this.savingPro.set(false);
       },

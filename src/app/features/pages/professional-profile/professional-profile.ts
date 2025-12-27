@@ -56,7 +56,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
               <!-- Avatar -->
               <div class="relative">
                 <div class="h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-400/30 flex items-center justify-center font-bold text-2xl shadow-lg">
-                  <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro.name }}" class="h-full w-full object-cover" />
+                  <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro.name }}" class="h-full w-full object-contain bg-black/40" />
                   <span *ngIf="!avatarUrl" class="text-yellow-300">{{ initials }}</span>
                 </div>
 

@@ -103,6 +103,12 @@ export class ApiService {
       .pipe(map(unwrap));
   }
 
+  adminProfessionalById(id: string): Observable<Professional> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<Professional>();
+    return this.http.get<DryResponse<Professional>>(`${base}${this.prefix}/admin/professionals/${id}`).pipe(map(unwrap));
+  }
+
   adminUpdateProfessionalStatus(id: string, approvalStatus: 'pending' | 'approved' | 'rejected'): Observable<Professional> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<Professional>();
@@ -170,7 +176,7 @@ export class ApiService {
     return this.http.patch<DryResponse<Professional>>(`${base}${this.prefix}/professionals/me`, payload).pipe(map(unwrap));
   }
 
-  updateMyAccount(payload: { name?: string; telephone?: string; nom?: string }): Observable<any> {
+  updateMyAccount(payload: any): Observable<any> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<any>();
     return this.http.patch<DryResponse<any>>(`${base}${this.prefix}/auth/profile`, payload).pipe(map(unwrap));
