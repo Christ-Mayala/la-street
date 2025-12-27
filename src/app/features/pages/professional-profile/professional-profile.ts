@@ -56,7 +56,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
               <!-- Avatar -->
               <div class="relative">
                 <div class="h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-400/30 flex items-center justify-center font-bold text-2xl shadow-lg">
-                  <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro.name }}" class="h-full w-full object-contain bg-black/40" />
+                  <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro.name }}" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
                   <span *ngIf="!avatarUrl" class="text-yellow-300">{{ initials }}</span>
                 </div>
 
@@ -307,7 +307,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
                     class="relative aspect-square rounded-xl overflow-hidden border border-slate-700 group cursor-pointer"
                     (click)="viewImage(img.url)"
                   >
-                    <img [src]="img.url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img [src]="img.url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                   </div>
                 </div>

@@ -93,18 +93,18 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
 
             <div class="p-4 rounded-xl bg-black/20 border border-slate-800 mb-6">
               <div class="flex items-center gap-4">
-                <div class="h-16 w-16 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
-                  <img *ngIf="avatarPreview || u.avatarUrl" [src]="avatarPreview || (u.avatarUrl || '')" alt="" class="h-full w-full object-contain bg-black/40" />
-                  <span *ngIf="!(avatarPreview || u.avatarUrl)" class="text-yellow-300 font-bold">{{ u.name.slice(0, 1) }}</span>
+                <div class="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
+                  <img *ngIf="accountPhotoUrl" [src]="accountPhotoUrl" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
+                  <span *ngIf="!accountPhotoUrl" class="text-yellow-300 font-bold">{{ u.name.slice(0, 1) }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-medium text-white">Photo de profil</div>
                   <div class="text-sm text-slate-400">PNG/JPG · 10MB</div>
-                  <div *ngIf="avatarError" class="text-xs text-red-300 mt-1">{{ avatarError }}</div>
+                  <div *ngIf="accountPhotoError" class="text-xs text-red-300 mt-1">{{ accountPhotoError }}</div>
                 </div>
                 <label class="px-4 py-2 bg-black/40 border border-slate-700 text-slate-200 text-sm font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 cursor-pointer">
                   Changer
-                  <input type="file" accept="image/*" class="hidden" (change)="onAvatarChange($event)" />
+                  <input type="file" accept="image/*" class="hidden" (change)="u.role === 'professional' ? onProImageChange($event) : onAvatarChange($event)" />
                 </label>
               </div>
             </div>
@@ -256,8 +256,8 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                 <label class="block text-sm font-medium text-slate-300">Photo de profil</label>
                 <div class="p-4 rounded-xl bg-black/20 border border-slate-800">
                   <div class="flex items-center gap-4">
-                    <div class="h-20 w-20 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
-                      <img *ngIf="proImagePreview || p.profileImage?.url" [src]="proImagePreview || (p.profileImage?.url || '')" alt="" class="h-full w-full object-contain bg-black/40" />
+                    <div class="h-24 w-24 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
+                      <img *ngIf="proImagePreview || p.profileImage?.url" [src]="proImagePreview || (p.profileImage?.url || '')" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
                       <span *ngIf="!(proImagePreview || p.profileImage?.url)" class="text-yellow-300 font-bold">{{ (p.name || '').slice(0, 1) }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
@@ -498,6 +498,22 @@ export class ProfilePage implements OnInit {
   avatarPreview = '';
   savingAccount = signal(false);
 
+  get accountPhotoUrl() {
+    const u: any = this.auth.user();
+    if (!u) return '';
+    if (String(u.role || '').toLowerCase() === 'professional') {
+      const p: any = this.professional();
+      return this.proImagePreview || p?.profileImage?.url || u.avatarUrl || '';
+    }
+    return this.avatarPreview || u.avatarUrl || '';
+  }
+
+  get accountPhotoError() {
+    const u: any = this.auth.user();
+    if (String(u?.role || '').toLowerCase() === 'professional') return this.proImageError;
+    return this.avatarError;
+  }
+
   professional = signal<Professional | null>(null);
   loadingPro = signal(false);
   savingPro = signal(false);
@@ -622,6 +638,12 @@ export class ProfilePage implements OnInit {
         this.proDays = (p.daysAvailable || []).join(', ');
         this.proHours = p.hoursAvailable || '';
         this.proPreferredContact = (p.preferredContact || 'both') as any;
+
+        const u: any = this.auth.user();
+        if (String(u?.role || '').toLowerCase() === 'professional' && p?.profileImage?.url) {
+          this.auth.setUser({ ...(u || {}), avatarUrl: p.profileImage.url } as any);
+        }
+
         this.loadingPro.set(false);
       },
       error: (e) => {
@@ -680,6 +702,13 @@ export class ProfilePage implements OnInit {
     this.api.updateMyProfessional(payload).subscribe({
       next: (updated) => {
         this.professional.set(updated);
+
+        const u: any = this.auth.user();
+        const url = (updated as any)?.profileImage?.url;
+        if (String(u?.role || '').toLowerCase() === 'professional' && url) {
+          this.auth.setUser({ ...(u || {}), avatarUrl: url } as any);
+        }
+
         this.proImageFile = null;
         this.proImagePreview = '';
         this.toast.success('Profil professionnel mis à jour avec succès');

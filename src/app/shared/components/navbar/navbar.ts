@@ -136,7 +136,7 @@ import { filter, Subscription } from 'rxjs';
               <!-- User Info -->
               <div class="flex items-center gap-2">
                 <div class="h-8 w-8 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center">
-                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-contain bg-black/40" />
+                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
                   <span *ngIf="!u.avatarUrl" class="text-xs font-bold text-primary">{{ getUserInitials(u.name) }}</span>
                 </div>
                 <div class="hidden lg:flex flex-col">
@@ -295,7 +295,7 @@ import { filter, Subscription } from 'rxjs';
             <ng-container *ngIf="auth.user() as u; else guestMobile">
               <div class="flex items-center gap-3 mb-4 p-3 rounded-lg bg-primary/5">
                 <div class="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center">
-                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-contain bg-black/40" />
+                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
                   <span *ngIf="!u.avatarUrl" class="text-sm font-bold text-primary">{{ getUserInitials(u.name) }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
