@@ -591,40 +591,77 @@ export class ProfilePage implements OnInit {
   }
 
   saveAccount() {
-    const u = this.auth.user();
-    if (!u) {
+    const initialUser: any = this.auth.user();
+    if (!initialUser) {
       this.router.navigate(['/login']);
       return;
     }
 
     this.savingAccount.set(true);
 
-    const payload: any = this.avatarFile ? (() => {
-      const fd = new FormData();
-      fd.append('name', this.name);
-      fd.append('telephone', this.telephone);
-      fd.append('avatar', this.avatarFile as File, (this.avatarFile as File).name);
-      return fd;
-    })() : { name: this.name, telephone: this.telephone };
+    const runAccountUpdate = () => {
+      const u: any = this.auth.user();
+      const payload: any = this.avatarFile
+        ? (() => {
+            const fd = new FormData();
+            fd.append('name', this.name);
+            fd.append('telephone', this.telephone);
+            fd.append('avatar', this.avatarFile as File, (this.avatarFile as File).name);
+            return fd;
+          })()
+        : { name: this.name, telephone: this.telephone };
 
-    this.api.updateMyAccount(payload).subscribe({
-      next: (updated) => {
-        this.auth.setUser({
-          ...u,
-          ...(updated || {}),
-          name: updated?.name || this.name,
-          ...(updated?.telephone !== undefined ? { telephone: updated.telephone } : {})
-        } as any);
-        this.avatarFile = null;
-        this.avatarPreview = '';
-        this.toast.success('Profil mis à jour avec succès');
-        this.savingAccount.set(false);
-      },
-      error: (e) => {
-        this.toast.error('Erreur', e?.message || 'Impossible de sauvegarder les modifications');
-        this.savingAccount.set(false);
-      },
-    });
+      this.api.updateMyAccount(payload).subscribe({
+        next: (updated) => {
+          const nextUser = {
+            ...(u || {}),
+            ...(updated || {}),
+            name: updated?.name || this.name,
+            ...(updated?.telephone !== undefined ? { telephone: updated.telephone } : {}),
+          } as any;
+
+          this.auth.setUser(nextUser);
+          this.avatarFile = null;
+          this.avatarPreview = '';
+          this.toast.success('Profil mis à jour avec succès');
+          this.savingAccount.set(false);
+        },
+        error: (e) => {
+          this.toast.error('Erreur', e?.message || 'Impossible de sauvegarder les modifications');
+          this.savingAccount.set(false);
+        },
+      });
+    };
+
+    if (String(initialUser.role || '').toLowerCase() === 'professional' && this.proImageFile) {
+      const fd = new FormData();
+      fd.append('profileImage', this.proImageFile as File, (this.proImageFile as File).name);
+
+      this.api.updateMyProfessional(fd).subscribe({
+        next: (updatedPro) => {
+          this.professional.set(updatedPro);
+
+          const u: any = this.auth.user();
+          const url = (updatedPro as any)?.profileImage?.url;
+          if (url) {
+            this.auth.setUser({ ...(u || {}), avatarUrl: url } as any);
+          }
+
+          this.proImageFile = null;
+          this.proImagePreview = '';
+
+          runAccountUpdate();
+        },
+        error: (e) => {
+          this.toast.error('Erreur', e?.message || 'Impossible de mettre à jour la photo professionnelle');
+          this.savingAccount.set(false);
+        },
+      });
+
+      return;
+    }
+
+    runAccountUpdate();
   }
 
   reloadProfessional() {

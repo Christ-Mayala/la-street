@@ -53,13 +53,17 @@ import { SeoService } from '../../../core/services/seo.service';
                   <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                   </svg>
-                  <input
-                    [(ngModel)]="q"
-                    name="q"
-                    type="text"
-                    placeholder="Métier (ex: Plombier, Électricien)"
-                    class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                  />
+                  <select
+                    [(ngModel)]="tradeId"
+                    name="tradeId"
+                    class="w-full pl-12 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
+                  >
+                    <option [ngValue]="''">Tous les métiers</option>
+                    <option *ngFor="let t of tradeOptions" [ngValue]="t.id">{{ t.name }}</option>
+                  </select>
+                  <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </div>
 
                 <div class="relative">
@@ -130,8 +134,8 @@ import { SeoService } from '../../../core/services/seo.service';
             </h2>
             <p class="mt-2 text-slate-300">{{ subtitle }}</p>
 
-            <div *ngIf="q || ville || quartier" class="mt-3 flex flex-wrap items-center gap-2">
-              <span *ngIf="q" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Métier : {{ q }}</span>
+            <div *ngIf="tradeId || ville || quartier" class="mt-3 flex flex-wrap items-center gap-2">
+              <span *ngIf="tradeId" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Métier : {{ tradeName(tradeId) }}</span>
               <span *ngIf="ville" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Ville : {{ ville }}</span>
               <span *ngIf="quartier" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Quartier : {{ quartier }}</span>
               <button
@@ -326,7 +330,9 @@ export class SearchPage implements OnInit {
   error = '';
   loading = true;
 
-  q = '';
+  tradeId = '';
+  tradeOptions: Array<{ id: string; name: string }> = [];
+
   ville = '';
   quartier = '';
 
@@ -334,16 +340,18 @@ export class SearchPage implements OnInit {
   pageSize = 9;
 
   ngOnInit() {
+    this.loadTrades();
+
     this.route.queryParamMap.subscribe((qp) => {
       this.loading = true;
-      this.q = qp.get('q') || '';
+      this.tradeId = qp.get('tradeId') || '';
       this.ville = qp.get('ville') || '';
       this.quartier = qp.get('quartier') || '';
       this.page = Math.max(1, parseInt(qp.get('page') || '1', 10) || 1);
 
       // Update subtitle
       const pieces = [] as string[];
-      if (this.q) pieces.push(`Métier : ${this.q}`);
+      if (this.tradeId) pieces.push(`Métier : ${this.tradeName(this.tradeId)}`);
       if (this.ville) pieces.push(`Ville : ${this.ville}`);
       if (this.quartier) pieces.push(`Quartier : ${this.quartier}`);
       this.subtitle = pieces.length ? pieces.join(' · ') : 'Tous les professionnels approuvés';
@@ -360,7 +368,7 @@ export class SearchPage implements OnInit {
 
       // Load all professionals
       this.api.professionals({
-        q: this.q || undefined,
+        tradeId: this.tradeId || undefined,
         ville: this.ville || undefined,
         quartier: this.quartier || undefined
       }).subscribe({
@@ -391,9 +399,9 @@ export class SearchPage implements OnInit {
     let title = 'Recherche de professionnels';
     let description = 'Trouvez les meilleurs professionnels près de chez vous';
 
-    if (this.q || this.ville || this.quartier) {
+    if (this.tradeId || this.ville || this.quartier) {
       const filters = [];
-      if (this.q) filters.push(`métier : ${this.q}`);
+      if (this.tradeId) filters.push(`métier : ${this.tradeName(this.tradeId)}`);
       if (this.ville) filters.push(`ville : ${this.ville}`);
       if (this.quartier) filters.push(`quartier : ${this.quartier}`);
 
@@ -407,7 +415,7 @@ export class SearchPage implements OnInit {
 
   doSearch() {
     const qp: any = {};
-    if (this.q) qp.q = this.q;
+    if (this.tradeId) qp.tradeId = this.tradeId;
     if (this.ville) qp.ville = this.ville;
     if (this.quartier) qp.quartier = this.quartier;
     qp.page = 1;
@@ -415,7 +423,7 @@ export class SearchPage implements OnInit {
   }
 
   clearFilters() {
-    this.q = '';
+    this.tradeId = '';
     this.ville = '';
     this.quartier = '';
     this.doSearch();
@@ -481,5 +489,41 @@ export class SearchPage implements OnInit {
   }
 
   trackByProfessional = (_: number, p: Professional) => p._id || p.name;
+
+  loadTrades() {
+    if (this.tradeOptions.length) return;
+
+    this.api.categories().subscribe({
+      next: (cats: any[]) => {
+        const out: Array<{ id: string; name: string }> = [];
+        for (const c of cats || []) {
+          const trades = (c?.trades || c?.tradeIds || c?.metiers || []) as any[];
+          for (const t of trades || []) {
+            const id = String(t?._id || '').trim();
+            const name = String(t?.name || '').trim();
+            if (!id || !name) continue;
+            out.push({ id, name });
+          }
+        }
+
+        const seen = new Set<string>();
+        this.tradeOptions = out
+          .filter((x) => {
+            if (seen.has(x.id)) return false;
+            seen.add(x.id);
+            return true;
+          })
+          .sort((a, b) => a.name.localeCompare(b.name));
+      },
+      error: () => {
+        this.tradeOptions = [];
+      },
+    });
+  }
+
+  tradeName(id: string): string {
+    const hit = (this.tradeOptions || []).find((x) => x.id === id);
+    return hit?.name || 'Métier';
+  }
 }
 }

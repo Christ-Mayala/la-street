@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SeoService } from '../../../core/services/seo.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Professional } from '../../../core/models/professional.model';
 
 @Component({
@@ -159,8 +160,12 @@ import { Professional } from '../../../core/models/professional.model';
               </div>
               <div *ngIf="r.message" class="mt-2 text-sm text-slate-300">{{ r.message }}</div>
               <div class="mt-3 flex gap-2">
-                <button class="btn-outline" (click)="decide(r, 'keep')" [disabled]="r.status!=='open'">Garder</button>
-                <button class="btn-primary" (click)="decide(r, 'delete')" [disabled]="r.status!=='open'">Supprimer user</button>
+                <button type="button" class="btn-outline" (click)="decide(r, 'keep')" [disabled]="r.status!=='open' || isDeciding(r)">
+                  {{ isDeciding(r) ? '...' : 'Garder' }}
+                </button>
+                <button type="button" class="btn-primary" (click)="decide(r, 'delete')" [disabled]="r.status!=='open' || isDeciding(r)">
+                  {{ isDeciding(r) ? '...' : 'Supprimer user' }}
+                </button>
               </div>
             </div>
             <div *ngIf="reports.length===0" class="text-sm text-slate-300">Aucun signalement.</div>
@@ -269,6 +274,7 @@ import { Professional } from '../../../core/models/professional.model';
 export class AdminDashboardPage {
   private readonly api = inject(ApiService);
   private readonly seo = inject(SeoService);
+  private readonly toast = inject(ToastService);
 
   selectedProOpen = false;
   selectedProLoading = false;
@@ -282,6 +288,7 @@ export class AdminDashboardPage {
   pros: Professional[] = [];
   users: any[] = [];
   reports: any[] = [];
+  private readonly decidingReports = new Set<string>();
   stats: any = { professionals: 0, pending: 0, approved: 0, rejected: 0, users: 0 };
 
   proStatusFilter: 'pending' | 'approved' | 'rejected' = 'pending';
@@ -376,14 +383,31 @@ export class AdminDashboardPage {
     });
   }
 
-  decide(r: any, decision: 'keep' | 'delete') {
-    if (!r?._id) return;
-    if (!confirm(`${decision === 'delete' ? 'Supprimer' : 'Garder'} l'utilisateur signalé ?`)) return;
+  isDeciding(r: any): boolean {
+    const id = String(r?._id || '');
+    if (!id) return false;
+    return this.decidingReports.has(id);
+  }
 
-    const note = prompt('Note (optionnel)') || '';
-    this.api.adminReportDecision(r._id, { decision, note: note || undefined }).subscribe({
-      next: () => this.reload(),
-      error: (e) => (this.error = e?.message || 'Erreur décision signalement'),
+  decide(r: any, decision: 'keep' | 'delete') {
+    const id = String(r?._id || '');
+    if (!id) return;
+    if (this.decidingReports.has(id)) return;
+
+    this.decidingReports.add(id);
+
+    this.api.adminReportDecision(id, { decision }).subscribe({
+      next: () => {
+        this.toast.success('Signalement', 'Traité');
+        this.decidingReports.delete(id);
+        this.reload();
+      },
+      error: (e) => {
+        const msg = e?.error?.message || e?.message || 'Erreur décision signalement';
+        this.error = msg;
+        this.toast.error('Erreur', msg);
+        this.decidingReports.delete(id);
+      },
     });
   }
 
