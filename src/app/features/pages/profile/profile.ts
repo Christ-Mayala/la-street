@@ -95,7 +95,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
               <div class="flex items-center gap-4">
                 <div class="h-16 w-16 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
                   <img *ngIf="avatarPreview || u.avatarUrl" [src]="avatarPreview || (u.avatarUrl || '')" alt="" class="h-full w-full object-contain bg-black/40" />
-                  <span *ngIf="!(avatarPreview || u.avatarUrl)" class="text-yellow-300 font-bold">{{ u.name?.slice(0, 1) }}</span>
+                  <span *ngIf="!(avatarPreview || u.avatarUrl)" class="text-yellow-300 font-bold">{{ u.name.slice(0, 1) }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-medium text-white">Photo de profil</div>

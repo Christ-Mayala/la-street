@@ -63,7 +63,7 @@ import { Professional } from '../../../core/models/professional.model';
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div class="flex items-start gap-3 min-w-0">
                     <div class="h-12 w-12 rounded-full overflow-hidden border border-yellow-400/25 bg-black/40 flex items-center justify-center shrink-0">
-                      <img *ngIf="p.profileImage?.url" [src]="p.profileImage.url" alt="" class="h-full w-full object-contain bg-black/40" />
+                      <img *ngIf="p.profileImage?.url" [src]="p.profileImage?.url" alt="" class="h-full w-full object-contain bg-black/40" />
                       <span *ngIf="!p.profileImage?.url" class="text-yellow-300 font-bold">{{ (p.name || '?').slice(0, 1) }}</span>
                     </div>
                     <div class="min-w-0">
@@ -192,7 +192,7 @@ import { Professional } from '../../../core/models/professional.model';
               <div *ngIf="!selectedProLoading && selectedPro" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="md:col-span-1">
                   <div class="aspect-square rounded-2xl overflow-hidden border border-slate-800 bg-black/40 flex items-center justify-center">
-                    <img *ngIf="selectedPro.profileImage?.url" [src]="selectedPro.profileImage.url" alt="" class="w-full h-full object-contain bg-black/40" />
+                    <img *ngIf="selectedPro.profileImage?.url" [src]="selectedPro.profileImage?.url" alt="" class="w-full h-full object-contain bg-black/40" />
                     <div *ngIf="!selectedPro.profileImage?.url" class="text-yellow-300 font-bold text-3xl">{{ (selectedPro.name || '?').slice(0, 1) }}</div>
                   </div>
 
