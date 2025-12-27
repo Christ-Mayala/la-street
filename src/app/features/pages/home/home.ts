@@ -7,6 +7,7 @@ import { Professional } from '../../../core/models/professional.model';
 import { ProfessionalCardComponent } from '../../../shared/components/professional-card/professional-card';
 import { SeoService } from '../../../core/services/seo.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SiteStatsService } from '../../../core/services/site-stats.service';
 
 @Component({
   selector: 'app-home',
@@ -47,15 +48,15 @@ import { AuthService } from '../../../core/services/auth.service';
           <!-- Stats -->
           <div class="mt-10 flex flex-wrap gap-8">
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">{{ totalProfessionals }}+</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalProfessionals }}</div>
               <div class="text-sm text-slate-400">Professionnels</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">50+</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalTrades }}</div>
               <div class="text-sm text-slate-400">Métiers</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">12</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalCities }}</div>
               <div class="text-sm text-slate-400">Villes</div>
             </div>
           </div>
@@ -298,12 +299,15 @@ export class HomePage implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
+  private readonly stats = inject(SiteStatsService);
 
   q = '';
   ville = '';
   loadingPros = true;
   loadingRecommended = true;
   totalProfessionals = 0;
+  totalTrades = 0;
+  totalCities = 0;
 
   readonly pros = signal<Professional[]>([]);
   readonly recommended = signal<Professional[]>([]);
@@ -318,6 +322,13 @@ export class HomePage implements OnInit {
 
     this.loadRecommended();
     this.loadProfessionals();
+    this.stats.counts().subscribe({
+      next: (c) => {
+        this.totalCities = c?.totalCities || 0;
+        this.totalTrades = c?.totalTrades || 0;
+        if (!this.totalProfessionals) this.totalProfessionals = c?.totalProfessionals || 0;
+      },
+    });
 
     const seo = inject(SeoService);
     seo.setTitle('La STREET · Plateforme des métiers');
@@ -349,17 +360,11 @@ export class HomePage implements OnInit {
     this.loadingPros = true;
     this.error = '';
 
-    this.api.professionals().subscribe({
-      next: (list) => {
-        // Trier par date de création (les plus récents d'abord)
-        const sortedList = (list || []).sort((a, b) => {
-          const dateA = new Date(a.createdAt || 0).getTime();
-          const dateB = new Date(b.createdAt || 0).getTime();
-          return dateB - dateA; // Décroissant
-        });
-
-        this.pros.set(sortedList);
-        this.totalProfessionals = list?.length || 0;
+    this.api.professionalsPaged({ page: 1, limit: 50 }).subscribe({
+      next: (r) => {
+        const items = r?.items || [];
+        this.pros.set(items);
+        this.totalProfessionals = r?.total || 0;
         this.loadingPros = false;
       },
       error: (e) => {
@@ -374,6 +379,7 @@ export class HomePage implements OnInit {
   getLastThreeProfessionals(): Professional[] {
     return this.pros().slice(0, 3);
   }
+
 
   retryLoading() {
     this.loadProfessionals();
