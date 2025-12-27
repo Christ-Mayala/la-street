@@ -47,15 +47,15 @@ import { AuthService } from '../../../core/services/auth.service';
           <!-- Stats -->
           <div class="mt-10 flex flex-wrap gap-8">
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">{{ totalProfessionals }}+</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalProfessionals }}</div>
               <div class="text-sm text-slate-400">Professionnels</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">50+</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalTrades }}</div>
               <div class="text-sm text-slate-400">Métiers</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">12</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalCities }}</div>
               <div class="text-sm text-slate-400">Villes</div>
             </div>
           </div>
@@ -304,6 +304,8 @@ export class HomePage implements OnInit {
   loadingPros = true;
   loadingRecommended = true;
   totalProfessionals = 0;
+  totalTrades = 0;
+  totalCities = 0;
 
   readonly pros = signal<Professional[]>([]);
   readonly recommended = signal<Professional[]>([]);
@@ -318,6 +320,7 @@ export class HomePage implements OnInit {
 
     this.loadRecommended();
     this.loadProfessionals();
+    this.loadMetaCounts();
 
     const seo = inject(SeoService);
     seo.setTitle('La STREET · Plateforme des métiers');
@@ -349,17 +352,11 @@ export class HomePage implements OnInit {
     this.loadingPros = true;
     this.error = '';
 
-    this.api.professionals().subscribe({
-      next: (list) => {
-        // Trier par date de création (les plus récents d'abord)
-        const sortedList = (list || []).sort((a, b) => {
-          const dateA = new Date(a.createdAt || 0).getTime();
-          const dateB = new Date(b.createdAt || 0).getTime();
-          return dateB - dateA; // Décroissant
-        });
-
-        this.pros.set(sortedList);
-        this.totalProfessionals = list?.length || 0;
+    this.api.professionalsPaged({ page: 1, limit: 50 }).subscribe({
+      next: (r) => {
+        const items = r?.items || [];
+        this.pros.set(items);
+        this.totalProfessionals = r?.total || 0;
         this.loadingPros = false;
       },
       error: (e) => {
@@ -373,6 +370,84 @@ export class HomePage implements OnInit {
   // Méthode pour récupérer les 3 derniers profils
   getLastThreeProfessionals(): Professional[] {
     return this.pros().slice(0, 3);
+  }
+
+  loadMetaCounts() {
+    const tradeIds = new Set<string>();
+    const villes = new Set<string>();
+
+    this.api.categories().subscribe({
+      next: (cats: any[]) => {
+        const tradeNameById = new Map<string, string>();
+        for (const c of cats || []) {
+          const trades = (c?.trades || c?.tradeIds || c?.metiers || []) as any[];
+          for (const t of trades || []) {
+            const id = String(t?._id || '').trim();
+            const name = String(t?.name || '').trim();
+            if (id && name) tradeNameById.set(id, name);
+          }
+        }
+
+        const loadPage = (page: number) => {
+          this.api.professionalsPaged({ page, limit: 100 }).subscribe({
+            next: (r) => {
+              for (const p of r?.items || []) {
+                const v = String((p as any)?.ville || '').trim();
+                if (v) villes.add(v);
+
+                const t: any = (p as any)?.tradeId;
+                const id = typeof t === 'string' ? t : String(t?._id || '');
+                if (id) tradeIds.add(id);
+              }
+
+              if ((r?.currentPage || page) < (r?.totalPages || 1)) {
+                loadPage(page + 1);
+                return;
+              }
+
+              this.totalCities = villes.size;
+              this.totalTrades = Array.from(tradeIds).filter((id) => tradeNameById.has(id) || id).length;
+            },
+            error: () => {
+              this.totalCities = villes.size;
+              this.totalTrades = tradeIds.size;
+            },
+          });
+        };
+
+        loadPage(1);
+      },
+      error: () => {
+        const loadPage = (page: number) => {
+          this.api.professionalsPaged({ page, limit: 100 }).subscribe({
+            next: (r) => {
+              for (const p of r?.items || []) {
+                const v = String((p as any)?.ville || '').trim();
+                if (v) villes.add(v);
+
+                const t: any = (p as any)?.tradeId;
+                const id = typeof t === 'string' ? t : String(t?._id || '');
+                if (id) tradeIds.add(id);
+              }
+
+              if ((r?.currentPage || page) < (r?.totalPages || 1)) {
+                loadPage(page + 1);
+                return;
+              }
+
+              this.totalCities = villes.size;
+              this.totalTrades = tradeIds.size;
+            },
+            error: () => {
+              this.totalCities = villes.size;
+              this.totalTrades = tradeIds.size;
+            },
+          });
+        };
+
+        loadPage(1);
+      },
+    });
   }
 
   retryLoading() {

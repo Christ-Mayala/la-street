@@ -94,7 +94,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
             <div class="p-4 rounded-xl bg-black/20 border border-slate-800 mb-6">
               <div class="flex items-center gap-4">
                 <div class="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
-                  <img *ngIf="accountPhotoUrl" [src]="accountPhotoUrl" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
+                  <img *ngIf="accountPhotoUrl" [src]="accountPhotoUrl" alt="" class="h-full w-full object-cover" loading="lazy" decoding="async" />
                   <span *ngIf="!accountPhotoUrl" class="text-yellow-300 font-bold">{{ u.name.slice(0, 1) }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -256,8 +256,8 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                 <label class="block text-sm font-medium text-slate-300">Photo de profil</label>
                 <div class="p-4 rounded-xl bg-black/20 border border-slate-800">
                   <div class="flex items-center gap-4">
-                    <div class="h-24 w-24 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
-                      <img *ngIf="proImagePreview || p.profileImage?.url" [src]="proImagePreview || (p.profileImage?.url || '')" alt="" class="h-full w-full object-contain bg-black/40" loading="lazy" decoding="async" />
+                    <div class="h-28 w-28 rounded-full overflow-hidden border border-yellow-400/30 bg-black/40 flex items-center justify-center">
+                      <img *ngIf="proImagePreview || p.profileImage?.url" [src]="proImagePreview || (p.profileImage?.url || '')" alt="" class="h-full w-full object-cover" loading="lazy" decoding="async" />
                       <span *ngIf="!(proImagePreview || p.profileImage?.url)" class="text-yellow-300 font-bold">{{ (p.name || '').slice(0, 1) }}</span>
                     </div>
                     <div class="flex-1 min-w-0">

@@ -67,6 +67,32 @@ export class ApiService {
       .pipe(map((r) => unwrap(r).items || []));
   }
 
+  professionalsPaged(params?: {
+    ville?: string;
+    quartier?: string;
+    categoryId?: string;
+    tradeId?: string;
+    q?: string;
+    page?: number;
+    limit?: number;
+  }): Observable<{ items: Professional[]; total: number; totalPages: number; currentPage: number }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ items: Professional[]; total: number; totalPages: number; currentPage: number }>();
+
+    let httpParams = new HttpParams();
+    if (params?.ville) httpParams = httpParams.set('ville', params.ville);
+    if (params?.quartier) httpParams = httpParams.set('quartier', params.quartier);
+    if (params?.categoryId) httpParams = httpParams.set('categoryId', params.categoryId);
+    if (params?.tradeId) httpParams = httpParams.set('tradeId', params.tradeId);
+    if (params?.q) httpParams = httpParams.set('q', params.q);
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.limit) httpParams = httpParams.set('limit', String(params.limit));
+
+    return this.http
+      .get<DryResponse<{ items: Professional[]; total: number; totalPages: number; currentPage: number }>>(`${base}${this.prefix}/professionals`, { params: httpParams })
+      .pipe(map(unwrap));
+  }
+
   professionalById(id: string): Observable<Professional> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<Professional>();

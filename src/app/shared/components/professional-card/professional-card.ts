@@ -15,8 +15,8 @@ import { ToastService } from '../../../core/services/toast.service';
     <article class="card p-4 hover:shadow-lg transition-shadow duration-200 rounded-lg border border-slate-800 bg-black/30 hover:bg-black/40 overflow-hidden">
       <div class="flex items-start gap-3 sm:gap-4">
         <!-- Avatar -->
-        <div class="h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 text-primary flex items-center justify-center font-bold text-lg border border-yellow-400/30">
-          <img *ngIf="avatarUrl" [src]="avatarUrl" class="w-full h-full object-contain bg-black/40" alt="" loading="lazy" decoding="async" />
+        <div class="h-14 w-14 sm:h-16 sm:w-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 text-primary flex items-center justify-center font-bold text-lg border border-yellow-400/30">
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="w-full h-full object-cover" alt="" loading="lazy" decoding="async" />
           <span *ngIf="!avatarUrl" class="text-yellow-300">{{ initials }}</span>
         </div>
 

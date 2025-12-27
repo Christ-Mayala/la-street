@@ -130,7 +130,7 @@ import { SeoService } from '../../../core/services/seo.service';
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-2xl md:text-3xl font-bold text-white">
-              <span class="text-yellow-400">{{ results.length }}</span> professionnels trouvés
+              <span class="text-yellow-400">{{ totalResults }}</span> professionnels trouvés
             </h2>
             <p class="mt-2 text-slate-300">{{ subtitle }}</p>
 
@@ -183,7 +183,7 @@ import { SeoService } from '../../../core/services/seo.service';
       <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold text-white">Tous les résultats</h3>
-          <span class="text-sm text-slate-400">{{ results.length }} {{ results.length === 1 ? 'profil' : 'profils' }}</span>
+          <span class="text-sm text-slate-400">{{ totalResults }} {{ totalResults === 1 ? 'profil' : 'profils' }}</span>
         </div>
 
         <!-- Loading State -->
@@ -192,14 +192,14 @@ import { SeoService } from '../../../core/services/seo.service';
         </div>
 
         <!-- Results Grid -->
-        <div *ngIf="!loading && results.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngIf="!loading && totalResults > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <app-professional-card *ngFor="let p of pagedResults(); trackBy: trackByProfessional" [pro]="p" />
         </div>
 
-        <div *ngIf="!loading && results.length > pageSize" class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div *ngIf="!loading && totalResults > pageSize" class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="text-sm text-slate-400">
             Affichage <span class="text-yellow-300 font-medium">{{ pageStart() }}</span>–<span class="text-yellow-300 font-medium">{{ pageEnd() }}</span>
-            sur <span class="text-yellow-300 font-medium">{{ results.length }}</span>
+            sur <span class="text-yellow-300 font-medium">{{ totalResults }}</span>
           </div>
 
           <nav class="flex items-center gap-2" aria-label="Pagination">
@@ -243,7 +243,7 @@ import { SeoService } from '../../../core/services/seo.service';
         </div>
 
         <!-- No Results -->
-        <div *ngIf="!loading && results.length === 0" class="text-center py-16 bg-black/30 rounded-2xl border border-slate-800">
+        <div *ngIf="!loading && totalResults === 0" class="text-center py-16 bg-black/30 rounded-2xl border border-slate-800">
           <svg class="w-16 h-16 mx-auto mb-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
@@ -325,6 +325,9 @@ export class SearchPage implements OnInit {
   private readonly seo = inject(SeoService);
 
   results: Professional[] = [];
+  totalResults = 0;
+  totalPagesApi = 1;
+
   recommended: Professional[] = [];
   subtitle = '';
   error = '';
@@ -367,19 +370,23 @@ export class SearchPage implements OnInit {
       });
 
       // Load all professionals
-      this.api.professionals({
+      this.api.professionalsPaged({
         tradeId: this.tradeId || undefined,
         ville: this.ville || undefined,
-        quartier: this.quartier || undefined
+        quartier: this.quartier || undefined,
+        page: this.page,
+        limit: this.pageSize,
       }).subscribe({
-        next: (list) => {
+        next: (r) => {
           this.error = '';
-          this.results = list || [];
+          this.results = r?.items || [];
+          this.totalResults = r?.total || 0;
+          this.totalPagesApi = r?.totalPages || 1;
           this.loading = false;
 
-          const tp = this.totalPages();
-          if (this.page > tp) {
-            this.page = tp;
+          if (this.page > this.totalPagesApi) {
+            this.goToPage(this.totalPagesApi);
+            return;
           }
 
           // Update SEO
@@ -439,20 +446,19 @@ export class SearchPage implements OnInit {
   }
 
   totalPages(): number {
-    return Math.max(1, Math.ceil((this.results?.length || 0) / this.pageSize));
+    return Math.max(1, this.totalPagesApi || 1);
   }
 
   pagedResults(): Professional[] {
-    const start = (this.page - 1) * this.pageSize;
-    return (this.results || []).slice(start, start + this.pageSize);
+    return this.results || [];
   }
 
   pageStart(): number {
-    return this.results.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    return this.totalResults ? (this.page - 1) * this.pageSize + 1 : 0;
   }
 
   pageEnd(): number {
-    return Math.min(this.results.length, this.page * this.pageSize);
+    return Math.min(this.totalResults || 0, this.page * this.pageSize);
   }
 
   pages(): Array<number | '…'> {
@@ -495,25 +501,46 @@ export class SearchPage implements OnInit {
 
     this.api.categories().subscribe({
       next: (cats: any[]) => {
-        const out: Array<{ id: string; name: string }> = [];
+        const byId = new Map<string, string>();
         for (const c of cats || []) {
           const trades = (c?.trades || c?.tradeIds || c?.metiers || []) as any[];
           for (const t of trades || []) {
             const id = String(t?._id || '').trim();
             const name = String(t?.name || '').trim();
             if (!id || !name) continue;
-            out.push({ id, name });
+            byId.set(id, name);
           }
         }
 
-        const seen = new Set<string>();
-        this.tradeOptions = out
-          .filter((x) => {
-            if (seen.has(x.id)) return false;
-            seen.add(x.id);
-            return true;
-          })
-          .sort((a, b) => a.name.localeCompare(b.name));
+        const used = new Set<string>();
+        const limit = 100;
+
+        const loadPage = (page: number) => {
+          this.api.professionalsPaged({ page, limit }).subscribe({
+            next: (r) => {
+              for (const p of r?.items || []) {
+                const t: any = (p as any)?.tradeId;
+                const id = typeof t === 'string' ? t : String(t?._id || '');
+                if (id) used.add(id);
+              }
+
+              if ((r?.currentPage || page) < (r?.totalPages || 1)) {
+                loadPage(page + 1);
+                return;
+              }
+
+              this.tradeOptions = Array.from(used)
+                .map((id) => ({ id, name: byId.get(id) || '' }))
+                .filter((x) => x.id && x.name)
+                .sort((a, b) => a.name.localeCompare(b.name));
+            },
+            error: () => {
+              this.tradeOptions = [];
+            },
+          });
+        };
+
+        loadPage(1);
       },
       error: () => {
         this.tradeOptions = [];
