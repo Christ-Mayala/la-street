@@ -12,25 +12,25 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <article class="card p-4 hover:shadow-lg transition-shadow duration-200 rounded-lg border border-slate-800 bg-black/30 hover:bg-black/40">
-      <div class="flex items-start gap-4">
+    <article class="card p-4 hover:shadow-lg transition-shadow duration-200 rounded-lg border border-slate-800 bg-black/30 hover:bg-black/40 overflow-hidden">
+      <div class="flex items-start gap-3 sm:gap-4">
         <!-- Avatar -->
-        <div class="h-14 w-14 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 text-primary flex items-center justify-center font-bold text-lg border border-yellow-400/30">
+        <div class="h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 text-primary flex items-center justify-center font-bold text-lg border border-yellow-400/30">
           <img *ngIf="avatarUrl" [src]="avatarUrl" class="w-full h-full object-cover" alt="" />
           <span *ngIf="!avatarUrl" class="text-yellow-300">{{ initials }}</span>
         </div>
 
         <div class="min-w-0 flex-1">
           <!-- Header -->
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-semibold text-white truncate">{{ pro.name }}</h3>
-              <span class="badge" [ngClass]="statusBadgeClass(pro.availabilityStatus)">{{ availabilityLabel(pro.availabilityStatus) }}</span>
+          <div class="mb-2">
+            <div class="flex items-start gap-2 min-w-0">
+              <h3 class="min-w-0 flex-1 text-base font-semibold text-white leading-snug clamp-2 text-anywhere" [title]="pro.name">{{ pro.name }}</h3>
+              <span class="badge shrink-0 whitespace-nowrap" [ngClass]="statusBadgeClass(pro.availabilityStatus)">{{ availabilityLabel(pro.availabilityStatus) }}</span>
             </div>
           </div>
 
           <!-- Location & Trade -->
-          <p class="text-sm text-slate-300 truncate mb-4">
+          <p class="text-sm text-slate-300 clamp-2 text-anywhere mb-4" [title]="tradeLabel + ' · ' + pro.ville + (pro.quartier ? ' · ' + pro.quartier : '')">
             {{ tradeLabel }} · {{ pro.ville }}
             <span *ngIf="pro.quartier"> · {{ pro.quartier }}</span>
           </p>
@@ -79,7 +79,7 @@ import { ToastService } from '../../../core/services/toast.service';
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-2 items-center">
+          <div class="flex flex-wrap gap-2 items-center">
             <button
               class="px-4 py-2 bg-transparent border border-slate-700 text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-800/50 hover:border-slate-600 hover:text-white transition-all duration-200"
               (click)="viewProfile()"

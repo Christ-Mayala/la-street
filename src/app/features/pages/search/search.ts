@@ -129,6 +129,19 @@ import { SeoService } from '../../../core/services/seo.service';
               <span class="text-yellow-400">{{ results.length }}</span> professionnels trouvés
             </h2>
             <p class="mt-2 text-slate-300">{{ subtitle }}</p>
+
+            <div *ngIf="q || ville || quartier" class="mt-3 flex flex-wrap items-center gap-2">
+              <span *ngIf="q" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Métier : {{ q }}</span>
+              <span *ngIf="ville" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Ville : {{ ville }}</span>
+              <span *ngIf="quartier" class="badge bg-yellow-400/10 text-yellow-200 border-yellow-400/20">Quartier : {{ quartier }}</span>
+              <button
+                type="button"
+                class="ml-auto text-sm px-3 py-2 rounded-lg border border-slate-700 bg-black/30 text-slate-200 hover:bg-black/50 transition-colors"
+                (click)="clearFilters()"
+              >
+                Tout effacer
+              </button>
+            </div>
           </div>
 
           <div class="flex items-center gap-3">
@@ -176,7 +189,53 @@ import { SeoService } from '../../../core/services/seo.service';
 
         <!-- Results Grid -->
         <div *ngIf="!loading && results.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <app-professional-card *ngFor="let p of results" [pro]="p" />
+          <app-professional-card *ngFor="let p of pagedResults(); trackBy: trackByProfessional" [pro]="p" />
+        </div>
+
+        <div *ngIf="!loading && results.length > pageSize" class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-slate-400">
+            Affichage <span class="text-yellow-300 font-medium">{{ pageStart() }}</span>–<span class="text-yellow-300 font-medium">{{ pageEnd() }}</span>
+            sur <span class="text-yellow-300 font-medium">{{ results.length }}</span>
+          </div>
+
+          <nav class="flex items-center gap-2" aria-label="Pagination">
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg border border-slate-700 bg-black/30 text-slate-200 hover:bg-black/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              [disabled]="page <= 1"
+              (click)="goToPage(page - 1)"
+            >
+              Précédent
+            </button>
+
+            <div class="hidden sm:flex items-center gap-1">
+              <ng-container *ngFor="let p of pages()">
+                <span *ngIf="p === '…'" class="px-2 text-slate-500">…</span>
+                <button
+                  *ngIf="p !== '…'"
+                  type="button"
+                  class="min-w-9 px-3 py-2 rounded-lg border transition-colors"
+                  [ngClass]="p === page ? 'border-yellow-400/40 bg-yellow-400/10 text-yellow-200' : 'border-slate-700 bg-black/30 text-slate-200 hover:bg-black/50'"
+                  (click)="goToPage($any(p))"
+                >
+                  {{ p }}
+                </button>
+              </ng-container>
+            </div>
+
+            <div class="sm:hidden text-sm text-slate-300 px-2">
+              Page <span class="text-yellow-300 font-medium">{{ page }}</span>/<span class="text-yellow-300 font-medium">{{ totalPages() }}</span>
+            </div>
+
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg border border-slate-700 bg-black/30 text-slate-200 hover:bg-black/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              [disabled]="page >= totalPages()"
+              (click)="goToPage(page + 1)"
+            >
+              Suivant
+            </button>
+          </nav>
         </div>
 
         <!-- No Results -->
@@ -271,12 +330,16 @@ export class SearchPage implements OnInit {
   ville = '';
   quartier = '';
 
+  page = 1;
+  pageSize = 9;
+
   ngOnInit() {
     this.route.queryParamMap.subscribe((qp) => {
       this.loading = true;
       this.q = qp.get('q') || '';
       this.ville = qp.get('ville') || '';
       this.quartier = qp.get('quartier') || '';
+      this.page = Math.max(1, parseInt(qp.get('page') || '1', 10) || 1);
 
       // Update subtitle
       const pieces = [] as string[];
@@ -305,6 +368,11 @@ export class SearchPage implements OnInit {
           this.error = '';
           this.results = list || [];
           this.loading = false;
+
+          const tp = this.totalPages();
+          if (this.page > tp) {
+            this.page = tp;
+          }
 
           // Update SEO
           this.updateSeo();
@@ -342,6 +410,7 @@ export class SearchPage implements OnInit {
     if (this.q) qp.q = this.q;
     if (this.ville) qp.ville = this.ville;
     if (this.quartier) qp.quartier = this.quartier;
+    qp.page = 1;
     this.router.navigate([], { queryParams: qp });
   }
 
@@ -360,4 +429,57 @@ export class SearchPage implements OnInit {
   getAvailableCount(): number {
     return this.results.filter(p => p.availabilityStatus === 'available').length;
   }
+
+  totalPages(): number {
+    return Math.max(1, Math.ceil((this.results?.length || 0) / this.pageSize));
+  }
+
+  pagedResults(): Professional[] {
+    const start = (this.page - 1) * this.pageSize;
+    return (this.results || []).slice(start, start + this.pageSize);
+  }
+
+  pageStart(): number {
+    return this.results.length ? (this.page - 1) * this.pageSize + 1 : 0;
+  }
+
+  pageEnd(): number {
+    return Math.min(this.results.length, this.page * this.pageSize);
+  }
+
+  pages(): Array<number | '…'> {
+    const total = this.totalPages();
+    const current = this.page;
+
+    if (total <= 7) {
+      const all: number[] = [];
+      for (let i = 1; i <= total; i++) all.push(i);
+      return all;
+    }
+
+    const out: Array<number | '…'> = [1];
+
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    if (start > 2) out.push('…');
+    for (let p = start; p <= end; p++) out.push(p);
+    if (end < total - 1) out.push('…');
+
+    out.push(total);
+    return out;
+  }
+
+  goToPage(p: number) {
+    const tp = this.totalPages();
+    const next = Math.min(tp, Math.max(1, p));
+    if (next === this.page) return;
+
+    this.page = next;
+    this.router.navigate([], { queryParams: { page: next }, queryParamsHandling: 'merge' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  trackByProfessional = (_: number, p: Professional) => p._id || p.name;
+}
 }
