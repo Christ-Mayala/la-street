@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../../core/services/seo.service';
@@ -38,15 +38,15 @@ import { SiteStatsService } from '../../../core/services/site-stats.service';
           <!-- Stats -->
           <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalProfessionals | number) }}</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalProfessionals }}</div>
               <div class="text-sm text-slate-400">Professionnels</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalTrades | number) }}</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalTrades }}</div>
               <div class="text-sm text-slate-400">Métiers</div>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-yellow-400">{{ loadingStats ? '…' : (totalCities | number) }}</div>
+              <div class="text-3xl font-bold text-yellow-400">{{ totalCities }}</div>
               <div class="text-sm text-slate-400">Villes</div>
             </div>
             <div class="text-center">
@@ -269,6 +269,55 @@ import { SiteStatsService } from '../../../core/services/site-stats.service';
       </div>
     </section>
 
+    <!-- CyberFusion Section -->
+    <section class="container py-16">
+      <div class="max-w-4xl mx-auto bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-8 md:p-12">
+        <div class="text-center mb-8">
+          <span class="inline-block px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 text-sm font-medium text-yellow-300 mb-4">
+            À l’origine du projet
+          </span>
+          <h2 class="text-3xl md:text-4xl font-bold text-white">
+            CyberFusion Group
+          </h2>
+        </div>
+
+        <p class="text-lg text-slate-300 text-center max-w-3xl mx-auto">
+          <strong class="text-white">La STREET</strong> est une initiative conçue et développée par
+          <strong class="text-yellow-400">CyberFusion Group</strong>, un studio africain de solutions digitales
+          fondé en République du Congo.
+        </p>
+
+        <p class="mt-6 text-slate-300 text-center max-w-3xl mx-auto">
+          CyberFusion Group accompagne les organisations, entrepreneurs et talents locaux
+          dans leur transformation numérique à travers le développement web et mobile,
+          le conseil stratégique, la formation et l’innovation responsable.
+        </p>
+
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div>
+            <div class="text-xl font-bold text-yellow-400">Innovation utile</div>
+            <p class="text-sm text-slate-400 mt-2">
+              Des produits pensés pour des usages réels et des contextes locaux.
+            </p>
+          </div>
+
+          <div>
+            <div class="text-xl font-bold text-yellow-400">Éthique & impact</div>
+            <p class="text-sm text-slate-400 mt-2">
+              Accessibilité, souveraineté des données et impact humain au cœur des décisions.
+            </p>
+          </div>
+
+          <div>
+            <div class="text-xl font-bold text-yellow-400">Afrique first</div>
+            <p class="text-sm text-slate-400 mt-2">
+              Des solutions construites en Afrique, pour l’Afrique et au-delà.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="container py-16">
       <div class="bg-gradient-to-r from-yellow-400/10 via-black/30 to-yellow-400/10 rounded-2xl border border-yellow-400/20 p-8 md:p-12 text-center">
@@ -301,7 +350,7 @@ import { SiteStatsService } from '../../../core/services/site-stats.service';
         </div>
 
         <p class="mt-8 text-sm text-slate-400">
-          Déjà <span class="text-yellow-300 font-semibold">{{ loadingStats ? '…' : (totalProfessionals | number) }} professionnels</span> nous font confiance. Et vous ?
+          Déjà <span class="text-yellow-300 font-semibold">{{ totalProfessionals }} professionnels</span> nous font confiance. Et vous ?
         </p>
       </div>
     </section>
@@ -328,29 +377,33 @@ import { SiteStatsService } from '../../../core/services/site-stats.service';
 })
 export class AboutPage implements OnInit {
   private readonly stats = inject(SiteStatsService);
+  private readonly seo = inject(SeoService);
 
-  loadingStats = true;
   totalProfessionals = 0;
   totalTrades = 0;
   totalCities = 0;
 
+  constructor() {}
+
   ngOnInit() {
-    const seo = inject(SeoService);
-    seo.setTitle('À propos · La STREET - La vitrine des métiers locaux');
-    seo.updateTags({
+    this.seo.setTitle('À propos · La STREET - La vitrine des métiers locaux');
+    this.seo.updateTags({
       description: 'Découvrez La STREET, la plateforme qui connecte les habitants aux meilleurs professionnels et artisans locaux en République du Congo. Simple, rapide et fiable.'
     });
 
-    this.loadingStats = true;
+    this.loadStats();
+  }
+
+  loadStats() {
     this.stats.counts().subscribe({
       next: (c) => {
+        console.log('Données reçues de l\'API:', c);
         this.totalProfessionals = c?.totalProfessionals || 0;
         this.totalTrades = c?.totalTrades || 0;
         this.totalCities = c?.totalCities || 0;
-        this.loadingStats = false;
       },
-      error: () => {
-        this.loadingStats = false;
+      error: (e) => {
+        console.error('Erreur lors de la récupération des statistiques:', e);
       },
     });
   }

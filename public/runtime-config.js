@@ -1,3 +1,3 @@
 window.__STREET_CONFIG__ = {
-  apiBaseUrl: '',
+  apiBaseUrl: 'http://localhost:5000/',
 };

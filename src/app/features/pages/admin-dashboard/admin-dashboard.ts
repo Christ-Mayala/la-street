@@ -172,22 +172,24 @@ import { Professional } from '../../../core/models/professional.model';
           </div>
         </div>
 
-
-        <div *ngIf="selectedProOpen" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div class="w-full max-w-3xl bg-black/90 rounded-2xl border border-slate-800 shadow-2xl">
-            <div class="flex items-center justify-between p-5 border-b border-slate-800">
-              <div class="min-w-0">
-                <div class="text-lg font-semibold text-white truncate">Détails professionnel</div>
-                <div class="text-sm text-slate-400 truncate">{{ selectedPro?.name || '—' }}</div>
+        <!-- Modal optimisé pour mobile et desktop -->
+        <div *ngIf="selectedProOpen" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto">
+          <div class="w-full max-w-3xl bg-black/90 rounded-2xl border border-slate-800 shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 z-10 bg-black/90 p-5 border-b border-slate-800">
+              <div class="flex items-center justify-between">
+                <div class="min-w-0">
+                  <div class="text-lg font-semibold text-white truncate">Détails professionnel</div>
+                  <div class="text-sm text-slate-400 truncate">{{ selectedPro?.name || '—' }}</div>
+                </div>
+                <button type="button" class="p-2 rounded-lg hover:bg-slate-800/50 transition-colors" (click)="closeProfessional()">
+                  <svg class="w-5 h-5 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
               </div>
-              <button type="button" class="p-2 rounded-lg hover:bg-slate-800/50 transition-colors" (click)="closeProfessional()">
-                <svg class="w-5 h-5 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
             </div>
 
-            <div class="p-5">
+            <div class="p-5 pb-8">
               <div *ngIf="selectedProLoading" class="py-12 flex justify-center">
                 <div class="h-10 w-10 rounded-full border-2 border-yellow-400/20 border-t-yellow-400 animate-spin"></div>
               </div>
@@ -255,21 +257,142 @@ import { Professional } from '../../../core/models/professional.model';
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
 
-                  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 pt-2">
-                    <button type="button" class="btn-outline" (click)="closeProfessional()">Fermer</button>
-                    <button *ngIf="selectedPro.approvalStatus !== 'approved'" type="button" class="btn-primary" (click)="setStatus(selectedPro, 'approved')">Approuver</button>
-                    <button *ngIf="selectedPro.approvalStatus !== 'rejected'" type="button" class="btn-outline" (click)="setStatus(selectedPro, 'rejected')">Rejeter</button>
-                  </div>
+            <!-- Boutons fixés en bas sur mobile -->
+            <div class="sticky bottom-0 left-0 right-0 bg-black/90 border-t border-slate-800 p-4 md:hidden">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+                <button type="button" class="btn-outline w-full" (click)="closeProfessional()">Fermer</button>
+                <div class="flex gap-2">
+                  <button *ngIf="selectedPro.approvalStatus !== 'approved'" type="button" class="btn-primary flex-1" (click)="setStatus(selectedPro, 'approved')">Approuver</button>
+                  <button *ngIf="selectedPro.approvalStatus !== 'rejected'" type="button" class="btn-outline flex-1" (click)="setStatus(selectedPro, 'rejected')">Rejeter</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Boutons normaux sur desktop -->
+        <div class="hidden md:block">
+          <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>
+        </div>
       </div>
     </section>
   `,
+  styles: [`
+    /* Styles pour le modal mobile */
+    @media (max-width: 767px) {
+      .modal-mobile-fullscreen {
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .modal-content-mobile {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .modal-mobile-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(128, 128, 128, 0.3);
+      }
+
+      /* Styles pour les cartes */
+      .card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(128, 128, 128, 0.3);
+        backdrop-filter: blur(5px);
+      }
+
+      /* Styles pour les boutons */
+      .btn-primary {
+        background: #f59e0b;
+        color: #000;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        border: none;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #f59e0b;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #f59e0b;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .btn-primary:hover, .btn-outline:hover {
+        transform: translateY(-1px);
+      }
+
+      /* Style pour les badges */
+      .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        border-width: 1px;
+      }
+    }
+
+    /* Styles pour desktop */
+    @media (min-width: 768px) {
+      .modal-desktop {
+        max-width: 80vw;
+        max-height: 90vh;
+        margin: 2rem auto;
+        border-radius: 1rem;
+      }
+
+      .card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(128, 128, 128, 0.2);
+        backdrop-filter: blur(8px);
+      }
+    }
+
+    /* Styles communs */
+    .input-modern {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .input-modern:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Clamp text */
+    .clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .text-anywhere {
+      word-break: break-word;
+    }
+  `]
 })
 export class AdminDashboardPage {
   private readonly api = inject(ApiService);
