@@ -6,8 +6,11 @@ import { APP_ENV } from '../config/app-env';
 
 type DryResponse<T> = { success: boolean; message: string; data: T; timestamp: string };
 
+// Convention backend: le serveur renvoie {success, message, data}.
+// Si success=false, on lève une erreur avec un message lisible (pas de message système).
+
 const unwrap = <T>(r: DryResponse<T>): T => {
-  if (!r?.success) throw new Error(r?.message || 'Erreur API');
+  if (!r?.success) throw new Error(String(r?.message || 'Une erreur est survenue.'));
   return r.data;
 };
 
@@ -37,23 +40,21 @@ export class ApiService {
     return this.safeBaseUrl();
   }
 
-  private baseOrError<T>(hint?: string): Observable<T> {
-    const base = this.baseUrl();
-    const msg = hint
-      ? `API non disponible: ${hint}`
-      : `API non disponible. Configure public/runtime-config.js (window.__STREET_CONFIG__.apiBaseUrl) ou NG_APP_API_BASE_URL/VITE_API_BASE_URL. Valeur actuelle: ${base || '(vide)'}`;
-    return throwError(() => new Error(msg));
+  // Quand l'API n'est pas joignable (mauvaise config, mixed-content, CORS, serveur down),
+  // on renvoie un message utilisateur simple.
+  private baseOrError<T>(): Observable<T> {
+    return throwError(() => new Error('Connexion impossible. Vérifiez votre connexion internet et réessayez.'));
   }
 
   categories(): Observable<any[]> {
     const base = this.safeBaseUrl();
-    if (!base) return this.baseOrError<any[]>('Base URL manquante ou invalide (env NG_APP_/VITE_, CORS / mixed-content)');
+    if (!base) return this.baseOrError<any[]>();
     return this.http.get<DryResponse<any[]>>(`${base}${this.prefix}/categories`).pipe(map(unwrap));
   }
 
   professionals(params?: { ville?: string; quartier?: string; categoryId?: string; tradeId?: string; q?: string }): Observable<Professional[]> {
     const base = this.safeBaseUrl();
-    if (!base) return this.baseOrError<Professional[]>('Base URL manquante ou invalide (env NG_APP_/VITE_, CORS / mixed-content)');
+    if (!base) return this.baseOrError<Professional[]>();
 
     let httpParams = new HttpParams();
     if (params?.ville) httpParams = httpParams.set('ville', params.ville);
@@ -151,11 +152,18 @@ export class ApiService {
     return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/admin/professionals/${id}`).pipe(map(unwrap));
   }
 
-  adminUsers(): Observable<{ items: any[]; total?: number }> {
+  adminUsers(params?: { status?: 'active' | 'inactive' | 'deleted' | 'all'; role?: string; search?: string; page?: number; limit?: number }): Observable<{ items: any[]; total?: number; totalPages?: number; currentPage?: number }> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<{ items: any[]; total?: number }>();
 
-    return this.http.get<DryResponse<{ items: any[]; total: number }>>(`${base}${this.prefix}/admin/users`).pipe(map(unwrap));
+    let httpParams = new HttpParams();
+    if (params?.status) httpParams = httpParams.set('status', params.status);
+    if (params?.role) httpParams = httpParams.set('role', params.role);
+    if (params?.search) httpParams = httpParams.set('search', params.search);
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.limit) httpParams = httpParams.set('limit', String(params.limit));
+
+    return this.http.get<DryResponse<{ items: any[]; total: number; totalPages?: number; currentPage?: number }>>(`${base}${this.prefix}/admin/users`, { params: httpParams }).pipe(map(unwrap));
   }
 
   adminCreateUser(payload: { name: string; email: string; password: string; role: string; telephone?: string }): Observable<any> {
@@ -170,6 +178,27 @@ export class ApiService {
     if (!base) return this.baseOrError<any>();
 
     return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/admin/users/${id}`).pipe(map(unwrap));
+  }
+
+  adminUpdateUserStatus(id: string, payload: { status: 'active' | 'inactive'; restore?: boolean }): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+
+    return this.http.patch<DryResponse<any>>(`${base}${this.prefix}/admin/users/${id}/status`, payload).pipe(map(unwrap));
+  }
+
+  adminSendUserEmail(id: string, payload: { subject: string; message: string }): Observable<{ to: string }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ to: string }>();
+
+    return this.http.post<DryResponse<{ to: string }>>(`${base}${this.prefix}/admin/users/${id}/email`, payload).pipe(map(unwrap));
+  }
+
+  adminBroadcastEmail(payload: { audience: 'users' | 'professionals'; subject: string; message: string }): Observable<{ attempted: number; sent: number; failed: number }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ attempted: number; sent: number; failed: number }>();
+
+    return this.http.post<DryResponse<{ attempted: number; sent: number; failed: number }>>(`${base}${this.prefix}/admin/email/broadcast`, payload).pipe(map(unwrap));
   }
 
   adminAudits(): Observable<any[]> {

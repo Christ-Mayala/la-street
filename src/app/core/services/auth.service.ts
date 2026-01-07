@@ -7,8 +7,11 @@ import { APP_ENV } from '../config/app-env';
 
 type DryResponse<T> = { success: boolean; message: string; data: T; timestamp: string };
 
+// Service Auth (LaStreet): gère login/register + persistance du user.
+// Important: ne jamais remonter des erreurs techniques à l'UI (messages simples uniquement).
+
 const unwrap = <T>(r: DryResponse<T>): T => {
-  if (!r?.success) throw new Error(r?.message || 'Erreur API');
+  if (!r?.success) throw new Error(String(r?.message || 'Une erreur est survenue.'));
   return r.data;
 };
 
@@ -50,6 +53,7 @@ export class AuthService {
     this.saveUser(u);
   }
 
+  // Empêche les appels API si mixed-content (page https -> API http) en prod.
   private safeBaseUrl(): string {
     const url = this.apiBaseUrl();
     if (!url) return '';
@@ -89,7 +93,7 @@ export class AuthService {
     }
 
     const base = this.safeBaseUrl();
-    if (!base) throw new Error('API base URL non configurée');
+    if (!base) throw new Error('Connexion impossible. Vérifiez votre connexion internet et réessayez.');
 
     const res = await firstValueFrom(
       this.http.post<DryResponse<{ token: string; user: any }>>(
@@ -121,7 +125,7 @@ export class AuthService {
     telephone?: string
   }) {
     const base = this.safeBaseUrl();
-    if (!base) throw new Error('API base URL non configurée');
+    if (!base) throw new Error('Connexion impossible. Vérifiez votre connexion internet et réessayez.');
 
     // Enregistrer l'utilisateur seulement, sans login automatique
     const res = await firstValueFrom(

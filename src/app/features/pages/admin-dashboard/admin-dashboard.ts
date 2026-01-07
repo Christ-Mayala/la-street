@@ -46,10 +46,19 @@ import { Professional } from '../../../core/models/professional.model';
           </div>
         </div>
 
-        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="card p-4">
+        <div class="mt-6 overflow-x-auto">
+          <div class="inline-flex gap-2 p-1 rounded-xl border border-slate-800 bg-black/20">
+            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='users' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='users'">Users</button>
+            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='pros' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='pros'">Pros</button>
+            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='reports' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='reports'">Reports</button>
+            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='email' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='email'; ensureEmailRecipients()">Email</button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div *ngIf="activeTab==='pros'" class="card p-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h3 class="font-semibold">Professionnels</h3>
+              <h3 class="font-semibold">Professionnels <span *ngIf="prosLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
               <div class="flex gap-2">
                 <select class="input-modern !py-1 !rounded-lg" [(ngModel)]="proStatusFilter" name="proStatusFilter" (change)="reloadPros()">
                   <option value="pending">En attente</option>
@@ -59,6 +68,8 @@ import { Professional } from '../../../core/models/professional.model';
                 <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="proSearch" name="proSearch" placeholder="Rechercher..." />
               </div>
             </div>
+            <div *ngIf="prosError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ prosError }}</div>
+            <div *ngIf="prosLoading" class="mt-3 text-sm text-slate-300">Chargement des professionnels...</div>
             <div class="mt-3 space-y-3">
               <div *ngFor="let p of filteredPros; trackBy: trackByEntity" class="p-3 rounded-xl border border-slate-800 bg-black/20">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -81,10 +92,10 @@ import { Professional } from '../../../core/models/professional.model';
                   </div>
 
                   <div class="flex flex-wrap gap-2">
-                    <button class="btn-outline" (click)="openProfessional(p)">Voir</button>
-                    <button *ngIf="p.approvalStatus!=='approved'" class="btn-primary" (click)="setStatus(p, 'approved')">Approuver</button>
-                    <button *ngIf="p.approvalStatus!=='rejected'" class="btn-outline" (click)="setStatus(p, 'rejected')">Rejeter</button>
-                    <button class="btn-outline" (click)="deleteProfessional(p)">Supprimer</button>
+                    <button class="btn-outline" (click)="openProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Voir' }}</button>
+                    <button *ngIf="p.approvalStatus!=='approved'" class="btn-primary" (click)="setStatus(p, 'approved')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Approuver' }}</button>
+                    <button *ngIf="p.approvalStatus!=='rejected'" class="btn-outline" (click)="setStatus(p, 'rejected')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Rejeter' }}</button>
+                    <button class="btn-outline" (click)="deleteProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Supprimer' }}</button>
                   </div>
                 </div>
               </div>
@@ -92,23 +103,33 @@ import { Professional } from '../../../core/models/professional.model';
             </div>
           </div>
 
-          <div class="card p-4">
-            <div class="flex items-center justify-between gap-3">
-              <h3 class="font-semibold">Utilisateurs</h3>
-              <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="userSearch" name="userSearch" placeholder="Rechercher..." />
+          <div *ngIf="activeTab==='users'" class="card p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h3 class="font-semibold">Utilisateurs <span *ngIf="usersLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
+              <div class="flex gap-2">
+                <select class="input-modern !py-1 !rounded-lg" [(ngModel)]="userStatusFilter" name="userStatusFilter" (change)="reloadUsers()">
+                  <option value="active">Actifs</option>
+                  <option value="inactive">Désactivés</option>
+                  <option value="deleted">Supprimés</option>
+                  <option value="all">Tous</option>
+                </select>
+                <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="userSearch" name="userSearch" placeholder="Rechercher..." (input)="reloadUsers()" />
+              </div>
             </div>
+            <div *ngIf="usersError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ usersError }}</div>
+            <div *ngIf="usersLoading" class="mt-3 text-sm text-slate-300">Chargement des utilisateurs...</div>
             <div class="mt-3">
               <form class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-3" (submit)="createUser($event)">
-                <input [(ngModel)]="newUserName" name="newUserName" placeholder="Nom" class="rounded border px-2 py-1" required />
-                <input [(ngModel)]="newUserEmail" name="newUserEmail" placeholder="Email" class="rounded border px-2 py-1" required />
-                <input [(ngModel)]="newUserPassword" name="newUserPassword" placeholder="Mot de passe" type="password" class="rounded border px-2 py-1" required minlength="6" />
-                <select [(ngModel)]="newUserRole" name="newUserRole" class="rounded border px-2 py-1">
+                <input [(ngModel)]="newUserName" name="newUserName" placeholder="Nom" class="input-modern !py-2 !rounded-lg" required />
+                <input [(ngModel)]="newUserEmail" name="newUserEmail" placeholder="Email" class="input-modern !py-2 !rounded-lg" required />
+                <input [(ngModel)]="newUserPassword" name="newUserPassword" placeholder="Mot de passe" type="password" class="input-modern !py-2 !rounded-lg" required minlength="6" />
+                <select [(ngModel)]="newUserRole" name="newUserRole" class="input-modern !py-2 !rounded-lg">
                   <option value="user">User</option>
                   <option value="professional">Professionnel</option>
                   <option value="admin">Admin</option>
                 </select>
-                <input [(ngModel)]="newUserTelephone" name="newUserTelephone" placeholder="Téléphone (optionnel)" class="rounded border px-2 py-1 md:col-span-2" />
-                <button class="btn-primary md:col-span-2" type="submit">Créer</button>
+                <input [(ngModel)]="newUserTelephone" name="newUserTelephone" placeholder="Téléphone (optionnel)" class="input-modern !py-2 !rounded-lg md:col-span-2" />
+                <button class="btn-primary md:col-span-2" type="submit" [disabled]="createUserLoading">{{ createUserLoading ? 'Création...' : 'Créer' }}</button>
               </form>
 
               <div class="space-y-2">
@@ -117,28 +138,40 @@ import { Professional } from '../../../core/models/professional.model';
                     <div class="font-medium">{{ u.name }}</div>
                     <div class="text-xs text-slate-400">{{ u.email }} · {{ u.role }}<span *ngIf="u.telephone"> · {{ u.telephone }}</span></div>
                   </div>
-                  <div class="flex gap-2">
-                    <button class="btn-outline" (click)="deleteUser(u)">Supprimer</button>
+                  <div class="flex flex-wrap gap-2">
+                    <button class="btn-outline" type="button" (click)="prefillEmail(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Email' }}</button>
+                    <button *ngIf="(u.status||'') !== 'inactive' && !(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="setUserStatus(u, 'inactive')" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Désactiver' }}</button>
+                    <button *ngIf="(u.status||'') === 'inactive'" class="btn-outline" type="button" (click)="setUserStatus(u, 'active')" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Activer' }}</button>
+                    <button *ngIf="(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="restoreUser(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Restaurer' }}</button>
+                    <button *ngIf="!(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="deleteUser(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Supprimer' }}</button>
                   </div>
                 </div>
                 <div *ngIf="users.length===0" class="text-sm text-slate-300">Aucun utilisateur.</div>
+              </div>
+
+              <div class="mt-4 p-3 rounded-xl border border-slate-800 bg-black/20 text-sm text-slate-300">
+                Onglet <span class="text-yellow-300 font-semibold">Email</span> pour envoyer des messages (individuel ou broadcast).
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mt-6 card p-4">
+        </div>
+
+        <div *ngIf="activeTab==='reports'" class="card p-4">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h3 class="font-semibold">Signalements</h3>
+            <h3 class="font-semibold">Signalements <span *ngIf="reportsLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
             <div class="flex gap-2">
               <select class="input-modern !py-1 !rounded-lg" [(ngModel)]="reportStatusFilter" name="reportStatusFilter" (change)="reloadReports()">
                 <option value="open">Ouverts</option>
                 <option value="resolved">Traités</option>
               </select>
               <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="reportSearch" name="reportSearch" placeholder="Rechercher..." />
-              <button class="btn-outline" (click)="reloadReports()">Rafraîchir</button>
+              <button class="btn-outline" (click)="reloadReports()" [disabled]="reportsLoading">{{ reportsLoading ? '...' : 'Rafraîchir' }}</button>
             </div>
           </div>
+          <div *ngIf="reportsError" class="mb-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ reportsError }}</div>
+          <div *ngIf="reportsLoading" class="text-sm text-slate-300">Chargement des signalements...</div>
           <div class="mt-3 space-y-2">
             <div *ngFor="let r of filteredReports; trackBy: trackByEntity" class="p-3 border rounded">
               <div class="text-sm text-slate-200">
@@ -169,6 +202,42 @@ import { Professional } from '../../../core/models/professional.model';
               </div>
             </div>
             <div *ngIf="reports.length===0" class="text-sm text-slate-300">Aucun signalement.</div>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab==='email'" class="card p-4">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-semibold">Email <span *ngIf="emailSending || broadcastSending" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
+          </div>
+
+          <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="p-3 rounded-xl border border-slate-800 bg-black/20">
+              <div class="font-semibold mb-2">Email individuel</div>
+              <form class="grid grid-cols-1 gap-2" (submit)="sendUserEmail($event)">
+                <select [(ngModel)]="emailUserId" name="emailUserId" class="input-modern !py-2 !rounded-lg" required>
+                  <option value="" disabled>Sélectionner un utilisateur</option>
+                  <option *ngFor="let u of emailRecipients; trackBy: trackByEntity" [value]="u._id">{{ u.name }} · {{ u.email }}</option>
+                </select>
+                <div *ngIf="emailRecipientsLoading" class="text-xs text-slate-400">Chargement des destinataires...</div>
+                <input [(ngModel)]="emailSubject" name="emailSubject" placeholder="Sujet" class="input-modern !py-2 !rounded-lg" required minlength="3" />
+                <textarea [(ngModel)]="emailMessage" name="emailMessage" placeholder="Message" class="input-modern !py-2 !rounded-lg" rows="5" required minlength="3"></textarea>
+                <button class="btn-primary" type="submit" [disabled]="emailSending">{{ emailSending ? 'Envoi...' : 'Envoyer' }}</button>
+              </form>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-800 bg-black/20">
+              <div class="font-semibold mb-2">Broadcast</div>
+              <form class="grid grid-cols-1 gap-2" (submit)="broadcastEmail($event)">
+                <select [(ngModel)]="broadcastAudience" name="broadcastAudience" class="input-modern !py-2 !rounded-lg" required>
+                  <option value="users">Tous les utilisateurs</option>
+                  <option value="professionals">Tous les professionnels</option>
+                </select>
+                <input [(ngModel)]="broadcastSubject" name="broadcastSubject" placeholder="Sujet" class="input-modern !py-2 !rounded-lg" required minlength="3" />
+                <textarea [(ngModel)]="broadcastMessage" name="broadcastMessage" placeholder="Message" class="input-modern !py-2 !rounded-lg" rows="5" required minlength="3"></textarea>
+                <button class="btn-primary" type="submit" [disabled]="broadcastSending">{{ broadcastSending ? 'Envoi...' : 'Envoyer à tous' }}</button>
+              </form>
+              <div class="text-xs text-slate-400 mt-2">Envoi en lot. Utilise la config email DRY (FROM_NAME = La STREET).</div>
+            </div>
           </div>
         </div>
 
@@ -278,7 +347,6 @@ import { Professional } from '../../../core/models/professional.model';
         <div class="hidden md:block">
           <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>
         </div>
-      </div>
     </section>
   `,
   styles: [`
@@ -395,9 +463,13 @@ import { Professional } from '../../../core/models/professional.model';
   `]
 })
 export class AdminDashboardPage {
+  // Dashboard admin: gestion pros, utilisateurs et signalements.
+  // Objectif: actions cohérentes (suppression -> disparition immédiate) + messages d'erreur lisibles.
   private readonly api = inject(ApiService);
   private readonly seo = inject(SeoService);
   private readonly toast = inject(ToastService);
+
+  activeTab: 'users' | 'pros' | 'reports' | 'email' = 'users';
 
   selectedProOpen = false;
   selectedProLoading = false;
@@ -408,14 +480,28 @@ export class AdminDashboardPage {
   trackByEntity = (_: number, x: any) => x?._id || x?.id || x?.email || x?.name || _;
   trackByImg = (_: number, x: any) => x?.public_id || x?.url || _;
 
+  statsLoading = false;
+  prosLoading = false;
+  usersLoading = false;
+  reportsLoading = false;
+
+  statsError = '';
+  prosError = '';
+  usersError = '';
+  reportsError = '';
+
+  private readonly actingPros = new Set<string>();
+  private readonly actingUsers = new Set<string>();
+  private readonly decidingReports = new Set<string>();
+
   pros: Professional[] = [];
   users: any[] = [];
   reports: any[] = [];
-  private readonly decidingReports = new Set<string>();
   stats: any = { professionals: 0, pending: 0, approved: 0, rejected: 0, users: 0 };
 
   proStatusFilter: 'pending' | 'approved' | 'rejected' = 'pending';
   proSearch = '';
+  userStatusFilter: 'active' | 'inactive' | 'deleted' | 'all' = 'active';
   userSearch = '';
   reportStatusFilter: 'open' | 'resolved' = 'open';
   reportSearch = '';
@@ -432,14 +518,7 @@ export class AdminDashboardPage {
   }
 
   get filteredUsers() {
-    const q = (this.userSearch || '').toLowerCase().trim();
-    if (!q) return this.users;
-    return (this.users || []).filter((u: any) =>
-      String(u?.name || '').toLowerCase().includes(q) ||
-      String(u?.email || '').toLowerCase().includes(q) ||
-      String(u?.telephone || '').toLowerCase().includes(q) ||
-      String(u?.role || '').toLowerCase().includes(q)
-    );
+    return this.users;
   }
 
   get filteredReports() {
@@ -460,6 +539,21 @@ export class AdminDashboardPage {
   newUserTelephone = '';
   newUserRole: 'user' | 'professional' | 'admin' = 'user';
 
+  emailRecipients: any[] = [];
+  emailRecipientsLoading = false;
+
+  emailUserId = '';
+  emailSubject = '';
+  emailMessage = '';
+  emailSending = false;
+
+  broadcastAudience: 'users' | 'professionals' = 'users';
+  broadcastSubject = '';
+  broadcastMessage = '';
+  broadcastSending = false;
+
+  createUserLoading = false;
+
   error = '';
 
   constructor() {
@@ -476,33 +570,79 @@ export class AdminDashboardPage {
 
   reload() {
     this.error = '';
+    this.statsError = '';
+    this.prosError = '';
+    this.usersError = '';
+    this.reportsError = '';
 
-    this.api.adminStats().subscribe({
-      next: (s) => (this.stats = s || this.stats),
-      error: (e) => (this.error = e?.message || 'Erreur chargement stats'),
-    });
-
+    this.reloadStats();
     this.reloadPros();
-
-    this.api.adminUsers().subscribe({
-      next: (r) => (this.users = r.items || []),
-      error: (e) => (this.error = e?.message || 'Erreur chargement utilisateurs'),
-    });
-
+    this.reloadUsers();
     this.reloadReports();
   }
 
+  reloadStats() {
+    this.statsLoading = true;
+    this.statsError = '';
+
+    this.api.adminStats().subscribe({
+      next: (s) => {
+        this.stats = s || this.stats;
+        this.statsLoading = false;
+      },
+      error: (e) => {
+        this.statsError = e?.message || 'Erreur chargement stats';
+        this.statsLoading = false;
+      },
+    });
+  }
+
+  reloadUsers() {
+    this.usersLoading = true;
+    this.usersError = '';
+
+    this.api.adminUsers({ status: this.userStatusFilter, search: this.userSearch || undefined, limit: 100 }).subscribe({
+      next: (r) => {
+        this.users = r.items || [];
+        this.usersLoading = false;
+      },
+      error: (e) => {
+        this.usersError = e?.message || 'Erreur chargement utilisateurs';
+        this.usersLoading = false;
+      },
+    });
+  }
+
   reloadPros() {
+    this.prosLoading = true;
+    this.prosError = '';
+
     this.api.adminProfessionals({ approvalStatus: this.proStatusFilter }).subscribe({
-      next: (r) => (this.pros = r.items || []),
-      error: (e) => (this.error = e?.message || 'Erreur chargement professionnels'),
+      next: (r) => {
+        this.pros = r.items || [];
+        this.prosLoading = false;
+      },
+      error: (e) => {
+        this.prosError = e?.message || 'Erreur chargement professionnels';
+        this.prosLoading = false;
+      },
     });
   }
 
   reloadReports() {
+    this.reportsLoading = true;
+    this.reportsError = '';
+
     this.api.adminReports({ status: this.reportStatusFilter, limit: 80 }).subscribe({
-      next: (r) => (this.reports = r.items || []),
-      error: () => (this.reports = []),
+      next: (r) => {
+        this.reports = r.items || [];
+        this.reportsLoading = false;
+      },
+      error: (e) => {
+        this.reportsError = e?.message || 'Erreur chargement signalements';
+        this.reports = [];
+        this.reportsLoading = false;
+      },
     });
   }
 
@@ -523,25 +663,43 @@ export class AdminDashboardPage {
       next: () => {
         this.toast.success('Signalement', 'Traité');
         this.decidingReports.delete(id);
-        this.reload();
+        this.reloadReports();
+        this.reloadStats();
       },
       error: (e) => {
         const msg = e?.error?.message || e?.message || 'Erreur décision signalement';
-        this.error = msg;
+        this.reportsError = msg;
         this.toast.error('Erreur', msg);
         this.decidingReports.delete(id);
       },
     });
   }
 
+  isProActing(p: any): boolean {
+    const id = String(p?._id || '').trim();
+    if (!id) return false;
+    return this.actingPros.has(id);
+  }
+
+  isUserActing(u: any): boolean {
+    const id = String(u?._id || '').trim();
+    if (!id) return false;
+    return this.actingUsers.has(id);
+  }
+
   setStatus(p: Professional, s: 'pending' | 'approved' | 'rejected') {
     if (!p._id) return;
 
+    const id = String(p._id);
+    if (this.actingPros.has(id)) return;
+
     if (s === 'approved' && !this.viewedPros.has(p._id)) {
-      this.error = 'Ouvrez les détails du professionnel avant d\'approuver.';
+      this.prosError = "Ouvrez les détails du professionnel avant d'approuver.";
       this.openProfessional(p);
       return;
     }
+
+    this.actingPros.add(id);
 
     this.api.adminUpdateProfessionalStatus(p._id, s).subscribe({
       next: (updated) => {
@@ -549,23 +707,54 @@ export class AdminDashboardPage {
         if (this.selectedPro?._id === p._id) {
           this.selectedPro = { ...this.selectedPro, approvalStatus: updated.approvalStatus };
         }
-        this.reload();
+        this.actingPros.delete(id);
+        this.reloadPros();
+        this.reloadStats();
       },
-      error: (e) => (this.error = e?.message || 'Erreur update status'),
+      error: (e) => {
+        const msg = e?.message || 'Impossible de mettre à jour le statut.';
+        this.prosError = msg;
+        this.toast.error('Erreur', msg);
+        this.actingPros.delete(id);
+      },
     });
   }
 
   deleteProfessional(p: Professional) {
     if (!p._id) return;
     if (!confirm(`Supprimer ${p.name} ?`)) return;
-    this.api.adminDeleteProfessional(p._id).subscribe({
-      next: () => this.reload(),
-      error: (e) => (this.error = e?.message || 'Erreur suppression'),
+
+    const id = String(p._id);
+    if (this.actingPros.has(id)) return;
+
+    this.actingPros.add(id);
+
+    this.api.adminDeleteProfessional(id).subscribe({
+      next: () => {
+        this.pros = (this.pros || []).filter((x: any) => String(x?._id) !== id);
+        if (this.selectedPro?._id === id) this.closeProfessional();
+        this.toast.success('Suppression', 'Professionnel supprimé');
+        this.actingPros.delete(id);
+        this.reloadPros();
+        this.reloadStats();
+      },
+      error: (e) => {
+        const msg = e?.message || 'Impossible de supprimer le professionnel.';
+        this.prosError = msg;
+        this.toast.error('Erreur', msg);
+        this.actingPros.delete(id);
+      },
     });
   }
 
   createUser(ev: Event) {
     ev.preventDefault();
+
+    if (this.createUserLoading) return;
+
+    this.usersError = '';
+    this.createUserLoading = true;
+
     this.api
       .adminCreateUser({
         name: this.newUserName,
@@ -581,18 +770,191 @@ export class AdminDashboardPage {
           this.newUserPassword = '';
           this.newUserTelephone = '';
           this.newUserRole = 'user';
-          this.reload();
+          this.toast.success('Utilisateur', 'Compte créé');
+          this.createUserLoading = false;
+          this.reloadUsers();
+          this.reloadStats();
         },
-        error: (e) => (this.error = e?.message || 'Erreur création user'),
+        error: (e) => {
+          const msg = e?.message || 'Impossible de créer le compte.';
+          this.usersError = msg;
+          this.toast.error('Erreur', msg);
+          this.createUserLoading = false;
+        },
       });
   }
 
   deleteUser(u: any) {
     if (!u?._id) return;
     if (!confirm(`Supprimer utilisateur ${u.name} ?`)) return;
-    this.api.adminDeleteUser(u._id).subscribe({
-      next: () => this.reload(),
-      error: (e) => (this.error = e?.message || 'Erreur suppression user'),
+
+    const id = String(u._id);
+    if (this.actingUsers.has(id)) return;
+
+    this.actingUsers.add(id);
+
+    this.api.adminDeleteUser(id).subscribe({
+      next: () => {
+        this.users = (this.users || []).filter((x: any) => String(x?._id) !== id);
+        this.toast.success('Suppression', 'Utilisateur supprimé');
+        this.actingUsers.delete(id);
+        this.reloadUsers();
+        this.reloadStats();
+      },
+      error: (e) => {
+        const msg = e?.message || 'Impossible de supprimer le compte.';
+        this.usersError = msg;
+        this.toast.error('Erreur', msg);
+        this.actingUsers.delete(id);
+      },
+    });
+  }
+
+  setUserStatus(u: any, status: 'active' | 'inactive') {
+    const id = String(u?._id || '').trim();
+    if (!id) return;
+    if (this.actingUsers.has(id)) return;
+
+    this.actingUsers.add(id);
+
+    this.api.adminUpdateUserStatus(id, { status }).subscribe({
+      next: () => {
+        this.toast.success('Utilisateur', status === 'active' ? 'Compte activé' : 'Compte désactivé');
+        this.actingUsers.delete(id);
+        this.reloadUsers();
+        this.reloadStats();
+      },
+      error: (e) => {
+        const msg = e?.message || 'Impossible de mettre à jour le statut.';
+        this.usersError = msg;
+        this.toast.error('Erreur', msg);
+        this.actingUsers.delete(id);
+      },
+    });
+  }
+
+  restoreUser(u: any) {
+    const id = String(u?._id || '').trim();
+    if (!id) return;
+    if (this.actingUsers.has(id)) return;
+
+    this.actingUsers.add(id);
+
+    this.api.adminUpdateUserStatus(id, { status: 'active', restore: true }).subscribe({
+      next: () => {
+        this.toast.success('Utilisateur', 'Compte restauré');
+        this.actingUsers.delete(id);
+        this.reloadUsers();
+        this.reloadStats();
+      },
+      error: (e) => {
+        const msg = e?.message || 'Impossible de restaurer le compte.';
+        this.usersError = msg;
+        this.toast.error('Erreur', msg);
+        this.actingUsers.delete(id);
+      },
+    });
+  }
+
+  ensureEmailRecipients() {
+    if (this.emailRecipientsLoading) return;
+    if ((this.emailRecipients || []).length) return;
+    this.reloadEmailRecipients();
+  }
+
+  reloadEmailRecipients() {
+    this.emailRecipientsLoading = true;
+
+    this.api.adminUsers({ status: 'active', limit: 200 }).subscribe({
+      next: (r) => {
+        this.emailRecipients = r.items || [];
+        this.emailRecipientsLoading = false;
+      },
+      error: () => {
+        this.emailRecipients = [];
+        this.emailRecipientsLoading = false;
+      },
+    });
+  }
+
+  prefillEmail(u: any) {
+    const id = String(u?._id || '').trim();
+    if (!id) return;
+
+    this.activeTab = 'email';
+    this.ensureEmailRecipients();
+
+    this.emailUserId = id;
+    if (!this.emailSubject) this.emailSubject = 'Information La STREET';
+  }
+
+  // Envoi d'un email à un utilisateur (via API admin).
+  sendUserEmail(ev: Event) {
+    ev.preventDefault();
+
+    if (this.emailSending) return;
+
+    const userId = String(this.emailUserId || '').trim();
+    const subject = String(this.emailSubject || '').trim();
+    const message = String(this.emailMessage || '').trim();
+
+    if (!userId || subject.length < 3 || message.length < 3) {
+      this.toast.error('Erreur', 'Veuillez remplir le destinataire, le sujet et le message.');
+      return;
+    }
+
+    this.usersError = '';
+    this.emailSending = true;
+
+    this.api.adminSendUserEmail(userId, { subject, message }).subscribe({
+      next: () => {
+        this.toast.success('Email', 'Email envoyé');
+        this.emailSubject = '';
+        this.emailMessage = '';
+        this.emailSending = false;
+      },
+      error: (e) => {
+        const msg = e?.message || "Impossible d'envoyer l'email.";
+        this.usersError = msg;
+        this.toast.error('Erreur', msg);
+        this.emailSending = false;
+      },
+    });
+  }
+
+  broadcastEmail(ev: Event) {
+    ev.preventDefault();
+
+    if (this.broadcastSending) return;
+
+    const audience = this.broadcastAudience;
+    const subject = String(this.broadcastSubject || '').trim();
+    const message = String(this.broadcastMessage || '').trim();
+
+    if (!audience || subject.length < 3 || message.length < 3) {
+      this.toast.error('Erreur', 'Veuillez remplir le public, le sujet et le message.');
+      return;
+    }
+
+    if (!confirm(`Envoyer un email à tous les ${audience === 'professionals' ? 'professionnels' : 'utilisateurs'} ?`)) {
+      return;
+    }
+
+    this.broadcastSending = true;
+
+    this.api.adminBroadcastEmail({ audience, subject, message }).subscribe({
+      next: (r) => {
+        this.toast.success('Broadcast', `Envoyés: ${r?.sent || 0}/${r?.attempted || 0}`);
+        this.broadcastSubject = '';
+        this.broadcastMessage = '';
+        this.broadcastSending = false;
+      },
+      error: (e) => {
+        const msg = e?.message || "Impossible d'envoyer le broadcast.";
+        this.usersError = msg;
+        this.toast.error('Erreur', msg);
+        this.broadcastSending = false;
+      },
     });
   }
 

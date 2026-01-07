@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { authInterceptor } from './core/services/auth.interceptor';
+import { errorInterceptor } from './core/services/error.interceptor';
 
 import { routes } from './app.routes';
 
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
         anchorScrolling: 'enabled',
       }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
     provideServiceWorker('ngsw-worker.js', { enabled: !isDevMode() })
   ]
 };

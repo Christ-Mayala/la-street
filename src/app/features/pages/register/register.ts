@@ -50,7 +50,7 @@ type Category = { _id: string; name: string; trades: { _id: string; name: string
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="w-8 h-1 bg-yellow-400 rounded-full"></div>
-              <h2 class="text-xl font-bold text-white">Étape {{ step }}/5</h2>
+              <h2 class="text-xl font-bold text-white">Étape {{ displayStep }}/{{ totalSteps }}</h2>
             </div>
             <span class="text-sm font-semibold text-yellow-400">{{ progress }}% complété</span>
           </div>
@@ -765,8 +765,18 @@ export class RegisterPage {
   globalError = '';
   isLoading = false;
 
+  get totalSteps() {
+    return this.role === 'professional' ? 5 : 3;
+  }
+
+  get displayStep() {
+    if (this.role === 'professional') return this.step;
+    if (this.step <= 2) return this.step;
+    return 3;
+  }
+
   get progress() {
-    return (this.step / 5) * 100;
+    return (this.displayStep / this.totalSteps) * 100;
   }
 
   constructor() {
@@ -784,13 +794,11 @@ export class RegisterPage {
         next: (list) => {
           this.categories = (list || []) as Category[];
         },
-        error: (e) => {
-          console.error('Erreur chargement catégories:', e);
+        error: () => {
           this.categories = [];
         },
       });
-    } catch (error) {
-      console.error('Exception chargement catégories:', error);
+    } catch {
       this.categories = [];
     }
   }
@@ -861,6 +869,12 @@ export class RegisterPage {
   }
 
   prev() {
+    if (this.role !== 'professional' && this.step === 5) {
+      this.step = 2;
+      this.scrollToTop();
+      return;
+    }
+
     if (this.step > 1) {
       this.step--;
       this.scrollToTop();
@@ -876,7 +890,17 @@ export class RegisterPage {
         this.scrollToTop();
         return;
       }
-      this.step++;
+
+      if (this.role !== 'professional') {
+        if (this.step === 2) {
+          this.step = 5;
+        } else {
+          this.step++;
+        }
+      } else {
+        this.step++;
+      }
+
       this.scrollToTop();
       return;
     }
@@ -912,17 +936,20 @@ export class RegisterPage {
     this.isLoading = true;
 
     try {
-      // 1. Créer le compte utilisateur
+      const cleanName = String(this.name || '').trim();
+      const cleanEmail = String(this.email || '').trim().toLowerCase();
+      const cleanPassword = String(this.password || '');
+      const cleanTelephone = String(this.telephone || '').trim();
+
       await this.auth.register({
-        name: this.name,
-        email: this.email,
-        password: this.password,
+        name: cleanName,
+        email: cleanEmail,
+        password: cleanPassword,
         role: this.role === 'professional' ? 'professional' : 'user',
-        telephone: this.telephone,
+        telephone: cleanTelephone,
       });
 
-      // 2. Se connecter pour récupérer le token (nécessaire pour les endpoints protégés)
-      await this.auth.login({ email: this.email, password: this.password });
+      await this.auth.login({ email: cleanEmail, password: cleanPassword });
 
       // 3. Si professionnel, créer le profil professionnel
       if (this.role === 'professional') {
@@ -931,8 +958,8 @@ export class RegisterPage {
         }
 
         const fd = new FormData();
-        fd.append('name', this.name);
-        fd.append('telephone', this.telephone);
+        fd.append('name', cleanName);
+        fd.append('telephone', cleanTelephone);
         fd.append('whatsapp', String(this.hasWhatsapp));
         fd.append('pays', this.pays);
         fd.append('ville', this.ville);
@@ -960,22 +987,16 @@ export class RegisterPage {
           this.api.createProfessional(fd).subscribe({
             next: () => resolve(),
             error: (err) => {
-              console.error('Erreur création profil professionnel:', err);
               reject(err);
             }
           });
         });
       }
 
-      // 3. Connecter l'utilisateur après inscription réussie
-      await this.auth.login(this.email, this.password);
-
-      this.toast.success('Bienvenue !', 'Votre compte a été créé avec succès.');
+      this.toast.success('Bienvenue !', this.role === 'professional' ? 'Votre compte et votre profil professionnel ont été créés.' : 'Votre compte a été créé avec succès.');
       this.router.navigate(['/profile']);
 
     } catch (error: any) {
-      console.error('Erreur inscription:', error);
-
       // Gestion des erreurs spécifiques
       if (error?.message?.includes('duplicate') || error?.error?.message?.includes('duplicate')) {
         this.globalError = 'Cet email est déjà utilisé. Veuillez utiliser une autre adresse email.';
