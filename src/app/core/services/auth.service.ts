@@ -1,14 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { User } from '../models/user.model';
 import { APP_ENV } from '../config/app-env';
 
 type DryResponse<T> = { success: boolean; message: string; data: T; timestamp: string };
-
-// Service Auth (LaStreet): gère login/register + persistance du user.
-// Important: ne jamais remonter des erreurs techniques à l'UI (messages simples uniquement).
 
 const unwrap = <T>(r: DryResponse<T>): T => {
   if (!r?.success) throw new Error(String(r?.message || 'Une erreur est survenue.'));
@@ -20,7 +18,15 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   private readonly storageKey = 'street_user';
+
+  // Signal pour les composants réactifs
   user = signal<User | null>(this.loadUser());
+
+  // Subject pour les observables
+  private userSubject = new BehaviorSubject<User | null>(this.loadUser());
+
+  // Observable pour les abonnements
+  user$: Observable<User | null> = this.userSubject.asObservable();
 
   private normalizeRole(raw: any): User['role'] {
     const r = String(raw || 'user').toLowerCase();
@@ -46,14 +52,16 @@ export class AuthService {
   private saveUser(u: User | null) {
     if (u) localStorage.setItem(this.storageKey, JSON.stringify(u));
     else localStorage.removeItem(this.storageKey);
+
+    // Mettre à jour à la fois le signal et le subject
     this.user.set(u);
+    this.userSubject.next(u);
   }
 
   setUser(u: User | null) {
     this.saveUser(u);
   }
 
-  // Empêche les appels API si mixed-content (page https -> API http) en prod.
   private safeBaseUrl(): string {
     const url = this.apiBaseUrl();
     if (!url) return '';
@@ -83,7 +91,6 @@ export class AuthService {
     let email: string;
     let pwd: string;
 
-    // Gestion des deux signatures
     if (typeof emailOrCredentials === 'object') {
       email = emailOrCredentials.email;
       pwd = emailOrCredentials.password;
@@ -127,7 +134,6 @@ export class AuthService {
     const base = this.safeBaseUrl();
     if (!base) throw new Error('Connexion impossible. Vérifiez votre connexion internet et réessayez.');
 
-    // Enregistrer l'utilisateur seulement, sans login automatique
     const res = await firstValueFrom(
       this.http.post<DryResponse<any>>(
         `${base}/api/v1/lastreet/auth/register`,
