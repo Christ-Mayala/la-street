@@ -50,12 +50,84 @@ import { Professional } from '../../../core/models/professional.model';
           <div class="inline-flex gap-2 p-1 rounded-xl border border-slate-800 bg-black/20">
             <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='users' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='users'">Users</button>
             <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='pros' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='pros'">Pros</button>
+            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='payments' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='payments'; reloadPayments()">Paiements</button>
             <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='reports' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='reports'">Reports</button>
             <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='email' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='email'; ensureEmailRecipients()">Email</button>
           </div>
         </div>
 
         <div class="mt-4">
+          <!-- Onglet Paiements -->
+          <div *ngIf="activeTab==='payments'" class="card p-4 animate-in fade-in duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold flex items-center gap-2">
+                Demandes de paiement
+                <span *ngIf="paymentsLoading" class="inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span>
+              </h3>
+              <button class="text-sm text-yellow-500 hover:underline" (click)="reloadPayments()">Actualiser</button>
+            </div>
+
+            <div *ngIf="paymentsError" class="p-3 mb-4 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ paymentsError }}</div>
+
+            <div class="overflow-x-auto border border-slate-800 rounded-xl bg-black/40">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-900/50 text-slate-400 border-b border-slate-800">
+                  <tr>
+                    <th class="p-4 font-normal">Utilisateur</th>
+                    <th class="p-4 font-normal">Plan / Mission</th>
+                    <th class="p-4 font-normal">Montant</th>
+                    <th class="p-4 font-normal">Preuve</th>
+                    <th class="p-4 font-normal">Statut</th>
+                    <th class="p-4 font-normal text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/50">
+                  <tr *ngFor="let p of payments" [class.bg-yellow-500/5]="p.status === 'pending'">
+                    <td class="p-4">
+                      <div class="font-medium text-white">{{ p.userId?.name }}</div>
+                      <div class="text-xs text-slate-500">{{ p.userId?.email }}</div>
+                    </td>
+                    <td class="p-4">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase" 
+                        [class.bg-yellow-500/20]="p.plan === 'premium'"
+                        [class.text-yellow-500]="p.plan === 'premium'"
+                        [class.bg-slate-800]="p.plan !== 'premium'"
+                        [class.text-slate-400]="p.plan !== 'premium'">
+                        {{ p.plan }}
+                      </span>
+                      <div *ngIf="p.leadId" class="text-[10px] text-slate-500 mt-1 italic">Mission: {{ p.leadId._id }}</div>
+                    </td>
+                    <td class="p-4 font-mono font-bold">{{ p.amount }} FCFA</td>
+                    <td class="p-4">
+                      <div class="flex flex-col gap-1">
+                        <div *ngIf="p.transactionCode" class="text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700 font-mono w-max">
+                          {{ p.transactionCode }}
+                        </div>
+                        <button *ngIf="p.proofImage" 
+                          (click)="selectedProofImage = p.proofImage"
+                          class="text-xs text-yellow-500 hover:text-yellow-400 flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                          Voir capture
+                        </button>
+                      </div>
+                    </td>
+                    <td class="p-4 text-xs">
+                      <span [class]="p.status === 'pending' ? 'text-yellow-500' : (p.status === 'approved' ? 'text-green-500' : 'text-red-500')">
+                        {{ p.status }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-right">
+                      <div class="flex justify-end gap-2" *ngIf="p.status === 'pending'">
+                        <button (click)="handlePayment(p, 'approved')" [disabled]="isPaymentActing(p)" class="px-2 py-1 bg-green-500/20 text-green-500 border border-green-500/30 rounded text-xs font-bold hover:bg-green-500 hover:text-white transition-colors">V</button>
+                        <button (click)="handlePayment(p, 'rejected')" [disabled]="isPaymentActing(p)" class="px-2 py-1 bg-red-500/20 text-red-500 border border-red-500/30 rounded text-xs font-bold hover:bg-red-500 hover:text-white transition-colors">X</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="payments.length === 0" class="p-8 text-center text-slate-500">Aucune demande trouvée.</div>
+            </div>
+          </div>
           <div *ngIf="activeTab==='pros'" class="card p-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h3 class="font-semibold">Professionnels <span *ngIf="prosLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
@@ -343,6 +415,16 @@ import { Professional } from '../../../core/models/professional.model';
           </div>
         </div>
 
+        <!-- Modal de preuve d'image -->
+        <div *ngIf="selectedProofImage" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4" (click)="selectedProofImage = null">
+          <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center">
+            <button (click)="selectedProofImage = null" class="absolute -top-12 right-0 text-white hover:text-yellow-500 flex items-center gap-2 font-bold transition-colors">
+              Fermer <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <img [src]="selectedProofImage" class="w-full h-full object-contain rounded-xl shadow-2xl border border-white/10" alt="Preuve de paiement">
+          </div>
+        </div>
+
         <!-- Boutons normaux sur desktop -->
         <div class="hidden md:block">
           <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>
@@ -469,13 +551,20 @@ export class AdminDashboardPage {
   private readonly seo = inject(SeoService);
   private readonly toast = inject(ToastService);
 
-  activeTab: 'users' | 'pros' | 'reports' | 'email' = 'users';
+  activeTab: 'users' | 'pros' | 'reports' | 'email' | 'payments' = 'users';
 
   selectedProOpen = false;
   selectedProLoading = false;
   selectedProError = '';
   selectedPro: any = null;
   private readonly viewedPros = new Set<string>();
+
+  // Payment management
+  payments: any[] = [];
+  paymentsLoading = false;
+  paymentsError = '';
+  actingPayments = new Set<string>();
+  selectedProofImage: string | null = null;
 
   trackByEntity = (_: number, x: any) => x?._id || x?.id || x?.email || x?.name || _;
   trackByImg = (_: number, x: any) => x?.public_id || x?.url || _;
@@ -517,10 +606,7 @@ export class AdminDashboardPage {
     );
   }
 
-  get filteredUsers() {
-    return this.users;
-  }
-
+  get filteredUsers() { return this.users; }
   get filteredReports() {
     const q = (this.reportSearch || '').toLowerCase().trim();
     if (!q) return this.reports;
@@ -574,11 +660,13 @@ export class AdminDashboardPage {
     this.prosError = '';
     this.usersError = '';
     this.reportsError = '';
+    this.paymentsError = '';
 
     this.reloadStats();
     this.reloadPros();
     this.reloadUsers();
     this.reloadReports();
+    this.reloadPayments();
   }
 
   reloadStats() {
@@ -595,6 +683,47 @@ export class AdminDashboardPage {
         this.statsLoading = false;
       },
     });
+  }
+
+  reloadPayments() {
+    this.paymentsLoading = true;
+    this.paymentsError = '';
+    this.api.adminSubscriptionRequests().subscribe({
+      next: (res) => {
+        this.payments = res || [];
+        this.paymentsLoading = false;
+      },
+      error: (err) => {
+        this.paymentsError = err.message || 'Erreur chargement paiements';
+        this.paymentsLoading = false;
+      }
+    });
+  }
+
+  handlePayment(req: any, status: 'approved' | 'rejected') {
+    const id = req._id;
+    if (this.actingPayments.has(id)) return;
+    
+    const note = prompt(`Note admin pour ce paiement (${status === 'approved' ? 'Validation' : 'Motif du rejet'}) :`, '');
+    if (note === null) return;
+
+    this.actingPayments.add(id);
+    this.api.adminHandleSubscription(id, status, note).subscribe({
+      next: () => {
+        this.toast.success('Paiement', status === 'approved' ? 'Approuvé' : 'Rejeté');
+        this.actingPayments.delete(id);
+        this.reloadPayments();
+        this.reloadStats();
+      },
+      error: (err) => {
+        this.toast.error('Erreur', err.message || 'Action échouée');
+        this.actingPayments.delete(id);
+      }
+    });
+  }
+
+  isPaymentActing(req: any) {
+    return this.actingPayments.has(req._id);
   }
 
   reloadUsers() {

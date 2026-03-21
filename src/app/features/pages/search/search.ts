@@ -12,119 +12,122 @@ import { SeoService } from '../../../core/services/seo.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ProfessionalCardComponent, RouterLink],
   template: `
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden hero-bg">
+    <div class="min-h-screen relative overflow-hidden hero-bg">
       <div class="absolute inset-0 -z-10 bg-black"></div>
 
       <!-- Background elements -->
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden">
-        <div class="absolute top-10 left-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-10 right-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-yellow-400/5 rounded-full blur-[120px] opacity-50"></div>
       </div>
 
-      <div class="container relative z-10 py-12 md:py-16">
-        <div class="max-w-4xl mx-auto">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 mb-6">
-            <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <span class="text-sm font-medium text-yellow-300">Recherche avancée</span>
-          </div>
-
-          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
-            Trouvez le <span class="text-yellow-400">professionnel</span> qu'il vous faut
-          </h1>
-          <p class="mt-4 text-lg text-slate-300">
-            Utilisez nos filtres pour découvrir les meilleurs professionnels près de chez vous
-          </p>
-
-          <!-- Search Form Card -->
-          <div class="mt-8 bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6 shadow-2xl shadow-black/50">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-              Affinez votre recherche
-            </h2>
-
-            <form class="space-y-4" (ngSubmit)="doSearch()">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                  </svg>
-                  <select
-                    [(ngModel)]="tradeId"
-                    name="tradeId"
-                    class="w-full pl-12 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
-                  >
-                    <option [ngValue]="''">Tous les métiers</option>
-                    <option *ngFor="let t of tradeOptions" [ngValue]="t.id">{{ t.name }}</option>
-                  </select>
-                  <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                  <input
-                    [(ngModel)]="ville"
-                    name="ville"
-                    type="text"
-                    placeholder="Ville (ex: Brazzaville)"
-                    class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
-
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                  </svg>
-                  <input
-                    [(ngModel)]="quartier"
-                    name="quartier"
-                    type="text"
-                    placeholder="Quartier (optionnel)"
-                    class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
+      <div class="relative z-10">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden">
+          <div class="container relative z-10 py-12 md:py-16">
+            <div class="max-w-4xl mx-auto text-center md:text-left">
+              <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 mb-6">
+                <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span class="text-sm font-medium text-yellow-300">Recherche avancée</span>
               </div>
 
-              <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                <div class="text-sm text-slate-400">
-                  <span class="text-yellow-300 font-medium">Astuce :</span> Laissez un champ vide pour élargir votre recherche
-                </div>
-                <div class="flex gap-3">
-                  <button
-                    type="button"
-                    (click)="clearFilters()"
-                    class="px-6 py-3.5 bg-black/40 border border-slate-700 text-slate-300 font-semibold rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200"
-                  >
-                    Effacer les filtres
-                  </button>
-                  <button
-                    type="submit"
-                    class="px-6 py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center gap-2"
-                  >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    Rechercher
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
+              <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+                Trouvez le <span class="text-yellow-400">professionnel</span> qu'il vous faut
+              </h1>
+              <p class="mt-4 text-lg text-slate-300">
+                Utilisez nos filtres pour découvrir les meilleurs professionnels près de chez vous
+              </p>
 
-    <!-- Results Section -->
-    <main class="container py-10 md:py-16">
+              <!-- Search Form Card -->
+              <div class="mt-8 bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6 shadow-2xl shadow-black/50">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                  <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  Affinez votre recherche
+                </h2>
+
+                <form class="space-y-4" (ngSubmit)="doSearch()">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative">
+                      <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                      <select
+                        [(ngModel)]="tradeId"
+                        name="tradeId"
+                        class="w-full pl-12 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
+                      >
+                        <option [ngValue]="''">Tous les métiers</option>
+                        <option *ngFor="let t of tradeOptions" [ngValue]="t.id">{{ t.name }}</option>
+                      </select>
+                      <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+
+                    <div class="relative">
+                      <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <input
+                        [(ngModel)]="ville"
+                        name="ville"
+                        type="text"
+                        placeholder="Ville (ex: Brazzaville)"
+                        class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+
+                    <div class="relative">
+                      <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                      <input
+                        [(ngModel)]="quartier"
+                        name="quartier"
+                        type="text"
+                        placeholder="Quartier (optionnel)"
+                        class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    <div class="text-sm text-slate-400">
+                      <span class="text-yellow-300 font-medium">Astuce :</span> Laissez un champ vide pour élargir votre recherche
+                    </div>
+                    <div class="flex gap-3">
+                      <button
+                        type="button"
+                        (click)="clearFilters()"
+                        class="px-6 py-3.5 bg-black/40 border border-slate-700 text-slate-300 font-semibold rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200"
+                      >
+                        Effacer les filtres
+                      </button>
+                      <button
+                        type="submit"
+                        class="px-6 py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center gap-2"
+                      >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Rechercher
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <main class="container py-10 md:py-16">
       <!-- Results Summary -->
       <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -295,7 +298,9 @@ import { SeoService } from '../../../core/services/seo.service';
           </a>
         </div>
       </div>
-    </main>
+      </main>
+    </div>
+  </div>
   `,
   styles: [`
     .hero-bg {

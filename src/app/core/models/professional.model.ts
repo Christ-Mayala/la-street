@@ -37,4 +37,7 @@ export interface Professional {
   availabilityStatus?: 'available' | 'busy' | 'temporarily_unavailable';
   rating?: number;
   ratingCount?: number;
+  isPremium?: boolean;
+  premiumUntil?: string | Date;
 }
+

@@ -1,393 +1,247 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { filter, Subscription } from 'rxjs';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <header class="sticky top-0 z-40 w-full bg-black/95 backdrop-blur-lg border-b border-slate-800/50 shadow-lg shadow-black/20">
-      <div class="container flex h-16 items-center justify-between">
-        <!-- Logo -->
-        <a routerLink="/" class="flex items-center gap-2 font-semibold text-white group">
-          <div class="relative">
-            <img
-              src="/logo.jpg"
-              alt="La STREET"
-              class="relative z-10 h-9 w-9 rounded-lg object-cover ring-1 ring-primary/30 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
-            />
-            <div class="absolute -inset-1 rounded-lg bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="relative">
+      <header class="sticky top-0 z-[100] w-full transition-all duration-300" 
+              [class.bg-black/80]="!menuOpen()" 
+              [class.backdrop-blur-xl]="true"
+              [class.border-b]="true"
+              [class.border-white/5]="true">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+          <!-- Logo -->
+          <a routerLink="/" class="flex items-center gap-2 group">
+            <div class="relative w-9 h-9 flex items-center justify-center">
+              <img src="/logo.jpg" alt="La STREET" class="w-full h-full rounded-xl object-cover ring-2 ring-yellow-500/20 group-hover:ring-yellow-500/50 transition-all duration-500">
+              <div class="absolute inset-0 bg-yellow-400/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
+            <div class="flex flex-col -gap-1">
+              <span class="text-lg font-black tracking-tighter text-white leading-none">LA STREET</span>
+              <span class="text-[10px] font-bold text-yellow-500 tracking-[0.2em] leading-none opacity-80 uppercase">Professionnels</span>
+            </div>
+          </a>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center gap-1">
+            <a *ngFor="let link of mainLinks()" 
+               [routerLink]="link.path" 
+               routerLinkActive="!text-white bg-white/5"
+               [routerLinkActiveOptions]="{exact: link.path === '/'}"
+               class="px-4 py-2 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 relative group">
+              {{ link.label }}
+              <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-yellow-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            </a>
+          </nav>
+
+          <!-- Right Side: Actions & User -->
+          <div class="flex items-center gap-2">
+            <!-- Desktop: Favorites -->
+            <button [routerLink]="['/favorites']" class="relative p-2 text-slate-400 hover:text-white transition-colors group hidden sm:block">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+              <span *ngIf="favCount > 0" class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-500 text-[10px] font-bold text-black ring-2 ring-black">
+                {{ favCount }}
+              </span>
+            </button>
+
+            <!-- Divider -->
+            <div class="hidden sm:block w-px h-6 bg-white/10 mx-2"></div>
+
+            <!-- Auth Section -->
+            <ng-container *ngIf="auth.user() as u; else guestActions">
+              <!-- User Control (Desktop) -->
+              <div class="relative hidden md:block">
+                <button (click)="userMenuOpen.set(!userMenuOpen())" 
+                        class="flex items-center gap-3 p-1.5 pl-3 rounded-full bg-white/5 border border-white/10 hover:border-yellow-500/30 transition-all">
+                  <div class="flex flex-col items-end">
+                    <span class="text-xs font-bold text-white leading-none whitespace-nowrap">{{ u.name }}</span>
+                    <span *ngIf="u.isPremium" class="text-[10px] text-yellow-500 font-bold uppercase leading-none mt-1 inline-flex items-center gap-0.5">Premium <svg class="w-2.5 h-2.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.563-.954L10 0l2.949 5.956 6.563.954-4.756 4.635 1.122 6.545z"/></svg></span>
+                  </div>
+                  <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border border-white/20">
+                    <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="w-full h-full object-cover">
+                    <div *ngIf="!u.avatarUrl" class="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">{{ getUserInitials(u.name) }}</div>
+                  </div>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div *ngIf="userMenuOpen()" 
+                     class="absolute right-0 mt-3 w-56 rounded-2xl bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200">
+                  <div class="px-4 py-2 border-b border-white/5 mb-2">
+                    <p class="text-xs text-slate-500">Connecté en tant que</p>
+                    <p class="text-sm font-bold text-white truncate">{{ u.email }}</p>
+                  </div>
+                  <a *ngIf="isAdmin(u)" routerLink="/admin" (click)="userMenuOpen.set(false)" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Dashboard Admin
+                  </a>
+                  <a routerLink="/profile" (click)="userMenuOpen.set(false)" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Mon Profil
+                  </a>
+                  <div class="h-px bg-white/5 mx-2 my-1"></div>
+                  <button (click)="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Déconnexion
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-template #guestActions>
+              <div class="hidden md:flex items-center gap-2">
+                <a [routerLink]="['/login']" class="px-5 py-2 text-sm font-bold text-white hover:text-yellow-500 transition-colors">Connexion</a>
+                <a [routerLink]="['/register']" class="px-5 py-2 text-sm font-bold bg-yellow-500 text-black rounded-full hover:bg-yellow-400 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-yellow-500/20">S'inscrire</a>
+              </div>
+            </ng-template>
+
+            <!-- Mobile: Hamburger Toggle -->
+            <button (click)="toggleMenu($event)" 
+                    class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all hover:bg-white/5 active:scale-90"
+                    [aria-expanded]="menuOpen()"
+                    aria-label="Toggle menu">
+              <span class="w-6 h-0.5 bg-white transition-all duration-300 transform origin-center" [class.rotate-45]="menuOpen()" [class.translate-y-2]="menuOpen()"></span>
+              <span class="w-6 h-0.5 bg-white transition-opacity duration-300" [class.opacity-0]="menuOpen()"></span>
+              <span class="w-6 h-0.5 bg-white transition-all duration-300 transform origin-center" [class.-rotate-45]="menuOpen()" [class.-translate-y-2]="menuOpen()"></span>
+            </button>
           </div>
-          <span class="text-lg font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
-            La STREET
-          </span>
-        </a>
-
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center gap-8">
-          <ng-container *ngIf="auth.user() as u; else normalNav">
-            <a *ngIf="isAdmin(u)"
-               routerLink="/admin"
-               routerLinkActive="text-primary"
-               [routerLinkActiveOptions]="{exact: true}"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              Tableau
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-
-            <a routerLink="/profile"
-               routerLinkActive="text-primary"
-               [routerLinkActiveOptions]="{exact: true}"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              Mon profil
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-
-            <ng-container *ngIf="!isAdmin(u)">
-              <a routerLink="/"
-                 routerLinkActive="text-primary"
-                 [routerLinkActiveOptions]="{exact: true}"
-                 class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-                Accueil
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-              </a>
-
-              <a routerLink="/search"
-                 routerLinkActive="text-primary"
-                 class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-                Recherche
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-              </a>
-
-              <a routerLink="/about"
-                 routerLinkActive="text-primary"
-                 class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-                À propos
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-              </a>
-
-              <a routerLink="/contact"
-                 routerLinkActive="text-primary"
-                 class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-                Contact
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-              </a>
-            </ng-container>
-          </ng-container>
-
-          <ng-template #normalNav>
-            <a routerLink="/"
-               routerLinkActive="text-primary"
-               [routerLinkActiveOptions]="{exact: true}"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              Accueil
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-
-            <a routerLink="/search"
-               routerLinkActive="text-primary"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              Recherche
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-
-            <a routerLink="/about"
-               routerLinkActive="text-primary"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              À propos
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-
-            <a routerLink="/contact"
-               routerLinkActive="text-primary"
-               class="text-sm text-slate-200 hover:text-primary transition-all duration-200 hover:scale-105 relative group">
-              Contact
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-            </a>
-          </ng-template>
-        </nav>
-
-        <!-- Right Actions -->
-        <div class="flex items-center gap-3">
-          <!-- Favorites Button -->
-          <button class="relative p-2 group"
-                  [routerLink]="['/favorites']"
-                  title="Favoris"
-                  [attr.aria-label]="'Favoris ' + (favCount > 0 ? '(' + favCount + ')' : '')">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-6 w-6 text-slate-200 group-hover:text-primary transition-all duration-200 group-hover:scale-110"
-                 viewBox="0 0 24 24"
-                 fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.54 0 3.04.99 3.57 2.36h.87C13.46 4.99 14.96 4 16.5 4 19 4 21 6 21 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-            <span *ngIf="favCount > 0"
-                  class="absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-primary text-black text-xs font-bold h-5 w-5 min-w-[20px] animate-pulse shadow-lg">
-              {{ favCount > 99 ? '99+' : favCount }}
-            </span>
-          </button>
-
-          <!-- User Actions -->
-          <ng-container *ngIf="auth.user() as u; else guest">
-            <div class="hidden sm:flex items-center gap-4">
-              <!-- User Info -->
-              <div class="flex items-center gap-2">
-                <div class="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 ring-1 ring-primary/20 flex items-center justify-center">
-                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-cover bg-black/40" loading="lazy" decoding="async" />
-                  <span *ngIf="!u.avatarUrl" class="text-xs font-bold text-primary">{{ getUserInitials(u.name) }}</span>
-                </div>
-                <div class="hidden lg:flex flex-col">
-                  <span class="text-xs text-slate-400">Bonjour,</span>
-                  <span class="text-sm font-medium text-slate-200 max-w-[120px] truncate">{{ u.name }}</span>
-                </div>
-              </div>
-
-              <!-- Logout Button -->
-              <button class="btn-outline group relative overflow-hidden"
-                      (click)="logout()"
-                      [attr.aria-label]="'Déconnexion de ' + u.name">
-                <span class="relative z-10 flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                  </svg>
-                  Déconnexion
-                </span>
-              </button>
-            </div>
-          </ng-container>
-
-          <ng-template #guest>
-            <div class="hidden sm:flex items-center gap-2">
-              <button class="btn-outline group relative overflow-hidden" [routerLink]="['/login']">
-                <span class="relative z-10">Connexion</span>
-              </button>
-              <button class="btn-primary group relative overflow-hidden" [routerLink]="['/register']">
-                <span class="relative z-10 flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                  </svg>
-                  S'inscrire
-                </span>
-              </button>
-            </div>
-          </ng-template>
-
-          <!-- Mobile Menu Button - CORRIGÉ -->
-          <button class="md:hidden p-2 rounded-md bg-black/50 border border-slate-800 hover:border-primary/30 transition-all duration-200 group"
-                  (click)="toggleMenu($event)"
-                  [attr.aria-expanded]="menuOpen()"
-                  [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'">
-            <svg *ngIf="!menuOpen()"
-                 xmlns="http://www.w3.org/2000/svg"
-                 class="h-6 w-6 text-slate-200 group-hover:text-primary transition-transform duration-200"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-            <svg *ngIf="menuOpen()"
-                 xmlns="http://www.w3.org/2000/svg"
-                 class="h-6 w-6 text-slate-200 group-hover:text-primary transition-transform duration-200"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
         </div>
-      </div>
+      </header>
 
-      <!-- Mobile Menu -->
-      <div *ngIf="menuOpen()"
-           class="md:hidden bg-black/95 backdrop-blur-lg border-t border-slate-800/50 animate-slideDown"
-           (click)="$event.stopPropagation()">
-
-        <div class="px-4 py-3 flex items-center justify-end">
-          <button class="p-2 rounded-md text-slate-400 hover:text-primary transition-colors"
-                  (click)="closeMenu()"
-                  aria-label="Fermer le menu">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <div class="px-4 py-2 flex flex-col gap-1">
-          <!-- Navigation Links -->
-          <ng-container *ngIf="auth.user() as u">
-            <div *ngIf="u.role==='admin'" class="py-3">
-              <a routerLink="/admin"
-                 (click)="closeMenu()"
-                 class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                Tableau de bord
-              </a>
+      <!-- Mobile Menu Overlay -->
+      <div *ngIf="menuOpen()" 
+           (click)="$event.stopPropagation()"
+           class="fixed inset-0 top-16 z-[999] md:hidden bg-black backdrop-blur-3xl flex flex-col animate-in fade-in duration-300">
+        
+        <!-- Mobile Menu Content -->
+        <div class="flex-1 overflow-y-auto px-6 py-8 flex flex-col no-scrollbar">
+          <!-- User Profile (Mobile) -->
+          <div *ngIf="auth.user() as u" class="mb-8 p-6 rounded-3xl bg-yellow-400/5 border border-yellow-400/10 flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-yellow-500/20 overflow-hidden flex items-center justify-center shadow-lg shadow-black/50">
+              <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" class="w-full h-full object-cover">
+              <span *ngIf="!u.avatarUrl" class="text-xl font-black text-yellow-500">{{ getUserInitials(u.name) }}</span>
             </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-lg font-bold text-white truncate leading-none uppercase tracking-tight">{{ u.name }}</h4>
+              <p *ngIf="u.isPremium" class="text-xs text-yellow-500 font-bold mt-1.5 flex items-center gap-1">
+                <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.563-.954L10 0l2.949 5.956 6.563.954-4.756 4.635 1.122 6.545z"/></svg> PRO PREMIUM
+              </p>
+              <p *ngIf="!u.isPremium" class="text-xs text-slate-500 mt-1.5 truncate">{{ u.email }}</p>
+            </div>
+          </div>
 
-            <a routerLink="/profile"
+          <!-- Navigation Links (Mobile) -->
+          <div class="flex flex-col gap-3">
+            <a *ngFor="let link of mobileLinks()" 
+               [routerLink]="link.path" 
                (click)="closeMenu()"
-               class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
-              Mon profil
+               class="group w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-yellow-400/10 hover:border-yellow-400/20 transition-all duration-300">
+               <div class="flex items-center gap-4 text-slate-300 group-hover:text-white">
+                 <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-yellow-500 group-hover:bg-yellow-500/10 transition-all shadow-inner" [innerHTML]="link.icon"></div>
+                 <span class="font-bold text-lg tracking-tight">{{ link.label }}</span>
+               </div>
+               <svg class="w-5 h-5 text-slate-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+               </svg>
             </a>
-          </ng-container>
+          </div>
 
-          <a routerLink="/"
-             (click)="closeMenu()"
-             class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            Accueil
-          </a>
+          <!-- Fill the rest -->
+          <div class="flex-1 min-h-[4rem]"></div>
 
-          <a routerLink="/search"
-             (click)="closeMenu()"
-             class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            Recherche
-          </a>
-
-          <a routerLink="/about"
-             (click)="closeMenu()"
-             class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            À propos
-          </a>
-
-          <a routerLink="/contact"
-             (click)="closeMenu()"
-             class="flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            Contact
-          </a>
-
-          <a routerLink="/favorites"
-             (click)="closeMenu()"
-             class="flex items-center justify-between py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-            <div class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.54 0 3.04.99 3.57 2.36h.87C13.46 4.99 14.96 4 16.5 4 19 4 21 6 21 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              </svg>
-              Favoris
-            </div>
-            <span *ngIf="favCount > 0"
-                  class="inline-flex items-center justify-center rounded-full bg-primary text-black text-xs font-bold h-5 w-5 min-w-[20px]">
-              {{ favCount > 99 ? '99+' : favCount }}
-            </span>
-          </a>
-
-          <!-- User Section -->
-          <div class="mt-4 pt-4 border-t border-slate-800/50">
-            <ng-container *ngIf="auth.user() as u; else guestMobile">
-              <div class="flex items-center gap-3 mb-4 p-3 rounded-lg bg-primary/5">
-                <div class="h-12 w-12 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 ring-1 ring-primary/20 flex items-center justify-center">
-                  <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" alt="" class="h-full w-full object-cover bg-black/40" loading="lazy" decoding="async" />
-                  <span *ngIf="!u.avatarUrl" class="text-sm font-bold text-primary">{{ getUserInitials(u.name) }}</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-200 truncate">{{ u.name }}</div>
-                  <div class="text-xs text-slate-400">{{ u.email }}</div>
-                </div>
-              </div>
-
-              <button (click)="logout(); closeMenu()"
-                      class="w-full flex items-center gap-3 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                Déconnexion
+          <!-- Auth Actions (Mobile) -->
+          <div class="mt-auto pt-8 border-t border-white/5 flex flex-col gap-4">
+            <ng-container *ngIf="auth.user(); else mobileGuestActions">
+              <button (click)="logout(); closeMenu()" 
+                      class="group w-full py-4 rounded-2xl text-center font-bold text-red-400 bg-red-400/5 hover:bg-red-400/10 transition-all flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Se déconnecter
               </button>
             </ng-container>
-
-            <ng-template #guestMobile>
-              <div class="grid grid-cols-2 gap-2">
-                <button [routerLink]="['/login']"
-                        (click)="closeMenu()"
-                        class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-slate-200 hover:bg-primary/10 hover:text-primary transition-all duration-200 group border border-slate-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                  </svg>
-                  Connexion
-                </button>
-                <button [routerLink]="['/register']"
-                        (click)="closeMenu()"
-                        class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-primary text-black font-medium hover:bg-primary/90 transition-all duration-200 group">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                  </svg>
-                  S'inscrire
-                </button>
+            <ng-template #mobileGuestActions>
+              <div class="grid grid-cols-2 gap-4">
+                <a [routerLink]="['/login']" (click)="closeMenu()" 
+                   class="py-4 rounded-2xl text-center font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                   Connexion
+                </a>
+                <a [routerLink]="['/register']" (click)="closeMenu()" 
+                   class="py-4 rounded-2xl text-center font-bold text-black bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 transition-all shadow-lg shadow-yellow-500/20">
+                   S'inscrire
+                </a>
               </div>
             </ng-template>
           </div>
         </div>
       </div>
-    </header>
+    </div>
   `,
   styles: [`
-    :host {
-      display: block;
-    }
-
-    .btn-outline {
-      @apply px-4 py-2 rounded-lg border border-slate-700 text-slate-200 text-sm font-medium transition-all duration-200 hover:border-primary/50 hover:text-primary hover:scale-105;
-    }
-
-    .btn-primary {
-      @apply px-4 py-2 rounded-lg bg-primary text-black text-sm font-medium transition-all duration-200 hover:bg-primary/90 hover:scale-105;
-    }
-
-    .animate-slideDown {
-      animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-pulse {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.7;
-      }
-    }
+    :host { display: block; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   `]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   protected readonly menuOpen = signal(false);
+  protected readonly userMenuOpen = signal(false);
   protected readonly auth = inject(AuthService);
   protected readonly favorites = inject(FavoritesService);
+  private readonly renderer = inject(Renderer2);
+  private readonly document = inject(DOCUMENT);
+  private readonly sanitizer = inject(DomSanitizer);
 
   private routerSubscription!: Subscription;
   private clickListener!: () => void;
+
+  mainLinks = computed(() => {
+    const u = this.auth.user();
+    if (!u) return [
+      { label: 'Accueil', path: '/' },
+      { label: 'Recherche', path: '/search' },
+      { label: 'Missions', path: '/leads' },
+      { label: 'À propos', path: '/about' }
+    ];
+    if (this.isAdmin(u)) return [
+      { label: 'Admin', path: '/admin' },
+      { label: 'Missions', path: '/leads' },
+      { label: 'Postuler', path: '/leads/new' },
+      { label: 'Profil', path: '/profile' }
+    ];
+    return [
+      { label: 'Accueil', path: '/' },
+      { label: 'Recherche', path: '/search' },
+      { label: 'Missions', path: '/leads' },
+      { label: 'Postuler', path: '/leads/new' },
+      { label: 'Profil', path: '/profile' }
+    ];
+  });
+
+  mobileLinks = computed(() => {
+    const base = [
+      { label: 'Accueil', path: '/', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>') },
+      { label: 'Recherche', path: '/search', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>') },
+      { label: 'Missions', path: '/leads', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>') },
+      { label: 'Favoris', path: '/favorites', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>') },
+    ];
+    const u = this.auth.user();
+    if (u) {
+       base.push({ label: 'Publier', path: '/leads/new', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>') });
+       base.push({ label: 'Mon Profil', path: '/profile', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>') });
+    }
+    return base;
+  });
+
+  private trustIcon(svg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
 
   isAdmin(u: any): boolean {
     return String(u?.role || '').toLowerCase() === 'admin';
@@ -398,11 +252,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Fermer le menu mobile lors de la navigation
     this.routerSubscription = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.menuOpen.set(false);
+      this.userMenuOpen.set(false);
     });
   }
 
@@ -410,39 +264,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
-
-    // Retirer le listener de clic
-    if (this.clickListener) {
-      this.clickListener();
-    }
+    this.removeOutsideClickListener();
   }
 
   toggleMenu(event: Event) {
-    event.stopPropagation(); // Empêche la propagation du clic
-    this.menuOpen.set(!this.menuOpen());
-
-    // Ajouter/supprimer le listener de clic à l'extérieur
-    if (this.menuOpen()) {
+    event.stopPropagation();
+    const next = !this.menuOpen();
+    this.menuOpen.set(next);
+    
+    if (next) {
+      this.renderer.addClass(this.document.body, 'overflow-hidden');
       this.addOutsideClickListener();
     } else {
+      this.renderer.removeClass(this.document.body, 'overflow-hidden');
       this.removeOutsideClickListener();
     }
   }
 
   closeMenu() {
     this.menuOpen.set(false);
+    this.renderer.removeClass(this.document.body, 'overflow-hidden');
     this.removeOutsideClickListener();
   }
 
   private addOutsideClickListener() {
-    // Ajouter un délai pour éviter que le clic actuel ne ferme immédiatement
     setTimeout(() => {
       this.clickListener = () => {
-        if (this.menuOpen()) {
-          this.closeMenu();
-        }
+        if (this.menuOpen()) this.closeMenu();
+        if (this.userMenuOpen()) this.userMenuOpen.set(false);
       };
-
       if (typeof window !== 'undefined') {
         window.addEventListener('click', this.clickListener);
       }
@@ -458,6 +308,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   logout() {
     this.auth.logout();
+    this.userMenuOpen.set(false);
     this.router.navigate(['/']);
   }
 

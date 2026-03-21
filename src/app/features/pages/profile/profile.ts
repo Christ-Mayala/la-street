@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -14,17 +14,19 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   template: `
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden hero-bg">
+    <div class="min-h-screen relative overflow-hidden hero-bg">
       <div class="absolute inset-0 -z-10 bg-black"></div>
 
       <!-- Background elements -->
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden">
-        <div class="absolute -top-10 left-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 right-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
       </div>
+
+      <!-- Hero Section -->
+      <section class="relative pt-12">
 
       <div class="container relative z-10 py-12">
         <div class="max-w-4xl mx-auto">
@@ -190,6 +192,58 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
             </div>
           </div>
 
+          <!-- Subscription Status Card -->
+          <div *ngIf="u.isPremium" class="bg-black/30 backdrop-blur-sm rounded-2xl border border-yellow-500/30 p-6 overflow-hidden relative group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+            
+            <div class="flex items-center gap-3 mb-6 relative z-10">
+              <div class="w-10 h-10 rounded-full bg-yellow-400/20 flex items-center justify-center border border-yellow-500/30 shadow-lg shadow-yellow-500/10">
+                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Abonnement Premium</h2>
+                <span class="text-xs font-black text-yellow-400 uppercase tracking-widest">{{ u.premiumPlan || 'Standard' }}</span>
+              </div>
+            </div>
+
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-slate-400 text-sm italic">Validité restante :</div>
+                <div class="text-2xl font-black text-yellow-400">{{ remainingDays }} <span class="text-xs uppercase text-slate-500">jours</span></div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden mb-6">
+                <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-300" 
+                     [style.width.%]="(remainingDays / 30) * 100"></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Status</div>
+                  <div class="text-xs text-green-400 font-bold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    Actif
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Expire le</div>
+                  <div class="text-xs text-slate-300 font-bold">{{ u.premiumUntil | date:'d MMM yyyy' }}</div>
+                </div>
+              </div>
+
+              <a routerLink="/pricing" 
+                 class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-yellow-500/30 text-yellow-400 font-bold rounded-xl text-xs uppercase tracking-wider transition-all duration-300">
+                Renouveler ou changer de plan
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
           <!-- Professional Profile Card -->
           <div *ngIf="u.role === 'professional'" class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
             <div class="flex items-center justify-between mb-6">
@@ -269,6 +323,118 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                       <input type="file" accept="image/*" class="hidden" (change)="onProImageChange($event)" />
                     </label>
                   </div>
+                </div>
+              </div>
+              <!-- Public Identity -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Nom commercial / Public</label>
+                  <div class="relative">
+                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <input
+                      [(ngModel)]="proName"
+                      [ngModelOptions]="{standalone: true}"
+                      class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                      placeholder="Nom affiché aux clients"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Téléphone public</label>
+                  <div class="relative">
+                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    <input
+                      [(ngModel)]="proTelephone"
+                      [ngModelOptions]="{standalone: true}"
+                      class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                      placeholder="Ex: +242 06 123 4567"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Specialization -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Catégorie</label>
+                  <div class="relative">
+                    <select
+                      [(ngModel)]="selectedCategoryId"
+                      [ngModelOptions]="{standalone: true}"
+                      (change)="onCategoryChange()"
+                      class="w-full pl-4 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
+                    >
+                      <option value="">Sélectionner une catégorie</option>
+                      <option *ngFor="let c of categories()" [value]="c._id">{{ c.name }}</option>
+                    </select>
+                    <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Métier / Profession</label>
+                  <div class="relative">
+                    <select
+                      [(ngModel)]="selectedTradeId"
+                      [ngModelOptions]="{standalone: true}"
+                      [disabled]="!trades().length"
+                      class="w-full pl-4 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none disabled:opacity-50"
+                    >
+                      <option value="">Sélectionner un métier</option>
+                      <option *ngFor="let t of trades()" [value]="t._id">{{ t.name }}</option>
+                    </select>
+                    <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Experience & Location -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Expérience</label>
+                  <div class="relative">
+                    <select
+                      [(ngModel)]="experienceRange"
+                      [ngModelOptions]="{standalone: true}"
+                      class="w-full pl-4 pr-10 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 appearance-none"
+                    >
+                      <option value="0-1">0 - 1 an</option>
+                      <option value="2-5">2 - 5 ans</option>
+                      <option value="5+">Plus de 5 ans</option>
+                    </select>
+                    <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Ville</label>
+                  <input
+                    [(ngModel)]="proVille"
+                    [ngModelOptions]="{standalone: true}"
+                    class="w-full px-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                    placeholder="Ex: Brazzaville"
+                  />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-slate-300">Quartier</label>
+                  <input
+                    [(ngModel)]="proQuartier"
+                    [ngModelOptions]="{standalone: true}"
+                    class="w-full px-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                    placeholder="Optionnel"
+                  />
                 </div>
               </div>
 
@@ -453,6 +619,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
         </div>
       </div>
     </main>
+      </div>
   `,
   styles: [`
     .hero-bg {
@@ -484,7 +651,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
     }
   `]
 })
-export class ProfilePage implements OnInit {
+export class UserProfilePage implements OnInit {
   protected readonly auth = inject(AuthService);
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
@@ -497,6 +664,13 @@ export class ProfilePage implements OnInit {
   avatarError = '';
   avatarPreview = '';
   savingAccount = signal(false);
+
+  get remainingDays(): number {
+    const u: any = this.auth.user();
+    if (!u || !u.isPremium || !u.premiumUntil) return 0;
+    const diff = new Date(u.premiumUntil).getTime() - new Date().getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }
 
   get accountPhotoUrl() {
     const u: any = this.auth.user();
@@ -523,6 +697,16 @@ export class ProfilePage implements OnInit {
   proImageError = '';
   proImagePreview = '';
 
+  categories = signal<any[]>([]);
+  trades = signal<any[]>([]);
+  selectedCategoryId = signal('');
+  selectedTradeId = signal('');
+  experienceRange = signal<'0-1' | '2-5' | '5+'>('0-1');
+  proVille = signal('');
+  proQuartier = signal('');
+  proName = signal('');
+  proTelephone = signal('');
+
   availability: Availability = 'available';
   proDescription = '';
   proDays = '';
@@ -544,8 +728,30 @@ export class ProfilePage implements OnInit {
     this.telephone = u.telephone || '';
 
     if (u.role === 'professional') {
+      this.loadCategories();
       this.reloadProfessional();
     }
+  }
+
+  loadCategories() {
+    this.api.categories().subscribe({
+      next: (cats) => {
+        this.categories.set(cats || []);
+        this.updateTradesList();
+      },
+      error: () => this.categories.set([])
+    });
+  }
+
+  onCategoryChange() {
+    this.selectedTradeId.set('');
+    this.updateTradesList();
+  }
+
+  private updateTradesList() {
+    const catId = this.selectedCategoryId();
+    const cat = this.categories().find(c => c._id === catId);
+    this.trades.set(cat?.trades || []);
   }
 
   getRoleLabel(role: string): string {
@@ -676,6 +882,20 @@ export class ProfilePage implements OnInit {
         this.proHours = p.hoursAvailable || '';
         this.proPreferredContact = (p.preferredContact || 'both') as any;
 
+        // Set new fields
+        this.proName.set(p.name || '');
+        this.proTelephone.set(p.telephone || '');
+        this.proVille.set(p.ville || '');
+        this.proQuartier.set(p.quartier || '');
+        this.experienceRange.set(p.experienceRange || '0-1');
+        
+        const catId = typeof p.categoryId === 'object' ? (p.categoryId as any)._id : p.categoryId;
+        const tradeId = typeof p.tradeId === 'object' ? (p.tradeId as any)._id : p.tradeId;
+        
+        this.selectedCategoryId.set(catId || '');
+        this.updateTradesList();
+        this.selectedTradeId.set(tradeId || '');
+
         const u: any = this.auth.user();
         if (String(u?.role || '').toLowerCase() === 'professional' && p?.profileImage?.url) {
           this.auth.setUser({ ...(u || {}), avatarUrl: p.profileImage.url } as any);
@@ -727,6 +947,16 @@ export class ProfilePage implements OnInit {
       fd.append('hoursAvailable', this.proHours || '');
       fd.append('preferredContact', this.proPreferredContact);
       fd.append('profileImage', this.proImageFile as File, (this.proImageFile as File).name);
+      
+      // Add missing fields to FormData
+      fd.append('name', this.proName() || '');
+      fd.append('telephone', this.proTelephone() || '');
+      fd.append('ville', this.proVille() || '');
+      fd.append('quartier', this.proQuartier() || '');
+      fd.append('categoryId', this.selectedCategoryId() || '');
+      fd.append('tradeId', this.selectedTradeId() || '');
+      fd.append('experienceRange', this.experienceRange());
+
       return fd;
     })() : {
       availabilityStatus: this.availability,
@@ -734,6 +964,13 @@ export class ProfilePage implements OnInit {
       daysAvailable: this.proDays,
       hoursAvailable: this.proHours,
       preferredContact: this.proPreferredContact,
+      name: this.proName(),
+      telephone: this.proTelephone(),
+      ville: this.proVille(),
+      quartier: this.proQuartier(),
+      categoryId: this.selectedCategoryId(),
+      tradeId: this.selectedTradeId(),
+      experienceRange: this.experienceRange(),
     };
 
     this.api.updateMyProfessional(payload).subscribe({

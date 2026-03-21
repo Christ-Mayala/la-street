@@ -104,9 +104,10 @@ export class AuthService {
 
     const res = await firstValueFrom(
       this.http.post<DryResponse<{ token: string; user: any }>>(
-        `${base}/api/v1/lastreet/auth/login`,
+        `${base}/api/v1/lastreet/user/login`,
         { email, password: pwd }
       ),
+
     );
 
     const data = unwrap(res);
@@ -117,6 +118,10 @@ export class AuthService {
       email: data.user?.email,
       role: this.normalizeRole(data.user?.role),
       telephone: data.user?.telephone,
+      avatarUrl: data.user?.avatarUrl,
+      isPremium: data.user?.isPremium,
+      premiumUntil: data.user?.premiumUntil,
+      premiumPlan: data.user?.premiumPlan,
       token: data.token,
     };
 
@@ -136,10 +141,11 @@ export class AuthService {
 
     const res = await firstValueFrom(
       this.http.post<DryResponse<any>>(
-        `${base}/api/v1/lastreet/auth/register`,
+        `${base}/api/v1/lastreet/user/register`,
         payload
       )
     );
+
 
     return unwrap(res);
   }

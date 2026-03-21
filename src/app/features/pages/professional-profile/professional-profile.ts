@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SeoService } from '../../../core/services/seo.service';
@@ -12,18 +12,20 @@ import { FavoritesService } from '../../../core/services/favorites.service';
 @Component({
   selector: 'app-professional-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   template: `
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden hero-bg">
+    <div class="min-h-screen relative overflow-hidden hero-bg">
       <div class="absolute inset-0 -z-10 bg-black"></div>
 
       <!-- Background elements -->
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden">
-        <div class="absolute top-10 left-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-10 right-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
       </div>
-    </section>
+
+      <div class="relative z-10">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden"></section>
 
     <!-- Main Content -->
     <main class="container py-12">
@@ -542,6 +544,8 @@ import { FavoritesService } from '../../../core/services/favorites.service';
         </div>
       </div>
     </main>
+      </div>
+    </div>
   `,
   styles: [`
     .hero-bg {
@@ -583,7 +587,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
     }
   `]
 })
-export class ProfessionalProfilePage implements OnInit {
+export class ProProfilePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly seo = inject(SeoService);
   private readonly api = inject(ApiService);

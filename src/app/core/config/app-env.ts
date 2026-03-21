@@ -9,7 +9,7 @@ const normalizeApiBaseUrl = (raw: unknown): string => {
     const isLocal = host === 'localhost' || host === '127.0.0.1';
 
     if (!isLocal) {
-      return window.location.origin;
+      if (!v) return window.location.origin;
     }
 
     if (!v) return 'http://localhost:5000';

@@ -52,6 +52,43 @@ export class ApiService {
     return this.http.get<DryResponse<any[]>>(`${base}${this.prefix}/categories`).pipe(map(unwrap));
   }
 
+  createCategory(payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/categories`, payload).pipe(map(unwrap));
+  }
+
+  updateCategory(id: string, payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.put<DryResponse<any>>(`${base}${this.prefix}/categories/${id}`, payload).pipe(map(unwrap));
+  }
+
+  deleteCategory(id: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/categories/${id}`).pipe(map(unwrap));
+  }
+
+
+  createTrade(payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/categories/trades`, payload).pipe(map(unwrap));
+  }
+
+  updateTrade(id: string, payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.put<DryResponse<any>>(`${base}${this.prefix}/categories/trades/${id}`, payload).pipe(map(unwrap));
+  }
+
+  deleteTrade(id: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/categories/trades/${id}`).pipe(map(unwrap));
+  }
+
   professionals(params?: { ville?: string; quartier?: string; categoryId?: string; tradeId?: string; q?: string }): Observable<Professional[]> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<Professional[]>();
@@ -234,8 +271,49 @@ export class ApiService {
   updateMyAccount(payload: any): Observable<any> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<any>();
-    return this.http.patch<DryResponse<any>>(`${base}${this.prefix}/auth/profile`, payload).pipe(map(unwrap));
+    return this.http.patch<DryResponse<any>>(`${base}${this.prefix}/user/profile`, payload).pipe(map(unwrap));
   }
+
+
+  requestPasswordReset(email: string): Observable<{ message: string; codeAlreadySent?: boolean; expiresAt?: string; timeRemaining?: number }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ message: string; codeAlreadySent?: boolean; expiresAt?: string; timeRemaining?: number }>();
+    return this.http.post<DryResponse<{ message: string; codeAlreadySent?: boolean; expiresAt?: string; timeRemaining?: number }>>(
+      `${base}/api/v1/lastreet/user/password-reset/request`,
+      { email }
+    ).pipe(map(unwrap));
+
+  }
+
+  verifyResetCode(email: string, code: string): Observable<{ valid: boolean; success?: boolean; message?: string }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ valid: boolean; success?: boolean; message?: string }>();
+    return this.http.post<DryResponse<{ valid: boolean; success?: boolean; message?: string }>>(
+      `${base}/api/v1/lastreet/user/password-reset/verify`,
+      { email, code }
+    ).pipe(map(unwrap));
+
+  }
+
+  resetPassword(email: string, code: string, newPassword: string): Observable<{ message: string }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ message: string }>();
+    return this.http.post<DryResponse<{ message: string }>>(
+      `${base}/api/v1/lastreet/user/password-reset/reset`,
+      { email, code, newPassword }
+    ).pipe(map(unwrap));
+
+  }
+
+
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ message: string }>();
+    return this.http
+      .patch<DryResponse<{ message: string }>>(`${base}${this.prefix}/user/password`, { currentPassword, newPassword })
+      .pipe(map(unwrap));
+  }
+
 
   reportProfile(payload: { professionalId?: string; targetUserId?: string; reason: string; message?: string }): Observable<any> {
     const base = this.safeBaseUrl();
@@ -260,5 +338,66 @@ export class ApiService {
 
     return this.http.post<DryResponse<any>>(`${base}${this.prefix}/admin/reports/${id}/decision`, payload).pipe(map(unwrap));
   }
+
+  leads(params?: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    const p = new HttpParams({ fromObject: params || {} });
+    return this.http.get<DryResponse<any>>(`${base}${this.prefix}/leads`, { params: p }).pipe(map(unwrap));
+  }
+
+  getLead(leadId: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.get<DryResponse<any>>(`${base}${this.prefix}/leads/${leadId}`).pipe(map(unwrap));
+  }
+
+  createLead(payload: { serviceType: string; description: string; location?: string; estimatedPrice?: number }): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads`, payload).pipe(map(unwrap));
+  }
+
+  // Phase 2: Responses and Assignment
+  respondToLead(leadId: string, message: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads/respond`, { leadId, message }).pipe(map(unwrap));
+  }
+
+  assignLead(leadId: string, professionalId: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads/assign`, { leadId, professionalId }).pipe(map(unwrap));
+  }
+
+  // ==========================================
+  // SUBSCRIPTIONS (Premium & Pay Per Lead)
+  // ==========================================
+
+  requestSubscription(payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/subscriptions/request`, payload).pipe(map(unwrap));
+  }
+
+  unlockLead(payload: any): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads/unlock`, payload).pipe(map(unwrap));
+  }
+
+  adminSubscriptionRequests(): Observable<any[]> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any[]>();
+    return this.http.get<DryResponse<any[]>>(`${base}${this.prefix}/subscriptions/admin/requests`).pipe(map(unwrap));
+  }
+
+  adminHandleSubscription(requestId: string, status: 'approved' | 'rejected', adminNote?: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/subscriptions/admin/requests/${requestId}/decision`, { status, adminNote }).pipe(map(unwrap));
+  }
 }
+
 
