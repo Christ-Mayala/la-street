@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -12,49 +12,64 @@ import { Professional } from '../../../core/models/professional.model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <section class="container py-8">
-      <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold">Tableau de bord admin</h1>
-          <div class="flex gap-2">
-            <button class="btn-outline" (click)="reload()">Rafraîchir</button>
-          </div>
+    <div class="fixed top-16 left-0 right-0 bottom-0 flex flex-col md:flex-row bg-black w-full overflow-hidden z-[50]">
+      <!-- Sidebar Navigation -->
+      <aside class="w-full md:w-64 flex-shrink-0 border-r border-slate-800 bg-slate-900/40 backdrop-blur-xl p-4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar">
+        <div class="hidden md:block mb-6 px-2 mt-2">
+          <h2 class="text-xl font-extrabold text-white tracking-tight">Espace <span class="text-yellow-500">Admin</span></h2>
+          <p class="text-xs text-slate-500 mt-1">Supervision globale de La STREET</p>
         </div>
+        
+        <button [class]="activeTab==='users' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-300 hover:bg-slate-800/50'" class="px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all whitespace-nowrap" (click)="activeTab='users'">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Utilisateurs
+        </button>
+        
+        <button [class]="activeTab==='pros' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-300 hover:bg-slate-800/50'" class="px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all whitespace-nowrap" (click)="activeTab='pros'">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> Professionnels
+        </button>
+        
+        <button [class]="activeTab==='payments' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-300 hover:bg-slate-800/50'" class="px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all whitespace-nowrap" (click)="activeTab='payments'; reloadPayments()">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Paiements
+        </button>
 
-        <div *ngIf="error" class="mt-4 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ error }}</div>
+        <button [class]="activeTab==='reports' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-300 hover:bg-slate-800/50'" class="px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all whitespace-nowrap" (click)="activeTab='reports'">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Signalements
+        </button>
 
-        <div class="mt-4 grid grid-cols-1 sm:grid-cols-5 gap-4">
-          <div class="card p-4 text-center">
-            <div class="text-sm text-slate-300">Professionnels</div>
-            <div class="text-2xl font-bold">{{ stats.professionals || 0 }}</div>
-          </div>
-          <div class="card p-4 text-center">
-            <div class="text-sm text-slate-500">En attente</div>
-            <div class="text-2xl font-bold">{{ stats.pending || 0 }}</div>
-          </div>
-          <div class="card p-4 text-center">
-            <div class="text-sm text-slate-500">Approuvés</div>
-            <div class="text-2xl font-bold">{{ stats.approved || 0 }}</div>
-          </div>
-          <div class="card p-4 text-center">
-            <div class="text-sm text-slate-500">Rejetés</div>
-            <div class="text-2xl font-bold">{{ stats.rejected || 0 }}</div>
-          </div>
-          <div class="card p-4 text-center">
-            <div class="text-sm text-slate-500">Utilisateurs</div>
-            <div class="text-2xl font-bold">{{ stats.users || 0 }}</div>
-          </div>
-        </div>
+        <button [class]="activeTab==='email' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-300 hover:bg-slate-800/50'" class="px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all whitespace-nowrap" (click)="activeTab='email'; ensureEmailRecipients()">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> E-Mailing
+        </button>
 
-        <div class="mt-6 overflow-x-auto">
-          <div class="inline-flex gap-2 p-1 rounded-xl border border-slate-800 bg-black/20">
-            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='users' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='users'">Users</button>
-            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='pros' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='pros'">Pros</button>
-            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='payments' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='payments'; reloadPayments()">Paiements</button>
-            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='reports' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='reports'">Reports</button>
-            <button type="button" class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" [class]="activeTab==='email' ? 'bg-yellow-500 text-black' : 'text-slate-200 hover:bg-slate-800/50'" (click)="activeTab='email'; ensureEmailRecipients()">Email</button>
+        <div class="hidden md:block flex-grow"></div>
+        
+        <!-- Action Globale Sidebar -->
+        <button *ngIf="activeTab==='users' || activeTab==='pros'" class="hidden md:flex px-4 py-3 rounded-xl items-center gap-3 text-sm font-semibold text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 border border-emerald-400/20 transition-all mt-6 whitespace-nowrap" (click)="exportData(activeTab)">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Exporter (CSV)
+        </button>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main class="flex-1 min-w-0 w-full bg-black overflow-y-auto px-2 py-6 md:p-8 relative no-scrollbar flex flex-col">
+        <div class="max-w-7xl mx-auto w-full">
+          <!-- Main Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Tableau de bord</h1>
+              <p class="text-sm text-slate-400 mt-1">Gérez vos utilisateurs, professionnels et configurations.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button *ngIf="(activeTab==='users' || activeTab==='pros')" class="md:hidden px-3 py-2 rounded-lg text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20" (click)="exportData(activeTab)">
+                Exporter
+              </button>
+              <button class="px-4 py-2 border border-slate-700 bg-slate-800/50 hover:bg-slate-700 rounded-lg text-sm text-white font-medium flex items-center gap-2 transition-all" (click)="reload()">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Actualiser
+              </button>
+            </div>
           </div>
-        </div>
+          
+          <div *ngIf="error" class="mb-6 flex items-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm font-medium">
+             <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> {{ error }}
+          </div>
 
         <div class="mt-4">
           <!-- Onglet Paiements -->
@@ -128,97 +143,168 @@ import { Professional } from '../../../core/models/professional.model';
               <div *ngIf="payments.length === 0" class="p-8 text-center text-slate-500">Aucune demande trouvée.</div>
             </div>
           </div>
-          <div *ngIf="activeTab==='pros'" class="card p-4">
+        <div *ngIf="activeTab==='pros'" class="card p-0 overflow-hidden">
+          <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md p-4 border-b border-slate-800">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h3 class="font-semibold">Professionnels <span *ngIf="prosLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
+              <h3 class="font-semibold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Professionnels 
+                <span *ngIf="prosLoading" class="inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span>
+              </h3>
               <div class="flex gap-2">
-                <select class="input-modern !py-1 !rounded-lg" [(ngModel)]="proStatusFilter" name="proStatusFilter" (change)="reloadPros()">
+                <select class="input-modern !py-1 !rounded-lg text-sm" [(ngModel)]="proStatusFilter" name="proStatusFilter" (change)="reloadPros()">
                   <option value="pending">En attente</option>
                   <option value="approved">Approuvés</option>
                   <option value="rejected">Rejetés</option>
                 </select>
-                <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="proSearch" name="proSearch" placeholder="Rechercher..." />
+                <input class="input-modern !py-1 !rounded-lg text-sm" [(ngModel)]="proSearch" name="proSearch" placeholder="Rechercher..." />
               </div>
             </div>
+          </div>
+          <div class="p-4 pt-0">
             <div *ngIf="prosError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ prosError }}</div>
             <div *ngIf="prosLoading" class="mt-3 text-sm text-slate-300">Chargement des professionnels...</div>
             <div class="mt-3 space-y-3">
-              <div *ngFor="let p of filteredPros; trackBy: trackByEntity" class="p-3 rounded-xl border border-slate-800 bg-black/20">
+              <div *ngFor="let p of paginatedPros; trackBy: trackByEntity" class="p-3 rounded-xl border border-slate-800 bg-black/20 group hover:border-slate-700/80 transition-all">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div class="flex items-start gap-3 min-w-0">
-                    <div class="h-14 w-14 rounded-full overflow-hidden border border-yellow-400/25 bg-black/40 flex items-center justify-center shrink-0">
+                  <div class="flex items-start gap-4 min-w-0">
+                    <div class="h-14 w-14 rounded-full overflow-hidden border border-yellow-400/25 bg-black/40 flex items-center justify-center shrink-0 shadow-inner">
                       <img *ngIf="p.profileImage?.url" [src]="p.profileImage?.url" alt="" class="h-full w-full object-cover bg-black/40" loading="lazy" decoding="async" />
-                      <span *ngIf="!p.profileImage?.url" class="text-yellow-300 font-bold">{{ (p.name || '?').slice(0, 1) }}</span>
+                      <span *ngIf="!p.profileImage?.url" class="text-yellow-300 font-bold text-xl">{{ (p.name || '?').slice(0, 1).toUpperCase() }}</span>
                     </div>
                     <div class="min-w-0">
-                      <div class="font-medium text-white clamp-2 text-anywhere">
-                        {{ p.name }} <span class="text-xs text-slate-500">({{ p.approvalStatus }})</span>
+                      <div class="font-medium text-white clamp-2 text-anywhere text-base flex items-center gap-2">
+                        {{ p.name }}
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase" [class]="p.approvalStatus === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : (p.approvalStatus === 'rejected' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20')">
+                          {{ p.approvalStatus }}
+                        </span>
                       </div>
-                      <div class="text-sm text-slate-300 clamp-2 text-anywhere">
+                      <div class="text-sm text-slate-400 clamp-2 text-anywhere mt-1">
                         {{ tradeLabel(p) }} · {{ p.ville }}<span *ngIf="p.quartier"> · {{ p.quartier }}</span>
                       </div>
-                      <button type="button" class="mt-2 text-sm text-primary hover:underline" (click)="openProfessional(p)">
-                        Voir les infos complètes
+                      <button type="button" class="mt-2 text-xs text-yellow-500 hover:underline flex items-center gap-1" (click)="openProfessional(p)">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Fiche complète
                       </button>
                     </div>
                   </div>
 
-                  <div class="flex flex-wrap gap-2">
-                    <button class="btn-outline" (click)="openProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Voir' }}</button>
-                    <button *ngIf="p.approvalStatus!=='approved'" class="btn-primary" (click)="setStatus(p, 'approved')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Approuver' }}</button>
-                    <button *ngIf="p.approvalStatus!=='rejected'" class="btn-outline" (click)="setStatus(p, 'rejected')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Rejeter' }}</button>
-                    <button class="btn-outline" (click)="deleteProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Supprimer' }}</button>
+                  <div class="flex flex-wrap gap-2 md:opacity-80 md:group-hover:opacity-100 transition-opacity">
+                    <button class="px-3 py-1.5 rounded-lg text-slate-300 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 transition-colors text-xs font-medium" (click)="openProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Voir' }}</button>
+                    <button *ngIf="p.approvalStatus!=='approved'" class="px-3 py-1.5 rounded-lg text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400 hover:text-white border border-emerald-400/20 transition-colors text-xs font-bold" (click)="setStatus(p, 'approved')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Approuver' }}</button>
+                    <button *ngIf="p.approvalStatus!=='rejected'" class="px-3 py-1.5 rounded-lg text-rose-400 bg-rose-400/10 hover:bg-rose-400 hover:text-white border border-rose-400/20 transition-colors text-xs font-bold" (click)="setStatus(p, 'rejected')" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Rejeter' }}</button>
+                    <button class="px-3 py-1.5 rounded-lg text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors text-xs font-medium" (click)="deleteProfessional(p)" [disabled]="isProActing(p)">{{ isProActing(p) ? '...' : 'Supprimer' }}</button>
                   </div>
                 </div>
               </div>
-              <div *ngIf="pros.length===0" class="text-sm text-slate-300">Aucun professionnel.</div>
+              <div *ngIf="pros.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun professionnel.</div>
+              
+              <!-- Pagination Pros -->
+              <div *ngIf="totalPagesPros > 1" class="mt-6 flex items-center justify-center gap-4">
+                <button (click)="currentPagePros = currentPagePros - 1" [disabled]="currentPagePros === 1" class="p-2 rounded-lg border border-slate-800 bg-slate-900/50 text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-all">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPagePros }}</span> sur {{ totalPagesPros }}</div>
+                <button (click)="currentPagePros = currentPagePros + 1" [disabled]="currentPagePros === totalPagesPros" class="p-2 rounded-lg border border-slate-800 bg-slate-900/50 text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-all">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div *ngIf="activeTab==='users'" class="card p-4">
+        <div *ngIf="activeTab==='users'" class="card p-0 overflow-hidden">
+          <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md p-4 border-b border-slate-800">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h3 class="font-semibold">Utilisateurs <span *ngIf="usersLoading" class="ml-2 inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span></h3>
+              <h3 class="font-semibold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Utilisateurs 
+                <span *ngIf="usersLoading" class="inline-block h-3 w-3 rounded-full border border-yellow-400/30 border-t-yellow-400 animate-spin"></span>
+              </h3>
               <div class="flex gap-2">
-                <select class="input-modern !py-1 !rounded-lg" [(ngModel)]="userStatusFilter" name="userStatusFilter" (change)="reloadUsers()">
+                <select class="input-modern !py-1 !rounded-lg text-sm" [(ngModel)]="userStatusFilter" name="userStatusFilter" (change)="reloadUsers()">
                   <option value="active">Actifs</option>
                   <option value="inactive">Désactivés</option>
                   <option value="deleted">Supprimés</option>
                   <option value="all">Tous</option>
                 </select>
-                <input class="input-modern !py-1 !rounded-lg" [(ngModel)]="userSearch" name="userSearch" placeholder="Rechercher..." (input)="reloadUsers()" />
+                <input class="input-modern !py-1 !rounded-lg text-sm" [(ngModel)]="userSearch" name="userSearch" placeholder="Rechercher..." (input)="reloadUsers()" />
               </div>
             </div>
+          </div>
+          <div class="p-4 pt-0">
             <div *ngIf="usersError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ usersError }}</div>
             <div *ngIf="usersLoading" class="mt-3 text-sm text-slate-300">Chargement des utilisateurs...</div>
-            <div class="mt-3">
-              <form class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-3" (submit)="createUser($event)">
-                <input [(ngModel)]="newUserName" name="newUserName" placeholder="Nom" class="input-modern !py-2 !rounded-lg" required />
-                <input [(ngModel)]="newUserEmail" name="newUserEmail" placeholder="Email" class="input-modern !py-2 !rounded-lg" required />
-                <input [(ngModel)]="newUserPassword" name="newUserPassword" placeholder="Mot de passe" type="password" class="input-modern !py-2 !rounded-lg" required minlength="6" />
-                <select [(ngModel)]="newUserRole" name="newUserRole" class="input-modern !py-2 !rounded-lg">
-                  <option value="user">User</option>
-                  <option value="professional">Professionnel</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <input [(ngModel)]="newUserTelephone" name="newUserTelephone" placeholder="Téléphone (optionnel)" class="input-modern !py-2 !rounded-lg md:col-span-2" />
-                <button class="btn-primary md:col-span-2" type="submit" [disabled]="createUserLoading">{{ createUserLoading ? 'Création...' : 'Créer' }}</button>
-              </form>
-
-              <div class="space-y-2">
-                <div *ngFor="let u of filteredUsers; trackBy: trackByEntity" class="flex items-center justify-between p-2 border rounded">
-                  <div>
-                    <div class="font-medium">{{ u.name }}</div>
-                    <div class="text-xs text-slate-400">{{ u.email }} · {{ u.role }}<span *ngIf="u.telephone"> · {{ u.telephone }}</span></div>
+            <div class="mt-4">
+              <!-- Formulaire Création Rapide -->
+              <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 mb-6">
+                <div class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> 
+                  Création Rapide
+                </div>
+                <form class="grid grid-cols-1 md:grid-cols-5 gap-3" (submit)="createUser($event)">
+                  <input [(ngModel)]="newUserName" name="newUserName" placeholder="Nom" class="input-modern !py-2 !rounded-lg" required />
+                  <input [(ngModel)]="newUserEmail" name="newUserEmail" placeholder="Email" class="input-modern !py-2 !rounded-lg" required />
+                  <input [(ngModel)]="newUserPassword" name="newUserPassword" placeholder="Mot de passe" type="password" class="input-modern !py-2 !rounded-lg" required minlength="6" />
+                  <select [(ngModel)]="newUserRole" name="newUserRole" class="input-modern !py-2 !rounded-lg">
+                    <option value="user">Utilisateur Standard</option>
+                    <option value="professional">Professionnel</option>
+                    <option value="admin">Administrateur</option>
+                  </select>
+                  <div class="flex gap-2">
+                    <input [(ngModel)]="newUserTelephone" name="newUserTelephone" placeholder="Téléphone" class="input-modern !py-2 !rounded-lg flex-1" />
+                    <button class="btn-primary whitespace-nowrap" type="submit" [disabled]="createUserLoading">{{ createUserLoading ? '...' : 'Créer' }}</button>
                   </div>
-                  <div class="flex flex-wrap gap-2">
-                    <button class="btn-outline" type="button" (click)="prefillEmail(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Email' }}</button>
-                    <button *ngIf="(u.status||'') !== 'inactive' && !(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="setUserStatus(u, 'inactive')" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Désactiver' }}</button>
-                    <button *ngIf="(u.status||'') === 'inactive'" class="btn-outline" type="button" (click)="setUserStatus(u, 'active')" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Activer' }}</button>
-                    <button *ngIf="(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="restoreUser(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Restaurer' }}</button>
-                    <button *ngIf="!(u.deleted===true || u.status==='deleted')" class="btn-outline" type="button" (click)="deleteUser(u)" [disabled]="isUserActing(u)">{{ isUserActing(u) ? '...' : 'Supprimer' }}</button>
+                </form>
+              </div>
+
+              <!-- Liste des utilisateurs -->
+              <div class="space-y-3">
+                <div *ngFor="let u of paginatedUsers; trackBy: trackByEntity" class="flex flex-col md:flex-row md:items-center justify-between p-4 border border-slate-800 bg-black/40 rounded-xl hover:border-slate-700/80 transition-all gap-4 group">
+                  <div class="flex items-center gap-4 min-w-0">
+                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center font-bold text-slate-300 border border-slate-700/50 shadow-inner shrink-0">
+                      {{ (u.name || '?').slice(0, 1).toUpperCase() }}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="font-medium text-white flex items-center flex-wrap gap-2 text-base">
+                        <span class="truncate">{{ u.name }}</span>
+                        <span *ngIf="u.role === 'admin'" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/10 text-red-400 border border-red-500/20">Admin</span>
+                        <span *ngIf="u.role === 'professional'" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">Pro</span>
+                        <span *ngIf="u.isPremium" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                          Premium
+                        </span>
+                      </div>
+                      <div class="text-sm text-slate-400 mt-1 truncate">{{ u.email }}<span *ngIf="u.telephone"> · {{ u.telephone }}</span></div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex flex-wrap items-center gap-2 md:opacity-80 md:group-hover:opacity-100 transition-opacity">
+                    <button class="px-3 py-1.5 rounded-lg border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black text-xs font-semibold transition-colors flex items-center gap-1.5" type="button" (click)="grantPremium(u)" [disabled]="isUserActing(u)">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                      {{ isUserActing(u) ? '...' : (u.isPremium ? '+ Jours' : 'Offrir Premium') }}
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg text-slate-300 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 transition-colors text-xs font-medium" type="button" (click)="prefillEmail(u)" [disabled]="isUserActing(u)">Email</button>
+                    
+                    <button *ngIf="(u.status||'') !== 'inactive' && !(u.deleted===true || u.status==='deleted')" class="px-3 py-1.5 rounded-lg text-orange-400 bg-orange-400/10 hover:bg-orange-400 hover:text-white border border-orange-400/20 transition-colors text-xs font-medium" type="button" (click)="setUserStatus(u, 'inactive')" [disabled]="isUserActing(u)">Désactiver</button>
+                    <button *ngIf="(u.status||'') === 'inactive'" class="px-3 py-1.5 rounded-lg text-green-400 bg-green-400/10 hover:bg-green-400 hover:text-white border border-green-400/20 transition-colors text-xs font-medium" type="button" (click)="setUserStatus(u, 'active')" [disabled]="isUserActing(u)">Activer</button>
+                    
+                    <button *ngIf="(u.deleted===true || u.status==='deleted')" class="px-3 py-1.5 rounded-lg text-slate-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-xs font-medium" type="button" (click)="restoreUser(u)" [disabled]="isUserActing(u)">Restaurer</button>
+                    <button *ngIf="!(u.deleted===true || u.status==='deleted')" class="px-3 py-1.5 rounded-lg text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors text-xs font-medium" type="button" (click)="deleteUser(u)" [disabled]="isUserActing(u)">Supprimer</button>
                   </div>
                 </div>
-                <div *ngIf="users.length===0" class="text-sm text-slate-300">Aucun utilisateur.</div>
+                <div *ngIf="users.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun utilisateur trouvé.</div>
+
+                <!-- Pagination Users -->
+                <div *ngIf="totalPagesUsers > 1" class="mt-6 flex items-center justify-center gap-4">
+                  <button (click)="currentPageUsers = currentPageUsers - 1" [disabled]="currentPageUsers === 1" class="p-2 rounded-lg border border-slate-800 bg-slate-900/50 text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                  </button>
+                  <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPageUsers }}</span> sur {{ totalPagesUsers }}</div>
+                  <button (click)="currentPageUsers = currentPageUsers + 1" [disabled]="currentPageUsers === totalPagesUsers" class="p-2 rounded-lg border border-slate-800 bg-slate-900/50 text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  </button>
+                </div>
               </div>
 
               <div class="mt-4 p-3 rounded-xl border border-slate-800 bg-black/20 text-sm text-slate-300">
@@ -226,8 +312,6 @@ import { Professional } from '../../../core/models/professional.model';
               </div>
             </div>
           </div>
-        </div>
-
         </div>
 
         <div *ngIf="activeTab==='reports'" class="card p-4">
@@ -429,9 +513,22 @@ import { Professional } from '../../../core/models/professional.model';
         <div class="hidden md:block">
           <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>
         </div>
-    </section>
+          </div>
+        </div>
+      </main>
+    </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      background: black;
+    }
+
+    /* Le container principal est maintenant en fixed top-16 (height de la navbar) */
+    /* Cela permet d'outrepasser le layout du app.html qui pourrait être gênant */
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     /* Styles pour le modal mobile */
     @media (max-width: 767px) {
       .modal-mobile-fullscreen {
@@ -544,7 +641,7 @@ import { Professional } from '../../../core/models/professional.model';
     }
   `]
 })
-export class AdminDashboardPage {
+export class AdminDashboardPage implements OnInit, OnDestroy {
   // Dashboard admin: gestion pros, utilisateurs et signalements.
   // Objectif: actions cohérentes (suppression -> disparition immédiate) + messages d'erreur lisibles.
   private readonly api = inject(ApiService);
@@ -552,6 +649,14 @@ export class AdminDashboardPage {
   private readonly toast = inject(ToastService);
 
   activeTab: 'users' | 'pros' | 'reports' | 'email' | 'payments' = 'users';
+
+  ngOnInit() {
+    document.body.classList.add('admin-page-active');
+  }
+
+  ngOnDestroy() {
+    document.body.classList.remove('admin-page-active');
+  }
 
   selectedProOpen = false;
   selectedProLoading = false;
@@ -595,6 +700,24 @@ export class AdminDashboardPage {
   reportStatusFilter: 'open' | 'resolved' = 'open';
   reportSearch = '';
 
+  // Pagination
+  currentPageUsers = 1;
+  currentPagePros = 1;
+  pageSize = 5;
+
+  get paginatedUsers() {
+    const start = (this.currentPageUsers - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
+  }
+
+  get paginatedPros() {
+    const start = (this.currentPagePros - 1) * this.pageSize;
+    return this.filteredPros.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesUsers() { return Math.ceil(this.filteredUsers.length / this.pageSize); }
+  get totalPagesPros() { return Math.ceil(this.filteredPros.length / this.pageSize); }
+
   get filteredPros() {
     const q = (this.proSearch || '').toLowerCase().trim();
     if (!q) return this.pros;
@@ -606,7 +729,15 @@ export class AdminDashboardPage {
     );
   }
 
-  get filteredUsers() { return this.users; }
+  get filteredUsers() {
+    const q = (this.userSearch || '').toLowerCase().trim();
+    if (!q) return this.users;
+    return (this.users || []).filter((u: any) =>
+      String(u?.name || '').toLowerCase().includes(q) ||
+      String(u?.email || '').toLowerCase().includes(q) ||
+      String(u?.telephone || '').toLowerCase().includes(q)
+    );
+  }
   get filteredReports() {
     const q = (this.reportSearch || '').toLowerCase().trim();
     if (!q) return this.reports;
@@ -727,6 +858,7 @@ export class AdminDashboardPage {
   }
 
   reloadUsers() {
+    this.currentPageUsers = 1;
     this.usersLoading = true;
     this.usersError = '';
 
@@ -743,6 +875,7 @@ export class AdminDashboardPage {
   }
 
   reloadPros() {
+    this.currentPagePros = 1;
     this.prosLoading = true;
     this.prosError = '';
 
@@ -1109,10 +1242,72 @@ export class AdminDashboardPage {
     });
   }
 
+  grantPremium(u: any) {
+    const daysStr = prompt(`Combien de jours Premium souhaitez-vous offrir à ${u.name} ?`, '7');
+    if (!daysStr) return;
+    
+    const days = parseInt(daysStr, 10);
+    if (isNaN(days) || days <= 0) {
+      this.toast.error('Erreur', 'Nombre de jours invalide.');
+      return;
+    }
+
+    if (!confirm(`Confirmez-vous l'octroi de ${days} jours Premium à ${u.name} ?`)) return;
+
+    this.actingUsers.add(u._id);
+    this.api.adminGrantPremium(u._id, { days }).subscribe({
+      next: (res) => {
+        const expDate = new Date(res.newExpiration).toLocaleDateString('fr-FR');
+        this.toast.success('Premium Accordé', `L'accès Premium est valable jusqu'au ${expDate}.`);
+        this.actingUsers.delete(u._id);
+        this.reloadUsers();
+        if (this.activeTab === 'pros') this.reloadPros();
+      },
+      error: (e) => {
+        this.toast.error('Erreur', e?.message || "Impossible d'accorder le Premium");
+        this.actingUsers.delete(u._id);
+      }
+    });
+  }
+
   closeProfessional() {
     this.selectedProOpen = false;
     this.selectedProLoading = false;
     this.selectedProError = '';
     this.selectedPro = null;
+  }
+
+  exportData(type: 'users' | 'pros') {
+    const data = type === 'users' ? this.users : this.pros; // On exporte tout, pas juste le filtré/paginé ? Généralement l'admin veut tout.
+    if (!data || !data.length) {
+      this.toast.error('Erreur', 'Aucune donnée à exporter');
+      return;
+    }
+    
+    let csvContent = '';
+    
+    if (type === 'users') {
+      csvContent = 'ID,Nom,Email,Telephone,Role,Status,Premium,Premium Expire,Date Creation\n';
+      data.forEach((u: any) => {
+        const createdAt = u.createdAt ? new Date(u.createdAt).toLocaleDateString('fr-FR') : '';
+        const premiumUntil = u.premiumUntil ? new Date(u.premiumUntil).toLocaleDateString('fr-FR') : '';
+        csvContent += `"${u._id}","${(u.name || '').replace(/"/g, '""')}","${(u.email || '').replace(/"/g, '""')}","${u.telephone || ''}","${u.role || ''}","${u.status || ''}","${u.isPremium ? 'Oui' : 'Non'}","${premiumUntil}","${createdAt}"\n`;
+      });
+    } else {
+      csvContent = 'ID,Nom,Email Createur,Telephone,Metier,Ville,Quartier,Status,Premium,Inscrit Le\n';
+      data.forEach((p: any) => {
+        const createdAt = p.createdAt ? new Date(p.createdAt).toLocaleDateString('fr-FR') : '';
+        csvContent += `"${p._id}","${(p.name || '').replace(/"/g, '""')}","${(p.createdBy?.email || '').replace(/"/g, '""')}","${p.telephone || ''}","${(this.tradeLabel(p)).replace(/"/g, '""')}","${(p.ville || '').replace(/"/g, '""')}","${(p.quartier || '').replace(/"/g, '""')}","${p.approvalStatus || ''}","${p.isPremium ? 'Oui' : 'Non'}","${createdAt}"\n`;
+      });
+    }
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `lastreet_${type}_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }

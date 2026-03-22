@@ -224,6 +224,13 @@ export class ApiService {
     return this.http.patch<DryResponse<any>>(`${base}${this.prefix}/admin/users/${id}/status`, payload).pipe(map(unwrap));
   }
 
+  adminGrantPremium(id: string, payload: { days: number; plan?: string }): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+
+    return this.http.post<DryResponse<any>>(`${base}${this.prefix}/admin/users/${id}/grant-premium`, payload).pipe(map(unwrap));
+  }
+
   adminSendUserEmail(id: string, payload: { subject: string; message: string }): Observable<{ to: string }> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<{ to: string }>();

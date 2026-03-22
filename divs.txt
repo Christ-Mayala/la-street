@@ -1,0 +1,135 @@
+15:    <div class="flex flex-col md:flex-row min-h-[calc(100vh-8rem)] bg-black w-full relative">
+18:        <div class="hidden md:block mb-6 px-2 mt-2">
+43:        <div class="hidden md:block flex-grow"></div>
+53:        <div class="max-w-7xl mx-auto w-full">
+55:          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+56:            <div>
+60:            <div class="flex items-center gap-3">
+70:          <div *ngIf="error" class="mb-6 flex items-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm font-medium">
+74:        <div class="mt-4">
+76:          <div *ngIf="activeTab==='payments'" class="card p-4 animate-in fade-in duration-300">
+77:            <div class="flex items-center justify-between mb-4">
+85:            <div *ngIf="paymentsError" class="p-3 mb-4 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ paymentsError }}</div>
+87:            <div class="overflow-x-auto border border-slate-800 rounded-xl bg-black/40">
+102:                      <div class="font-medium text-white">{{ p.userId?.name }}</div>
+103:                      <div class="text-xs text-slate-500">{{ p.userId?.email }}</div>
+113:                      <div *ngIf="p.leadId" class="text-[10px] text-slate-500 mt-1 italic">Mission: {{ p.leadId._id }}</div>
+117:                      <div class="flex flex-col gap-1">
+118:                        <div *ngIf="p.transactionCode" class="text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700 font-mono w-max">
+135:                      <div class="flex justify-end gap-2" *ngIf="p.status === 'pending'">
+143:              <div *ngIf="payments.length === 0" class="p-8 text-center text-slate-500">Aucune demande trouvée.</div>
+146:        <div *ngIf="activeTab==='pros'" class="card p-0 overflow-hidden">
+147:          <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md p-4 border-b border-slate-800">
+148:            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+154:              <div class="flex gap-2">
+164:          <div class="p-4 pt-0">
+165:            <div *ngIf="prosError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ prosError }}</div>
+166:            <div *ngIf="prosLoading" class="mt-3 text-sm text-slate-300">Chargement des professionnels...</div>
+167:            <div class="mt-3 space-y-3">
+168:              <div *ngFor="let p of paginatedPros; trackBy: trackByEntity" class="p-3 rounded-xl border border-slate-800 bg-black/20 group hover:border-slate-700/80 transition-all">
+169:                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+170:                  <div class="flex items-start gap-4 min-w-0">
+171:                    <div class="h-14 w-14 rounded-full overflow-hidden border border-yellow-400/25 bg-black/40 flex items-center justify-center shrink-0 shadow-inner">
+175:                    <div class="min-w-0">
+176:                      <div class="font-medium text-white clamp-2 text-anywhere text-base flex items-center gap-2">
+182:                      <div class="text-sm text-slate-400 clamp-2 text-anywhere mt-1">
+192:                  <div class="flex flex-wrap gap-2 md:opacity-80 md:group-hover:opacity-100 transition-opacity">
+200:              <div *ngIf="pros.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun professionnel.</div>
+203:              <div *ngIf="totalPagesPros > 1" class="mt-6 flex items-center justify-center gap-4">
+207:                <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPagePros }}</span> sur {{ totalPagesPros }}</div>
+215:        <div *ngIf="activeTab==='users'" class="card p-0 overflow-hidden">
+216:          <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md p-4 border-b border-slate-800">
+217:            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+223:              <div class="flex gap-2">
+234:          <div class="p-4 pt-0">
+235:            <div *ngIf="usersError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ usersError }}</div>
+236:            <div *ngIf="usersLoading" class="mt-3 text-sm text-slate-300">Chargement des utilisateurs...</div>
+237:            <div class="mt-4">
+239:              <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 mb-6">
+240:                <div class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+253:                  <div class="flex gap-2">
+261:              <div class="space-y-3">
+262:                <div *ngFor="let u of paginatedUsers; trackBy: trackByEntity" class="flex flex-col md:flex-row md:items-center justify-between p-4 border border-slate-800 bg-black/40 rounded-xl hover:border-slate-700/80 transition-all gap-4 group">
+263:                  <div class="flex items-center gap-4 min-w-0">
+264:                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center font-bold text-slate-300 border border-slate-700/50 shadow-inner shrink-0">
+267:                    <div class="min-w-0">
+268:                      <div class="font-medium text-white flex items-center flex-wrap gap-2 text-base">
+277:                      <div class="text-sm text-slate-400 mt-1 truncate">{{ u.email }}<span *ngIf="u.telephone"> · {{ u.telephone }}</span></div>
+281:                  <div class="flex flex-wrap items-center gap-2 md:opacity-80 md:group-hover:opacity-100 transition-opacity">
+295:                <div *ngIf="users.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun utilisateur trouvé.</div>
+298:                <div *ngIf="totalPagesUsers > 1" class="mt-6 flex items-center justify-center gap-4">
+302:                  <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPageUsers }}</span> sur {{ totalPagesUsers }}</div>
+309:              <div class="mt-4 p-3 rounded-xl border border-slate-800 bg-black/20 text-sm text-slate-300">
+316:        <div *ngIf="activeTab==='reports'" class="card p-4">
+317:          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+319:            <div class="flex gap-2">
+328:          <div *ngIf="reportsError" class="mb-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ reportsError }}</div>
+329:          <div *ngIf="reportsLoading" class="text-sm text-slate-300">Chargement des signalements...</div>
+330:          <div class="mt-3 space-y-2">
+331:            <div *ngFor="let r of filteredReports; trackBy: trackByEntity" class="p-3 border rounded">
+332:              <div class="text-sm text-slate-200">
+337:              <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-300">
+338:                <div>
+341:                <div>
+346:              <div class="mt-2" *ngIf="r.targetProfessional">
+349:              <div *ngIf="r.message" class="mt-2 text-sm text-slate-300">{{ r.message }}</div>
+350:              <div class="mt-3 flex gap-2">
+359:            <div *ngIf="reports.length===0" class="text-sm text-slate-300">Aucun signalement.</div>
+363:        <div *ngIf="activeTab==='email'" class="card p-4">
+364:          <div class="flex items-center justify-between gap-3">
+368:          <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+369:            <div class="p-3 rounded-xl border border-slate-800 bg-black/20">
+370:              <div class="font-semibold mb-2">Email individuel</div>
+376:                <div *ngIf="emailRecipientsLoading" class="text-xs text-slate-400">Chargement des destinataires...</div>
+383:            <div class="p-3 rounded-xl border border-slate-800 bg-black/20">
+384:              <div class="font-semibold mb-2">Broadcast</div>
+394:              <div class="text-xs text-slate-400 mt-2">Envoi en lot. Utilise la config email DRY (FROM_NAME = La STREET).</div>
+400:        <div *ngIf="selectedProOpen" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto">
+401:          <div class="w-full max-w-3xl bg-black/90 rounded-2xl border border-slate-800 shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
+402:            <div class="sticky top-0 z-10 bg-black/90 p-5 border-b border-slate-800">
+403:              <div class="flex items-center justify-between">
+404:                <div class="min-w-0">
+405:                  <div class="text-lg font-semibold text-white truncate">Détails professionnel</div>
+406:                  <div class="text-sm text-slate-400 truncate">{{ selectedPro?.name || '—' }}</div>
+416:            <div class="p-5 pb-8">
+417:              <div *ngIf="selectedProLoading" class="py-12 flex justify-center">
+418:                <div class="h-10 w-10 rounded-full border-2 border-yellow-400/20 border-t-yellow-400 animate-spin"></div>
+421:              <div *ngIf="selectedProError" class="mb-4 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ selectedProError }}</div>
+423:              <div *ngIf="!selectedProLoading && selectedPro" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+424:                <div class="md:col-span-1">
+425:                  <div class="aspect-square rounded-2xl overflow-hidden border border-slate-800 bg-black/40 flex items-center justify-center">
+427:                    <div *ngIf="!selectedPro.profileImage?.url" class="text-yellow-300 font-bold text-3xl">{{ (selectedPro.name || '?').slice(0, 1) }}</div>
+430:                  <div class="mt-4 flex flex-wrap gap-2">
+440:                <div class="md:col-span-2 space-y-4 min-w-0">
+441:                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+442:                    <div class="p-4 rounded-xl border border-slate-800 bg-black/20">
+443:                      <div class="text-xs text-slate-500">Nom</div>
+444:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ selectedPro.name }}</div>
+446:                    <div class="p-4 rounded-xl border border-slate-800 bg-black/20">
+447:                      <div class="text-xs text-slate-500">Téléphone</div>
+448:                      <div class="text-white font-medium">{{ selectedPro.telephone || '—' }}</div>
+449:                      <div class="text-xs text-slate-400" *ngIf="selectedPro.whatsapp">WhatsApp disponible</div>
+451:                    <div class="p-4 rounded-xl border border-slate-800 bg-black/20">
+452:                      <div class="text-xs text-slate-500">Métier</div>
+453:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ tradeLabel(selectedPro) }}</div>
+455:                    <div class="p-4 rounded-xl border border-slate-800 bg-black/20">
+456:                      <div class="text-xs text-slate-500">Localisation</div>
+457:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ selectedPro.ville }}<span *ngIf="selectedPro.quartier"> · {{ selectedPro.quartier }}</span></div>
+461:                  <div class="p-4 rounded-xl border border-slate-800 bg-black/20" *ngIf="selectedPro.description">
+462:                    <div class="text-xs text-slate-500">Description</div>
+463:                    <div class="text-slate-200 whitespace-pre-wrap text-anywhere">{{ selectedPro.description }}</div>
+466:                  <div class="p-4 rounded-xl border border-slate-800 bg-black/20">
+467:                    <div class="text-xs text-slate-500">Disponibilités</div>
+468:                    <div class="text-slate-200">
+473:                    <div class="text-xs text-slate-400" *ngIf="selectedPro.preferredContact">Contact préféré: {{ selectedPro.preferredContact }}</div>
+476:                  <div class="p-4 rounded-xl border border-slate-800 bg-black/20" *ngIf="selectedPro.images?.length">
+477:                    <div class="text-xs text-slate-500 mb-3">Autres photos</div>
+478:                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+479:                      <div *ngFor="let img of selectedPro.images; trackBy: trackByImg" class="aspect-square rounded-xl overflow-hidden border border-slate-800 bg-black/40">
+489:            <div class="sticky bottom-0 left-0 right-0 bg-black/90 border-t border-slate-800 p-4 md:hidden">
+490:              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+492:                <div class="flex gap-2">
+502:        <div *ngIf="selectedProofImage" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4" (click)="selectedProofImage = null">
+503:          <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center">
+512:        <div class="hidden md:block">
+513:          <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>

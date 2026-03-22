@@ -1,0 +1,135 @@
+21:        </div>
+43:        <div class="hidden md:block flex-grow"></div>
+59:            </div>
+67:            </div>
+68:          </div>
+72:          </div>
+83:            </div>
+85:            <div *ngIf="paymentsError" class="p-3 mb-4 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ paymentsError }}</div>
+102:                      <div class="font-medium text-white">{{ p.userId?.name }}</div>
+103:                      <div class="text-xs text-slate-500">{{ p.userId?.email }}</div>
+113:                      <div *ngIf="p.leadId" class="text-[10px] text-slate-500 mt-1 italic">Mission: {{ p.leadId._id }}</div>
+120:                        </div>
+127:                      </div>
+138:                      </div>
+143:              <div *ngIf="payments.length === 0" class="p-8 text-center text-slate-500">Aucune demande trouvée.</div>
+144:            </div>
+145:          </div>
+161:              </div>
+162:            </div>
+163:          </div>
+165:            <div *ngIf="prosError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ prosError }}</div>
+166:            <div *ngIf="prosLoading" class="mt-3 text-sm text-slate-300">Chargement des professionnels...</div>
+174:                    </div>
+181:                      </div>
+184:                      </div>
+189:                    </div>
+190:                  </div>
+197:                  </div>
+198:                </div>
+199:              </div>
+200:              <div *ngIf="pros.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun professionnel.</div>
+207:                <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPagePros }}</span> sur {{ totalPagesPros }}</div>
+211:              </div>
+212:            </div>
+213:          </div>
+231:              </div>
+232:            </div>
+233:          </div>
+235:            <div *ngIf="usersError" class="mt-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ usersError }}</div>
+236:            <div *ngIf="usersLoading" class="mt-3 text-sm text-slate-300">Chargement des utilisateurs...</div>
+243:                </div>
+256:                  </div>
+258:              </div>
+266:                    </div>
+276:                      </div>
+277:                      <div class="text-sm text-slate-400 mt-1 truncate">{{ u.email }}<span *ngIf="u.telephone"> · {{ u.telephone }}</span></div>
+278:                    </div>
+279:                  </div>
+293:                  </div>
+294:                </div>
+295:                <div *ngIf="users.length===0" class="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-black/20">Aucun utilisateur trouvé.</div>
+302:                  <div class="text-sm font-medium text-slate-400">Page <span class="text-white">{{ currentPageUsers }}</span> sur {{ totalPagesUsers }}</div>
+306:                </div>
+307:              </div>
+311:              </div>
+312:            </div>
+313:          </div>
+314:        </div>
+326:            </div>
+327:          </div>
+328:          <div *ngIf="reportsError" class="mb-3 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ reportsError }}</div>
+329:          <div *ngIf="reportsLoading" class="text-sm text-slate-300">Chargement des signalements...</div>
+336:              </div>
+340:                </div>
+344:                </div>
+345:              </div>
+348:              </div>
+349:              <div *ngIf="r.message" class="mt-2 text-sm text-slate-300">{{ r.message }}</div>
+357:              </div>
+358:            </div>
+359:            <div *ngIf="reports.length===0" class="text-sm text-slate-300">Aucun signalement.</div>
+360:          </div>
+361:        </div>
+366:          </div>
+370:              <div class="font-semibold mb-2">Email individuel</div>
+376:                <div *ngIf="emailRecipientsLoading" class="text-xs text-slate-400">Chargement des destinataires...</div>
+381:            </div>
+384:              <div class="font-semibold mb-2">Broadcast</div>
+394:              <div class="text-xs text-slate-400 mt-2">Envoi en lot. Utilise la config email DRY (FROM_NAME = La STREET).</div>
+395:            </div>
+396:          </div>
+397:        </div>
+405:                  <div class="text-lg font-semibold text-white truncate">Détails professionnel</div>
+406:                  <div class="text-sm text-slate-400 truncate">{{ selectedPro?.name || '—' }}</div>
+407:                </div>
+413:              </div>
+414:            </div>
+418:                <div class="h-10 w-10 rounded-full border-2 border-yellow-400/20 border-t-yellow-400 animate-spin"></div>
+419:              </div>
+421:              <div *ngIf="selectedProError" class="mb-4 p-3 rounded border border-red-500/30 bg-red-500/10 text-red-200 text-sm">{{ selectedProError }}</div>
+427:                    <div *ngIf="!selectedPro.profileImage?.url" class="text-yellow-300 font-bold text-3xl">{{ (selectedPro.name || '?').slice(0, 1) }}</div>
+428:                  </div>
+437:                  </div>
+438:                </div>
+443:                      <div class="text-xs text-slate-500">Nom</div>
+444:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ selectedPro.name }}</div>
+445:                    </div>
+447:                      <div class="text-xs text-slate-500">Téléphone</div>
+448:                      <div class="text-white font-medium">{{ selectedPro.telephone || '—' }}</div>
+449:                      <div class="text-xs text-slate-400" *ngIf="selectedPro.whatsapp">WhatsApp disponible</div>
+450:                    </div>
+452:                      <div class="text-xs text-slate-500">Métier</div>
+453:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ tradeLabel(selectedPro) }}</div>
+454:                    </div>
+456:                      <div class="text-xs text-slate-500">Localisation</div>
+457:                      <div class="text-white font-medium clamp-2 text-anywhere">{{ selectedPro.ville }}<span *ngIf="selectedPro.quartier"> · {{ selectedPro.quartier }}</span></div>
+458:                    </div>
+459:                  </div>
+462:                    <div class="text-xs text-slate-500">Description</div>
+463:                    <div class="text-slate-200 whitespace-pre-wrap text-anywhere">{{ selectedPro.description }}</div>
+464:                  </div>
+467:                    <div class="text-xs text-slate-500">Disponibilités</div>
+472:                    </div>
+473:                    <div class="text-xs text-slate-400" *ngIf="selectedPro.preferredContact">Contact préféré: {{ selectedPro.preferredContact }}</div>
+474:                  </div>
+477:                    <div class="text-xs text-slate-500 mb-3">Autres photos</div>
+481:                      </div>
+482:                    </div>
+483:                  </div>
+484:                </div>
+485:              </div>
+486:            </div>
+495:                </div>
+496:              </div>
+497:            </div>
+498:          </div>
+499:        </div>
+508:          </div>
+509:        </div>
+513:          <div *ngIf="selectedProOpen" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" (click)="closeProfessional()"></div>
+514:        </div>
+515:          </div>
+516:        </div>
+517:      </div>
+519:    </div>

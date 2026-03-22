@@ -5,6 +5,7 @@
 @layer base {
   html { font-family: theme('fontFamily.sans'); }
   body { @apply bg-black text-white; }
+  body.admin-page-active app-footer { display: none !important; }
 }
 
 @layer components {
@@ -23,8 +24,8 @@
   .footer-bg { background-image: radial-gradient(900px circle at 15% 60%, rgba(250,204,21,0.10), transparent 55%); }
 
   .text-anywhere { overflow-wrap: anywhere; word-break: break-word; }
-  .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* Custom Animations and Utilities */
   .no-scrollbar::-webkit-scrollbar { display: none; }
