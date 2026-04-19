@@ -177,7 +177,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                       </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-8 border-t border-white/5">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-white/5">
                       <div class="flex items-center gap-3">
                         <div class="text-xs font-black uppercase tracking-widest text-slate-500">Rôle :</div>
                         <span class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider" [ngClass]="{
@@ -192,7 +192,7 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                       <button
                         (click)="saveAccount()"
                         [disabled]="savingAccount()"
-                        class="flex items-center gap-3 px-8 py-4 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-black rounded-2xl transition-all duration-300 transform active:scale-95 shadow-xl shadow-yellow-500/10"
+                        class="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-black rounded-2xl transition-all duration-300 transform active:scale-95 shadow-xl shadow-yellow-500/10"
                       >
                         @if (savingAccount()) {
                           <div class="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>

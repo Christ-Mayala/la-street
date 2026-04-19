@@ -11,6 +11,7 @@ export interface User {
   avatarUrl?: string | null;
   avatarPublicId?: string | null;
   token?: string;
+  refreshToken?: string;
   isPremium?: boolean;
   premiumUntil?: string | Date;
   premiumPlan?: string;

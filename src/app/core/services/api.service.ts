@@ -19,9 +19,14 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
   baseUrl = signal<string>(APP_ENV.apiBaseUrl || '');
+  private cachedSafeBaseUrl = '';
   private readonly prefix = '/api/v1/lastreet';
 
-  private safeBaseUrl(): string {
+  constructor() {
+    this.cachedSafeBaseUrl = this.computeSafeBaseUrl();
+  }
+
+  private computeSafeBaseUrl(): string {
     const url = this.baseUrl();
     if (!url) return '';
     try {
@@ -34,6 +39,10 @@ export class ApiService {
     } catch {
       return '';
     }
+  }
+
+  private safeBaseUrl(): string {
+    return this.cachedSafeBaseUrl;
   }
 
   public getSafeBaseUrl(): string {

@@ -36,7 +36,7 @@ import { SeoService } from '../../../core/services/seo.service';
               Explorer les <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600 font-black">Talents</span>
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mb-12 font-medium">
-              Trouvez le partenaire idéal parmi notre réseau exclusif de professionnels certifiés en République du Congo.
+              Trouvez le partenaire idéal parmi notre réseau exclusif de professionnels certifiés en République du Congo (Brazzaville).
             </p>
 
             <!-- GLASS FILTER BAR -->

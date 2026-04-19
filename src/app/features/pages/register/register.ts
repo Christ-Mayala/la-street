@@ -84,7 +84,7 @@ export class RegisterPage {
   constructor() {
     this.seo.setTitle('Inscription · La STREET');
     this.seo.updateTags({
-      description: 'Rejoignez La STREET, la plateforme qui connecte les professionnels et clients en République du Congo. Inscrivez-vous gratuitement.'
+      description: 'Rejoignez La STREET, la plateforme qui connecte les professionnels et clients en République du Congo (Brazzaville). Inscrivez-vous gratuitement.'
     });
 
     this.loadCategories();

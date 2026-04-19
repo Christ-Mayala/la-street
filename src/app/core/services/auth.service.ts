@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { User } from '../models/user.model';
 import { APP_ENV } from '../config/app-env';
@@ -85,6 +84,34 @@ export class AuthService {
     return this.user()?.token || '';
   }
 
+  refreshToken(): string {
+    return this.user()?.refreshToken || '';
+  }
+
+  async refreshTokenRequest(): Promise<string> {
+    const rt = this.refreshToken();
+    if (!rt) throw new Error('No refresh token');
+
+    const base = this.safeBaseUrl();
+    const res = await firstValueFrom(
+      this.http.post<DryResponse<{ token: string; refreshToken: string }>>(
+        `${base}/api/v1/lastreet/user/refresh`,
+        { refreshToken: rt }
+      )
+    );
+
+    const data = unwrap(res);
+    const currentUser = this.user();
+    if (currentUser) {
+      this.saveUser({
+        ...currentUser,
+        token: data.token,
+        refreshToken: data.refreshToken
+      });
+    }
+    return data.token;
+  }
+
   async login(credentials: { email: string; password: string }): Promise<User>;
   async login(email: string, password: string): Promise<User>;
   async login(emailOrCredentials: string | { email: string; password: string }, password?: string): Promise<User> {
@@ -103,11 +130,10 @@ export class AuthService {
     if (!base) throw new Error('Connexion impossible. Vérifiez votre connexion internet et réessayez.');
 
     const res = await firstValueFrom(
-      this.http.post<DryResponse<{ token: string; user: any }>>(
+      this.http.post<DryResponse<{ token: string; refreshToken: string; user: any }>>(
         `${base}/api/v1/lastreet/user/login`,
         { email, password: pwd }
       ),
-
     );
 
     const data = unwrap(res);
@@ -123,6 +149,7 @@ export class AuthService {
       premiumUntil: data.user?.premiumUntil,
       premiumPlan: data.user?.premiumPlan,
       token: data.token,
+      refreshToken: data.refreshToken,
     };
 
     this.saveUser(u);
@@ -156,5 +183,19 @@ export class AuthService {
 
   isAuthenticated() {
     return !!this.user()?.token;
+  }
+
+  /**
+   * Tente de rafraîchir le token si on a un refresh token.
+   * Utile au démarrage de l'app pour prolonger la session.
+   */
+  async checkAuth() {
+    if (this.refreshToken()) {
+      try {
+        await this.refreshTokenRequest();
+      } catch {
+        this.logout();
+      }
+    }
   }
 }

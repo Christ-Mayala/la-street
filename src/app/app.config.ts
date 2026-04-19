@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
         anchorScrolling: 'enabled',
       }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([errorInterceptor, authInterceptor])),
     provideServiceWorker('ngsw-worker.js', { enabled: !isDevMode() })
   ]
 };

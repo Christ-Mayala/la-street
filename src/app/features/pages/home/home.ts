@@ -79,7 +79,7 @@ export class HomePage implements OnInit, OnDestroy {
     // Configuration SEO
     this.seo.setTitle('La STREET · Plateforme des métiers');
     this.seo.updateTags({
-      description: 'La STREET connecte les habitants à des professionnels par métier et localité en République du Congo.'
+      description: 'La STREET connecte les habitants à des professionnels par métier et localité en République du Congo (Brazzaville).'
     });
 
     // Afficher la modale après 10 secondes seulement si l'utilisateur n'est pas connecté
@@ -218,6 +218,13 @@ export class HomePage implements OnInit, OnDestroy {
 
     if (checked) {
       this.closeModal();
+    }
+  }
+
+  scrollToContent() {
+    const element = document.getElementById('main-content');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   }
 }

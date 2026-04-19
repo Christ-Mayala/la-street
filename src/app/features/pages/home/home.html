@@ -1,18 +1,18 @@
 <!-- Notification Bar -->
 @if (!isLoggedIn() && !isNotificationHidden()) {
-  <div class="fixed top-0 inset-x-0 z-[110] bg-yellow-500 text-black px-4 py-2.5 shadow-[0_0_20px_rgba(234,179,8,0.3)] animate-fade-in-down">
-    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+  <div class="fixed top-0 inset-x-0 z-[110] bg-yellow-500 text-black px-4 py-2 sm:py-2.5 shadow-[0_0_20px_rgba(234,179,8,0.3)] animate-fade-in-down">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </span>
-        <p class="text-sm font-bold tracking-tight text-center sm:text-left leading-tight">
-          Rejoignez l'élite des professionnels du Congo. Créez votre compte gratuitement !
+        <p class="text-[11px] sm:text-sm font-bold tracking-tight text-center sm:text-left leading-tight">
+          Rejoignez l'élite des professionnels du Congo. <span class="hidden xs:inline">Créez votre compte gratuitement !</span>
         </p>
       </div>
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <a [routerLink]="['/register']" class="flex-1 sm:flex-none px-4 py-2 bg-black text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-slate-900 transition-all text-center">Rejoindre</a>
-        <button (click)="hideNotificationBar()" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/10 transition-colors shrink-0">
+        <button type="button" title="Fermer la notification" (click)="hideNotificationBar()" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/10 transition-colors shrink-0">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
@@ -23,94 +23,94 @@
 <div class="min-h-screen bg-[#0a0a0c] selection:bg-yellow-500/30 selection:text-yellow-200">
   
   <!-- HERO SECTION - Massive, Dark & Premium -->
-  <section class="relative min-h-[90vh] flex flex-col justify-center pt-24 pb-16 overflow-hidden">
+  <section class="relative min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center pt-24 pb-12 md:pb-16 overflow-hidden">
     <!-- Abstract Background -->
     <div class="absolute inset-0 z-0">
        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-20 mix-blend-luminosity"></div>
        <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0c]/80 via-[#0a0a0c]/95 to-[#0a0a0c]"></div>
        <!-- Glows -->
-       <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-yellow-500/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
-       <div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-slate-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+       <div class="absolute top-1/4 left-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-yellow-500/10 rounded-full blur-[100px] md:blur-[120px] mix-blend-screen pointer-events-none"></div>
+       <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-slate-500/10 rounded-full blur-[120px] md:blur-[150px] pointer-events-none"></div>
     </div>
 
-    <div class="container mx-auto px-6 relative z-10">
-      <div class="max-w-4xl mx-auto text-center space-y-8">
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+      <div class="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
         
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 shadow-inner backdrop-blur-md mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/5 border border-white/10 shadow-inner backdrop-blur-md mx-auto">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
           </span>
-          <span class="text-xs font-bold text-white tracking-widest uppercase opacity-80">Plateforme N°1 en RDC</span>
+          <span class="text-[10px] sm:text-xs font-bold text-white tracking-widest uppercase opacity-80">Plateforme N°1 au Congo-Brazzaville</span>
         </div>
 
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.1]">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.1] px-2 sm:px-0">
           Trouvez l'<span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Excellence</span> près de chez vous.
         </h1>
         
-        <p class="text-lg md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        <p class="text-base sm:text-lg md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed px-4">
           La STREET connecte vos ambitions aux meilleurs talents locaux. Explorez un réseau exclusif de professionnels qualifiés.
         </p>
 
         <!-- Premium Search Bar -->
-        <div class="mt-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-3 md:p-4 max-w-4xl mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-           <form class="flex flex-col md:flex-row gap-3" (ngSubmit)="onSearch()">
+        <div class="mt-8 md:mt-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-3xl p-2.5 sm:p-3 md:p-4 max-w-4xl mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+           <form class="flex flex-col md:flex-row gap-2 sm:gap-3" (ngSubmit)="onSearch()">
              
              <!-- What -->
              <div class="flex-1 relative group">
-               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                 <svg class="w-5 h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+               <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none">
+                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                </div>
-               <input [(ngModel)]="q" name="q" type="text" placeholder="Métier, service, mot-clé..." class="w-full bg-black/40 border-none rounded-2xl py-4 pr-5 pl-14 text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
+               <input [(ngModel)]="q" name="q" type="text" placeholder="Métier, service..." class="w-full bg-black/40 border-none rounded-xl sm:rounded-2xl py-3.5 sm:py-4 pr-4 pl-12 sm:pl-14 text-sm sm:text-base text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
              </div>
 
              <!-- Where -->
              <div class="flex-1 relative group">
-               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                 <svg class="w-5 h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+               <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none">
+                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                </div>
-               <input [(ngModel)]="ville" name="ville" type="text" placeholder="Où ? (ex: Brazzaville)" class="w-full bg-black/40 border-none rounded-2xl py-4 pr-5 pl-14 text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
+               <input [(ngModel)]="ville" name="ville" type="text" placeholder="Où ?" class="w-full bg-black/40 border-none rounded-xl sm:rounded-2xl py-3.5 sm:py-4 pr-4 pl-12 sm:pl-14 text-sm sm:text-base text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
              </div>
 
              <!-- Submit -->
-             <button type="submit" class="md:w-auto px-10 py-4 bg-yellow-500 text-black text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all active:scale-95 flex items-center justify-center shrink-0 gap-2">
+             <button type="submit" class="md:w-auto px-6 sm:px-10 py-3.5 sm:py-4 bg-yellow-500 text-black text-xs sm:text-sm font-black uppercase tracking-widest rounded-xl sm:rounded-2xl hover:bg-yellow-400 hover:shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all active:scale-95 flex items-center justify-center shrink-0 gap-2">
                Explorer 
                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
              </button>
            </form>
            
-           <div class="mt-4 flex flex-col sm:flex-row justify-between items-center px-4 gap-2">
-             <div class="flex items-center gap-4 text-sm text-slate-400">
-               <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> {{ totalProfessionals || '100+' }} Pros</span>
-               <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> {{ totalTrades || '50+' }} Métiers</span>
+           <div class="mt-3 sm:mt-4 flex flex-col sm:flex-row justify-between items-center px-2 sm:px-4 gap-3 sm:gap-2">
+             <div class="flex items-center gap-4 text-[11px] sm:text-sm text-slate-400">
+               <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> {{ totalProfessionals || '100+' }} Pros</span>
+               <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> {{ totalTrades || '50+' }} Métiers</span>
              </div>
-             <a [routerLink]="['/search']" class="text-xs font-bold text-yellow-500 hover:text-yellow-400 uppercase tracking-widest">Recherche Avancée</a>
+             <a [routerLink]="['/search']" class="text-[10px] sm:text-xs font-bold text-yellow-500 hover:text-yellow-400 uppercase tracking-widest">Recherche Avancée</a>
            </div>
         </div>
       </div>
     </div>
     
     <!-- Scrolldown indicator -->
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce flex flex-col items-center gap-2 text-slate-500">
-       <span class="text-[10px] uppercase tracking-widest font-bold">Découvrir</span>
-       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+    <div class="mt-12 md:mt-16 animate-bounce flex flex-col items-center gap-2 text-slate-500/60 hover:text-yellow-500/80 transition-colors cursor-pointer" (click)="scrollToContent()">
+       <span class="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black">Découvrir</span>
+       <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
     </div>
   </section>
 
   <!-- CONTENT SECTION -->
-  <main class="container mx-auto px-6 py-24 space-y-32 relative z-10">
+  <main id="main-content" class="container mx-auto px-4 sm:px-6 py-12 md:py-24 space-y-20 md:space-y-32 relative z-10">
     
     <!-- RECOMMENDED SECTION -->
     <section>
-      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 border-b border-white/5 pb-6">
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 md:gap-6 mb-8 md:mb-12 border-b border-white/5 pb-6">
         <div>
-          <div class="inline-flex items-center gap-2 text-yellow-500 mb-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-            <span class="text-xs font-black uppercase tracking-widest">Le Choix de La STREET</span>
+          <div class="inline-flex items-center gap-2 text-yellow-500 mb-2 md:mb-3">
+            <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            <span class="text-[10px] md:text-xs font-black uppercase tracking-widest">Le Choix de La STREET</span>
           </div>
-          <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Professionnels Recommandés</h2>
+          <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">Professionnels Recommandés</h2>
         </div>
-        <a [routerLink]="['/search']" class="shrink-0 px-6 py-2.5 rounded-xl border border-white/10 text-white text-sm font-bold hover:bg-white/5 transition-all text-center">Voir l'élite</a>
+        <a [routerLink]="['/search']" class="shrink-0 px-5 md:px-6 py-2 md:py-2.5 rounded-xl border border-white/10 text-white text-xs md:text-sm font-bold hover:bg-white/5 transition-all text-center">Voir l'élite</a>
       </div>
 
       <!-- Loading State -->
@@ -144,19 +144,19 @@
     <!-- CATEGORIES NAVIGATOR - Visual Experience -->
     <section class="relative">
       <!-- Section Glow -->
-      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-full md:w-[800px] h-[300px] md:h-[400px] bg-yellow-500/5 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
 
-      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 relative z-10">
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 md:gap-6 mb-8 md:mb-12 relative z-10">
         <div>
-          <div class="inline-flex items-center gap-2 text-slate-500 mb-3">
-            <span class="w-8 h-px bg-white/10"></span>
-            <span class="text-[10px] font-black uppercase tracking-[0.3em]">Exploration par métier</span>
+          <div class="inline-flex items-center gap-2 text-slate-500 mb-2 md:mb-3">
+            <span class="w-6 md:w-8 h-px bg-white/10"></span>
+            <span class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em]">Exploration par métier</span>
           </div>
-          <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter">Parcourir par Secteur</h2>
+          <h2 class="text-2xl md:text-5xl font-black text-white tracking-tighter">Parcourir par Secteur</h2>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 relative z-10">
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 relative z-10">
         @for (cat of categories(); track cat._id) {
           <a [routerLink]="['/search']" [queryParams]="{ categoryId: cat._id }" 
              class="group relative flex flex-col items-center justify-center p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden text-center">
@@ -186,13 +186,13 @@
 
     <!-- RECENT PROFILES SECTION -->
     <section>
-      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 border-b border-white/5 pb-6">
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 md:gap-6 mb-8 md:mb-12 border-b border-white/5 pb-6">
         <div>
-          <div class="inline-flex items-center gap-2 text-white/50 mb-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span class="text-xs font-black uppercase tracking-widest">Nouvelles pépites</span>
+          <div class="inline-flex items-center gap-2 text-white/50 mb-2 md:mb-3">
+            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="text-[10px] md:text-xs font-black uppercase tracking-widest">Nouvelles pépites</span>
           </div>
-          <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Derniers Inscrits</h2>
+          <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">Derniers Inscrits</h2>
         </div>
       </div>
 
@@ -219,7 +219,7 @@
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
           <p class="text-red-400 font-medium mb-6">{{ error() }}</p>
-          <button (click)="retryLoading()" class="px-6 py-2.5 rounded-xl bg-red-500/20 text-red-400 font-bold hover:bg-red-500/30 transition-colors">Réessayer</button>
+          <button type="button" (click)="retryLoading()" class="px-6 py-2.5 rounded-xl bg-red-500/20 text-red-400 font-bold hover:bg-red-500/30 transition-colors">Réessayer</button>
         </div>
       }
 
@@ -237,19 +237,19 @@
 
     <!-- PREMIUM CALL TO ACTION -->
     @if (!isLoggedIn()) {
-      <section class="relative rounded-[2.5rem] overflow-hidden">
+      <section class="relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden">
         <div class="absolute inset-0 bg-yellow-500"></div>
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center mix-blend-multiply opacity-50"></div>
         
-        <div class="relative z-10 p-12 md:p-20 flex flex-col items-center text-center">
-          <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter mb-6 max-w-3xl leading-[1.1]">
+        <div class="relative z-10 p-10 md:p-20 flex flex-col items-center text-center">
+          <h2 class="text-3xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter mb-4 md:mb-6 max-w-3xl leading-[1.1]">
             Propulsez Votre Activité au Sommet.
           </h2>
-          <p class="text-lg md:text-xl text-black/80 font-medium mb-12 max-w-2xl">
+          <p class="text-base md:text-xl text-black/80 font-medium mb-8 md:mb-12 max-w-2xl">
             Des milliers de particuliers et entreprises recherchent vos compétences tous les jours sur La STREET. Rejoignez-nous et transformez votre talent en opportunités concrètes.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <a [routerLink]="['/register']" class="px-8 py-4 bg-black text-white text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-slate-900 transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">
+            <a [routerLink]="['/register']" class="px-8 py-3.5 md:py-4 bg-black text-white text-xs md:text-sm font-black uppercase tracking-widest rounded-xl md:rounded-2xl hover:bg-slate-900 transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">
               Créer Mon Espace Pro
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
@@ -263,29 +263,29 @@
   <!-- AUTH MODAL (Guest Only) -->
   @if (showAuthModal && !isLoggedIn() && !isModalDismissed()) {
     <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-      <div class="relative w-full max-w-md bg-[#0a0a0c] border border-white/10 rounded-[2rem] p-8 shadow-2xl overflow-hidden animate-slide-up">
+      <div class="relative w-full max-w-md bg-[#0a0a0c] border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 shadow-2xl overflow-hidden animate-slide-up">
         
         <!-- Glow -->
         <div class="absolute top-0 inset-x-0 h-40 bg-yellow-500/20 blur-[50px] rounded-full pointer-events-none -translate-y-1/2"></div>
         
-        <button (click)="dismissModal()" class="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors">
+        <button type="button" title="Fermer la fenêtre" (click)="dismissModal()" class="absolute top-4 md:top-6 right-4 md:right-6 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <div class="text-center relative z-10 mt-4">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 p-[1px] mx-auto mb-6">
+        <div class="text-center relative z-10 mt-2 md:mt-4">
+          <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 p-[1px] mx-auto mb-4 md:mb-6">
             <div class="w-full h-full bg-black rounded-[15px] flex items-center justify-center">
-              <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              <svg class="w-6 h-6 md:w-8 md:h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
             </div>
           </div>
-          <h3 class="text-3xl font-black text-white tracking-tighter mb-4">L'expérience<br>Premium</h3>
-          <p class="text-slate-400 mb-8 leading-relaxed">
+          <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-3 md:mb-4">L'expérience<br>Premium</h3>
+          <p class="text-xs md:text-sm text-slate-400 mb-6 md:mb-8 leading-relaxed">
             Créez un compte pour contacter les professionnels, publier des requêtes et enregistrer vos favoris.
           </p>
           
           <div class="space-y-3">
-            <a [routerLink]="['/register']" (click)="closeModal()" class="flex w-full py-4 bg-yellow-500 text-black text-sm font-black tracking-widest uppercase rounded-xl hover:bg-yellow-400 justify-center transition-colors">S'inscrire</a>
-            <a [routerLink]="['/login']" (click)="closeModal()" class="flex w-full py-4 bg-white/5 text-white text-sm font-black tracking-widest uppercase rounded-xl hover:bg-white/10 border border-white/5 justify-center transition-colors">Se connecter</a>
+            <a [routerLink]="['/register']" (click)="closeModal()" class="flex w-full py-3.5 md:py-4 bg-yellow-500 text-black text-xs md:text-sm font-black tracking-widest uppercase rounded-xl hover:bg-yellow-400 justify-center transition-colors">S'inscrire</a>
+            <a [routerLink]="['/login']" (click)="closeModal()" class="flex w-full py-3.5 md:py-4 bg-white/5 text-white text-xs md:text-sm font-black tracking-widest uppercase rounded-xl hover:bg-white/10 border border-white/5 justify-center transition-colors">Se connecter</a>
           </div>
 
           <label class="mt-8 flex items-center justify-center gap-3 cursor-pointer group">

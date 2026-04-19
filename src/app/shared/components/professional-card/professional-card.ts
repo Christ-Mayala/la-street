@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Professional } from '../../../core/models/professional.model';
@@ -11,7 +11,8 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'app-professional-card',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './professional-card.html'
+  templateUrl: './professional-card.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfessionalCardComponent {
   statusBadgeClass(s: any) {
@@ -35,6 +36,7 @@ export class ProfessionalCardComponent {
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
   protected readonly favorites = inject(FavoritesService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   ratingLoading = false;
   myRating = 0;
@@ -51,7 +53,11 @@ export class ProfessionalCardComponent {
   }
 
   avatarUrl() {
-    return this.pro.profileImage?.url || '';
+    const url = this.pro.profileImage?.url || '';
+    if (url.includes('cloudinary.com')) {
+      return url.replace('/upload/', '/upload/w_200,h_200,c_fill,g_face,f_auto,q_auto/');
+    }
+    return url;
   }
 
   tradeLabel() {
@@ -89,12 +95,14 @@ export class ProfessionalCardComponent {
         (this.pro as any).ratingCount = updated?.ratingCount ?? (this.pro as any).ratingCount;
         this.toast.success('Merci', 'Note enregistrée');
         this.ratingLoading = false;
+        this.cdr.markForCheck();
       },
       error: (e) => {
         const msg = e?.error?.message || e?.message || 'Impossible de noter';
         this.toast.error('Erreur', msg);
         this.myRating = 0;
         this.ratingLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }
