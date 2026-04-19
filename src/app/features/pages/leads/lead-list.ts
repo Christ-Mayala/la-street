@@ -34,13 +34,18 @@ export class LeadListPage implements OnInit {
   }
 
   loadTrades() {
-    this.api.categories().subscribe({
-      next: (categories) => {
-        const allTrades: any[] = [];
-        categories.forEach(cat => {
-          if (cat.trades) allTrades.push(...cat.trades);
+    this.api.leads({ limit: 1000 }).subscribe({
+      next: (res) => {
+        const uniqueTrades = new Set<string>();
+        (res.items || []).forEach((lead: Lead) => {
+          if (lead.serviceType) uniqueTrades.add(lead.serviceType);
         });
-        this.trades.set(allTrades.sort((a, b) => a.name.localeCompare(b.name)));
+        
+        const sortedTrades = Array.from(uniqueTrades)
+          .map(name => ({ name }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+          
+        this.trades.set(sortedTrades);
       },
       error: (e) => console.error(e),
     });

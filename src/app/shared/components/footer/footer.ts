@@ -23,7 +23,7 @@ import { RouterLink } from '@angular/router';
             </a>
             
             <p class="text-slate-400 text-lg leading-relaxed max-w-md">
-              La passerelle d'excellence entre les talents locaux et les projets d'envergure en République du Congo (Brazzaville).
+              La passerelle d'excellence entre les talents locaux et les projets d'envergure en République du Congo.
             </p>
 
             <div class="flex items-center gap-4">

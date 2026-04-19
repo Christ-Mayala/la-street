@@ -30,7 +30,7 @@
     <!-- Ambient Background Effects -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
       <div class="absolute top-[10%] left-[-10%] w-[60%] h-[60%] bg-yellow-400/5 rounded-full blur-[150px] animate-pulse"></div>
-      <div class="absolute bottom-[20%] right-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
+      <div class="absolute bottom-[20%] right-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] animate-pulse [animation-delay:2s]"></div>
     </div>
 
     <div class="container relative z-10 px-6 sm:px-12 lg:px-20 mx-auto">
@@ -56,7 +56,7 @@
         </div>
 
         <!-- Registration Form Area -->
-        <div class="animate-fade-in-up" style="animation-delay: 0.1s">
+        <div class="animate-fade-in-up [animation-delay:0.1s]">
           
           @if (globalError) {
             <div class="mb-8 p-5 bg-red-500/5 border border-red-500/20 rounded-2xl animate-shake">
@@ -95,20 +95,20 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                    <div class="space-y-2 group/field">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Nom complet</label>
-                      <input [(ngModel)]="name" name="name" type="text" required placeholder="John Doe" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                      <label for="reg-name" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Nom complet</label>
+                      <input id="reg-name" [(ngModel)]="name" name="name" type="text" required placeholder="John Doe" title="Nom complet" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                    </div>
                    <div class="space-y-2 group/field">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Téléphone</label>
-                      <input [(ngModel)]="telephone" name="telephone" type="tel" required placeholder="+242 06 XXX XX XX" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                      <label for="reg-tel" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Téléphone</label>
+                      <input id="reg-tel" [(ngModel)]="telephone" name="telephone" type="tel" required placeholder="+242 06 XXX XX XX" title="Numéro de téléphone" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                    </div>
                    <div class="space-y-2 group/field">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">E-mail</label>
-                      <input [(ngModel)]="email" name="email" type="email" required placeholder="john@exemple.com" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                      <label for="reg-email" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">E-mail</label>
+                      <input id="reg-email" [(ngModel)]="email" name="email" type="email" required placeholder="john@exemple.com" title="Adresse e-mail" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                    </div>
                    <div class="space-y-2 group/field relative">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Mot de passe</label>
-                      <input [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                      <label for="reg-password" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Mot de passe</label>
+                      <input id="reg-password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" required placeholder="••••••••" title="Mot de passe" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                       <button type="button" (click)="showPassword = !showPassword" class="absolute right-4 top-[38px] text-slate-600 hover:text-white transition-colors">
                          @if (!showPassword) { <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> }
                          @else { <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg> }
@@ -123,19 +123,19 @@
               <div class="space-y-8 animate-fade-in">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                    <div class="space-y-2">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Pays d'Opération</label>
-                      <input [(ngModel)]="pays" name="pays" type="text" readonly class="w-full bg-white/5 border border-slate-800 rounded-xl py-4 px-5 text-slate-500 font-bold outline-none cursor-not-allowed italic">
+                      <label for="reg-pays" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Pays d'Opération</label>
+                      <input id="reg-pays" [(ngModel)]="pays" name="pays" type="text" readonly title="Pays d'opération" class="w-full bg-white/5 border border-slate-800 rounded-xl py-4 px-5 text-slate-500 font-bold outline-none cursor-not-allowed italic">
                    </div>
                    <div class="space-y-2">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Ville <span class="text-red-500">*</span></label>
-                      <select [(ngModel)]="ville" name="ville" required class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
+                      <label for="reg-ville" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Ville <span class="text-red-500">*</span></label>
+                      <select id="reg-ville" [(ngModel)]="ville" name="ville" required title="Sélectionnez votre ville" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
                          <option value="" disabled>Sélectionnez une ville</option>
                          @for (v of villes; track v) { <option [value]="v">{{ v }}</option> }
                       </select>
                    </div>
                    <div class="sm:col-span-2 space-y-2">
-                      <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Quartier (Optionnel)</label>
-                      <input [(ngModel)]="quartier" name="quartier" type="text" placeholder="Ex: Poto-Poto, Pointe-Noire centre..." class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                      <label for="reg-quartier" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Quartier (Optionnel)</label>
+                      <input id="reg-quartier" [(ngModel)]="quartier" name="quartier" type="text" placeholder="Ex: Poto-Poto, Pointe-Noire centre..." title="Quartier" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                    </div>
                 </div>
               </div>
@@ -154,39 +154,49 @@
                     </div>
                  } @else {
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                       <div class="space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Secteur d'Activité <span class="text-red-500">*</span></label>
-                          <select [(ngModel)]="categoryId" name="categoryId" required (ngModelChange)="onCategoryChange($event)" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
+                       <div class="sm:col-span-2 space-y-4">
+                          <label for="reg-category" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Secteur d'Activité <span class="text-red-500">*</span></label>
+                          <select id="reg-category" [(ngModel)]="categoryId" name="categoryId" required title="Secteur d'activité" (ngModelChange)="onCategoryChange($event)" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
                              <option value="" disabled>Sélectionnez une catégorie</option>
                              @for (c of categories; track c._id) { <option [value]="c._id">{{ c.name }}</option> }
                           </select>
                        </div>
+
+                       @if (categoryId) {
+                        <div class="sm:col-span-2 space-y-4">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Métier(s) Précis <span class="text-red-500">*</span> (Plusieurs choix possibles)</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                               @for (t of selectedTrades; track t._id) {
+                                  <button type="button" 
+                                     (click)="toggleTrade(t._id)"
+                                     [class]="tradeIds.includes(t._id) ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500' : 'border-slate-800 bg-white/5 text-slate-600'"
+                                     class="py-4 px-4 rounded-xl border text-center font-black uppercase text-[9px] tracking-widest cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2">
+                                     <div class="w-2 h-2 rounded-full" [class]="tradeIds.includes(t._id) ? 'bg-yellow-500' : 'bg-slate-700'"></div>
+                                     {{ t.name }}
+                                  </button>
+                               }
+                            </div>
+                         </div>
+                       }
                        <div class="space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Métier Précis <span class="text-red-500">*</span></label>
-                          <select [(ngModel)]="tradeId" name="tradeId" required [disabled]="!categoryId" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none disabled:opacity-20">
-                             <option value="" disabled>Sélectionnez un métier</option>
-                             @for (t of selectedTrades; track t._id) { <option [value]="t._id">{{ t.name }}</option> }
-                          </select>
-                       </div>
-                       <div class="space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expérience</label>
-                          <select [(ngModel)]="experienceRange" name="experienceRange" required class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
+                          <label for="reg-experience" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expérience</label>
+                          <select id="reg-experience" [(ngModel)]="experienceRange" name="experienceRange" required title="Années d'expérience" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
                              <option value="0-1">0–1 an</option>
                              <option value="2-5">2–5 ans</option>
                              <option value="5+">Plus de 5 ans</option>
                           </select>
                        </div>
                        <div class="space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Contact Favori</label>
-                          <select [(ngModel)]="preferredContact" name="preferredContact" required class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
+                          <label for="reg-contact" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Contact Favori</label>
+                          <select id="reg-contact" [(ngModel)]="preferredContact" name="preferredContact" required title="Contact favori" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-bold focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none">
                              <option value="both">Appels & WhatsApp</option>
                              <option value="call">Appels Uniquement</option>
                              <option value="whatsapp">WhatsApp Uniquement</option>
                           </select>
                        </div>
                        <div class="sm:col-span-2 space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ma Biographie Professionnelle</label>
-                          <textarea [(ngModel)]="description" name="description" rows="3" maxlength="300" placeholder="Expertise en quelques phrases..." class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none resize-none"></textarea>
+                          <label for="reg-desc" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ma Biographie Professionnelle</label>
+                          <textarea id="reg-desc" [(ngModel)]="description" name="description" rows="3" maxlength="300" placeholder="Expertise en quelques phrases..." title="Ma biographie professionnelle" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none resize-none"></textarea>
                        </div>
                     </div>
                  }
@@ -210,8 +220,8 @@
                           </div>
                        </div>
                        <div class="space-y-2">
-                          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Horaires de Travail</label>
-                          <input [(ngModel)]="hoursAvailable" name="hoursAvailable" type="text" placeholder="Ex: 08:00 - 18:00" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
+                          <label for="reg-hours" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Horaires de Travail</label>
+                          <input id="reg-hours" [(ngModel)]="hoursAvailable" name="hoursAvailable" type="text" placeholder="Ex: 08:00 - 18:00" title="Horaires de travail" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:ring-1 focus:ring-yellow-500 transition-all outline-none">
                        </div>
                     </div>
                  } @else {
@@ -227,7 +237,7 @@
               <div class="space-y-8 animate-fade-in">
                  <label class="group/terms block relative p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.05] transition-all cursor-pointer">
                     <div class="flex gap-4">
-                       <input type="checkbox" [(ngModel)]="acceptRules" name="acceptRules" class="mt-1 w-5 h-5 rounded-md border-slate-700 bg-black text-yellow-500 focus:ring-yellow-500/50">
+                       <input type="checkbox" [(ngModel)]="acceptRules" name="acceptRules" title="Accepter les conditions d'utilisation" class="mt-1 w-5 h-5 rounded-md border-slate-700 bg-black text-yellow-500 focus:ring-yellow-500/50">
                        <div class="space-y-1">
                           <h4 class="text-sm font-black text-white uppercase tracking-tight italic">Conditions d'Utilisation</h4>
                           <p class="text-slate-500 text-[10px] leading-relaxed font-bold uppercase tracking-widest">J'accepte les termes et politiques de La STREET.</p>
@@ -238,10 +248,33 @@
                  @if (role === 'professional') {
                     <div class="space-y-4">
                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Photos (2 max)</label>
-                       <div (click)="fileInput.click()" class="p-8 border-2 border-dashed border-slate-800 rounded-3xl bg-white/[0.01] hover:bg-white/[0.03] hover:border-yellow-500/30 transition-all text-center group/upload cursor-pointer">
-                          <input #fileInput type="file" (change)="onPhotosChange($event)" accept="image/*" multiple class="hidden">
-                          <svg class="w-6 h-6 text-yellow-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                          <p class="text-[10px] font-black text-white uppercase tracking-widest">Télécharger vos visuels</p>
+                       <div (click)="fileInput.click()" class="p-8 border-2 border-dashed border-slate-800 rounded-3xl bg-white/[0.01] hover:bg-white/[0.03] hover:border-yellow-500/30 transition-all text-center group/upload cursor-pointer relative overflow-hidden">
+                          <input #fileInput id="reg-photos" type="file" (change)="onPhotosChange($event)" accept="image/*" multiple title="Choisir des photos" class="hidden">
+                          
+                          @if (!profilePreview && realizationPreviews.length === 0) {
+                             <svg class="w-6 h-6 text-yellow-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                             <p class="text-[10px] font-black text-white uppercase tracking-widest">Télécharger vos visuels</p>
+                          } @else {
+                             <div class="grid grid-cols-2 gap-4">
+                                @if (profilePreview) {
+                                   <div class="relative group/img aspect-square rounded-2xl overflow-hidden border border-white/10">
+                                      <img [src]="profilePreview" class="w-full h-full object-cover" alt="Profil">
+                                      <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                         <span class="text-[8px] font-black text-white uppercase tracking-tighter">Photo de Profil</span>
+                                      </div>
+                                   </div>
+                                }
+                                @for (p of realizationPreviews; track p) {
+                                   <div class="relative group/img aspect-square rounded-2xl overflow-hidden border border-white/10">
+                                      <img [src]="p" class="w-full h-full object-cover" alt="Réalisation">
+                                      <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                         <span class="text-[8px] font-black text-white uppercase tracking-tighter">Réalisation</span>
+                                      </div>
+                                   </div>
+                                }
+                             </div>
+                             <div class="mt-4 text-[9px] font-black text-yellow-500 uppercase tracking-widest">Cliquez pour modifier</div>
+                          }
                        </div>
                     </div>
                  }

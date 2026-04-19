@@ -47,7 +47,7 @@ export class RegisterPage {
 
   categories: Category[] = [];
   categoryId = '';
-  tradeId = '';
+  tradeIds: string[] = [];
   selectedTrades: { _id: string; name: string }[] = [];
 
   experienceRange: '0-1' | '2-5' | '5+' = '0-1';
@@ -63,6 +63,8 @@ export class RegisterPage {
 
   profileImageFile: File | null = null;
   realizationFiles: File[] = [];
+  profilePreview = '';
+  realizationPreviews: string[] = [];
   fileError = '';
   globalError = '';
   isLoading = false;
@@ -84,7 +86,7 @@ export class RegisterPage {
   constructor() {
     this.seo.setTitle('Inscription · La STREET');
     this.seo.updateTags({
-      description: 'Rejoignez La STREET, la plateforme qui connecte les professionnels et clients en République du Congo (Brazzaville). Inscrivez-vous gratuitement.'
+      description: 'Rejoignez La STREET, la plateforme qui connecte les professionnels et clients en République du Congo. Inscrivez-vous gratuitement.'
     });
 
     this.loadCategories();
@@ -110,7 +112,15 @@ export class RegisterPage {
     const c: any = this.categories.find((x: any) => x._id === this.categoryId);
     const trades = c?.trades || c?.tradeIds || c?.metiers || [];
     this.selectedTrades = Array.isArray(trades) ? trades : [];
-    this.tradeId = '';
+    this.tradeIds = [];
+  }
+
+  toggleTrade(id: string) {
+    if (this.tradeIds.includes(id)) {
+      this.tradeIds = this.tradeIds.filter(x => x !== id);
+    } else {
+      this.tradeIds = [...this.tradeIds, id];
+    }
   }
 
   toggleDay(d: string, e: any) {
@@ -160,15 +170,16 @@ export class RegisterPage {
 
     this.profileImageFile = arr[0] || null;
     this.realizationFiles = arr.slice(1, 2);
+
+    // Update previews
+    if (this.profilePreview) URL.revokeObjectURL(this.profilePreview);
+    this.realizationPreviews.forEach(p => URL.revokeObjectURL(p));
+    
+    this.profilePreview = this.profileImageFile ? URL.createObjectURL(this.profileImageFile) : '';
+    this.realizationPreviews = this.realizationFiles.map(f => URL.createObjectURL(f));
   }
 
-  previewUrl(f: File) {
-    try {
-      return URL.createObjectURL(f);
-    } catch {
-      return '';
-    }
-  }
+  // previewUrl(f: File) is no longer needed in template if we use profilePreview/realizationPreviews
 
   prev() {
     if (this.role !== 'professional' && this.step === 5) {
@@ -215,8 +226,8 @@ export class RegisterPage {
     }
 
     if (this.role === 'professional') {
-      if (!this.categoryId || !this.tradeId) {
-        this.globalError = 'Veuillez sélectionner une catégorie et un métier.';
+      if (!this.categoryId || this.tradeIds.length === 0) {
+        this.globalError = 'Veuillez sélectionner une catégorie et au moins un métier.';
         this.toast.error('Erreur', this.globalError);
         this.scrollToTop();
         return;
@@ -267,7 +278,14 @@ export class RegisterPage {
         fd.append('ville', this.ville);
         fd.append('quartier', this.quartier || '');
         fd.append('categoryId', this.categoryId);
-        fd.append('tradeId', this.tradeId);
+        // Envoyer tous les tradeIds
+        this.tradeIds.forEach(id => {
+          fd.append('tradeIds', id);
+        });
+        // Pour la rétrocompatibilité (le premier métier choisi)
+        if (this.tradeIds.length > 0) {
+          fd.append('tradeId', this.tradeIds[0]);
+        }
         fd.append('experienceRange', this.experienceRange);
         fd.append('preferredContact', this.preferredContact);
         fd.append('description', this.description || '');
@@ -349,8 +367,8 @@ export class RegisterPage {
             this.globalError = 'Veuillez sélectionner une catégorie.';
             return false;
           }
-          if (!this.tradeId) {
-            this.globalError = 'Veuillez sélectionner un métier.';
+          if (this.tradeIds.length === 0) {
+            this.globalError = 'Veuillez sélectionner au moins un métier.';
             return false;
           }
         }

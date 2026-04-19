@@ -22,6 +22,7 @@ export interface Professional {
 
   categoryId?: RefDoc | string;
   tradeId?: RefDoc | string;
+  tradeIds?: (RefDoc | string)[];
 
   experienceRange?: '0-1' | '2-5' | '5+';
   description?: string;

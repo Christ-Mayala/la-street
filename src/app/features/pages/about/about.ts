@@ -35,7 +35,7 @@ import { SiteStatsService } from '../../../core/services/site-stats.service';
             </h1>
 
             <p class="text-base sm:text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-medium px-2">
-              Nous bâtissons le pont numérique entre les talents invisibles et ceux qui les recherchent, en créant un cadre de confiance unique au Congo-Brazzaville.
+              Nous bâtissons le pont numérique entre les talents invisibles et ceux qui les recherchent, en créant un cadre de confiance unique au Congo.
             </p>
 
             <!-- Quick Stats: Responsive -->

@@ -2,7 +2,7 @@
   <!-- Ambient Background -->
   <div class="fixed inset-0 pointer-events-none">
     <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-yellow-400/5 rounded-full blur-[120px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-white/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-white/5 rounded-full blur-[120px] animate-pulse [animation-delay:2s]"></div>
   </div>
 
   <div class="container relative z-10 px-6 mx-auto">
@@ -100,23 +100,37 @@
             
             <!-- Filters Control -->
             <aside class="lg:col-span-1 space-y-8 sticky top-32 h-fit self-start">
-               <div class="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl space-y-8">
+               <div class="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl space-y-6">
                   <div class="flex items-center justify-between border-b border-white/5 pb-4">
                      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Filtres</h3>
                      @if (selectedTrade) {
-                        <button (click)="selectedTrade = ''; loadLeads()" class="text-[9px] font-black text-yellow-500 uppercase tracking-widest hover:text-white transition-colors">Reset</button>
+                        <button type="button" (click)="selectedTrade = ''; loadLeads()" class="text-[9px] font-black text-yellow-500 uppercase tracking-widest hover:text-white transition-colors">Reset</button>
                      }
                   </div>
                   
-                  <div class="flex flex-col gap-2">
-                     @for (t of trades(); track t.name) {
-                        <button (click)="selectedTrade = t.name; loadLeads()" 
-                           [class]="selectedTrade === t.name ? 'bg-yellow-500 text-black border-yellow-500 shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white'"
-                           class="w-full text-left px-5 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest border transition-all duration-300">
-                           {{ t.name }}
-                        </button>
-                     }
+                  <div class="space-y-4">
+                     <label class="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] pl-1">Filtrer par métier</label>
+                     <div class="relative group">
+                        <select [(ngModel)]="selectedTrade" (change)="loadLeads()" title="Sélectionner un métier"
+                           class="w-full bg-[#13141a]/60 border border-white/5 rounded-2xl py-4 pr-10 pl-5 text-white text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-yellow-500 transition-all outline-none appearance-none cursor-pointer group-hover:border-white/10">
+                           <option value="">Tous les métiers</option>
+                           @for (t of trades(); track t.name) {
+                              <option [value]="t.name">{{ t.name }}</option>
+                           }
+                        </select>
+                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-600">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                     </div>
                   </div>
+
+                  @if (selectedTrade) {
+                    <div class="p-4 rounded-2xl bg-yellow-500/5 border border-yellow-500/10 animate-fade-in">
+                       <p class="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest leading-relaxed">
+                          Affichage des opportunités pour <span class="text-yellow-500 font-black italic">{{ selectedTrade }}</span>.
+                       </p>
+                    </div>
+                  }
                </div>
             </aside>
 

@@ -440,18 +440,18 @@ type Availability = 'available' | 'busy' | 'temporarily_unavailable';
                                 </div>
                               </div>
 
-                              <div class="space-y-3">
-                                <label class="text-xs font-black uppercase tracking-widest text-slate-500">Métier Spécifique</label>
-                                <div class="relative group">
-                                  <select [(ngModel)]="selectedTradeId" [ngModelOptions]="{standalone: true}" [disabled]="!trades().length" class="w-full h-16 pl-6 pr-12 bg-white/[0.03] border border-white/5 rounded-[24px] text-white font-bold appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-all select-custom disabled:opacity-30 group-hover:bg-white/[0.05]">
-                                    <option value="" disabled class="bg-[#0a0a0c]">Sélect. Métier</option>
-                                    @for (t of trades(); track t._id) {
-                                      <option [value]="t._id" class="bg-[#0a0a0c]">{{ t.name }}</option>
-                                    }
-                                  </select>
-                                  <svg class="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-yellow-500 transition-colors pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                  </svg>
+                              <div class="sm:col-span-2 space-y-3" *ngIf="selectedCategoryId()">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500">Métiers Spécifiques (Plusieurs choix possibles)</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                  @for (t of trades(); track t._id) {
+                                    <button type="button" 
+                                      (click)="toggleTrade(t._id)"
+                                      [class]="selectedTradeIds.includes(t._id) ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500' : 'border-white/5 bg-white/[0.03] text-slate-500'"
+                                      class="py-4 px-4 rounded-2xl border text-center font-black uppercase text-[9px] tracking-widest cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2">
+                                      <div class="w-2 h-2 rounded-full" [class]="selectedTradeIds.includes(t._id) ? 'bg-yellow-500' : 'bg-slate-700'"></div>
+                                      {{ t.name }}
+                                    </button>
+                                  }
                                 </div>
                               </div>
                             </div>
@@ -664,7 +664,7 @@ export class UserProfilePage implements OnInit {
   categories = signal<any[]>([]);
   trades = signal<any[]>([]);
   selectedCategoryId = signal('');
-  selectedTradeId = signal('');
+  selectedTradeIds: string[] = [];
   experienceRange = signal<'0-1' | '2-5' | '5+'>('0-1');
   proVille = signal('');
   proQuartier = signal('');
@@ -706,8 +706,16 @@ export class UserProfilePage implements OnInit {
   }
 
   onCategoryChange() {
-    this.selectedTradeId.set('');
+    this.selectedTradeIds = [];
     this.updateTradesList();
+  }
+
+  toggleTrade(id: string) {
+    if (this.selectedTradeIds.includes(id)) {
+      this.selectedTradeIds = this.selectedTradeIds.filter(x => x !== id);
+    } else {
+      this.selectedTradeIds = [...this.selectedTradeIds, id];
+    }
   }
 
   private updateTradesList() {
@@ -824,10 +832,12 @@ export class UserProfilePage implements OnInit {
         this.proQuartier.set(p.quartier || '');
         this.experienceRange.set(p.experienceRange || '0-1');
         const catId = typeof p.categoryId === 'object' ? (p.categoryId as any)._id : p.categoryId;
-        const tradeId = typeof p.tradeId === 'object' ? (p.tradeId as any)._id : p.tradeId;
         this.selectedCategoryId.set(catId || '');
         this.updateTradesList();
-        this.selectedTradeId.set(tradeId || '');
+
+        const tradeIds = (p as any).tradeIds || (p.tradeId ? [p.tradeId] : []);
+        this.selectedTradeIds = tradeIds.map((t: any) => typeof t === 'object' ? t._id : t).filter(Boolean);
+
         const u: any = this.auth.user();
         if (String(u?.role || '').toLowerCase() === 'professional' && p?.profileImage?.url) {
           this.auth.setUser({ ...(u || {}), avatarUrl: p.profileImage.url } as any);
@@ -869,7 +879,12 @@ export class UserProfilePage implements OnInit {
       fd.append('ville', this.proVille() || '');
       fd.append('quartier', this.proQuartier() || '');
       fd.append('categoryId', this.selectedCategoryId() || '');
-      fd.append('tradeId', this.selectedTradeId() || '');
+      this.selectedTradeIds.forEach(id => {
+        fd.append('tradeIds', id);
+      });
+      if (this.selectedTradeIds.length > 0) {
+        fd.append('tradeId', this.selectedTradeIds[0]);
+      }
       fd.append('experienceRange', this.experienceRange());
       return fd;
     })() : {
@@ -883,7 +898,8 @@ export class UserProfilePage implements OnInit {
       ville: this.proVille(),
       quartier: this.proQuartier(),
       categoryId: this.selectedCategoryId(),
-      tradeId: this.selectedTradeId(),
+      tradeIds: this.selectedTradeIds,
+      tradeId: this.selectedTradeIds[0] || '',
       experienceRange: this.experienceRange(),
     };
 

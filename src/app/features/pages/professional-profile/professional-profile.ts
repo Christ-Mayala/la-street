@@ -380,6 +380,10 @@ export class ProProfilePage implements OnInit {
   }
 
   get tradeLabel() {
+    const trades = this.pro?.tradeIds || [];
+    if (Array.isArray(trades) && trades.length > 0) {
+      return trades.map(t => typeof t === 'object' ? t.name : t).join(' · ');
+    }
     const t: any = this.pro?.tradeId;
     if (t && typeof t === 'object') return t.name || 'Métier';
     return 'Métier';
