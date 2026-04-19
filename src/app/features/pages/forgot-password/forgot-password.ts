@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,161 +12,120 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen relative overflow-hidden hero-bg">
-      <div class="absolute inset-0 -z-10 bg-black"></div>
-
-      <!-- Background elements -->
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
-        <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-yellow-400/5 rounded-full blur-[120px] opacity-50"></div>
+    <div class="min-h-screen flex text-slate-300 font-sans selection:bg-yellow-400/30">
+      <!-- Left Side (Image Cover) -->
+      <div class="hidden lg:flex lg:w-1/2 relative bg-black">
+        <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop" 
+             class="absolute inset-0 w-full h-full object-cover opacity-70 mix-blend-luminosity hover:mix-blend-normal transition-all duration-1000" 
+             alt="Urban Recovery">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0a0a0c]"></div>
+        
+        <!-- Content Overlay -->
+        <div class="absolute bottom-16 left-12 right-12 z-10 text-white animate-fade-in">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md">
+            <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]"></span>
+            <span class="text-sm font-medium text-slate-200">Sécurité La STREET</span>
+          </div>
+          <h1 class="text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+            Accès Disruption<br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Signal Perdu.</span>
+          </h1>
+          <p class="text-lg text-slate-300 opacity-90 max-w-lg mt-4 font-light leading-relaxed">
+            Récupérez l'accès à votre terminal expert. Un code de vérification vous sera transmis par signal e-mail.
+          </p>
+        </div>
       </div>
 
-      <div class="relative z-10">
-        <!-- Hero Section -->
-        <section class="relative overflow-hidden">
-          <div class="container relative z-10 py-16">
-            <div class="max-w-md mx-auto text-center">
-              <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 mb-6">
-                <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-                <span class="text-sm font-medium text-yellow-300">Compte & Accès</span>
-              </div>
+      <!-- Right Side (Form) -->
+      <div class="flex-1 flex flex-col pt-32 lg:justify-center px-6 sm:px-12 lg:px-24 bg-[#0a0a0c] relative overflow-hidden">
+        <!-- Subtle Glows -->
+        <div class="absolute -top-32 -right-32 w-64 h-64 bg-yellow-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-yellow-900/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-              <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
-                Mot de passe <span class="text-yellow-400">oublié</span>
-              </h1>
-              <p class="mt-4 text-lg text-slate-300">
-                Entrez votre email. La logique d'envoi sera branchée côté backend.
-              </p>
-            </div>
+        <div class="w-full max-w-md mx-auto relative z-10">
+          <!-- Header Area -->
+          <div class="text-center lg:text-left mb-10">
+             <div class="w-16 h-16 lg:mx-0 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border border-yellow-400/20 shadow-inner flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+             </div>
+             <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Mot de passe oublié</h2>
+             <p class="text-slate-400 text-sm">Entrez votre e-mail pour recevoir les instructions de récupération.</p>
           </div>
-        </section>
 
-        <main class="container py-12 md:py-16">
-          <div class="max-w-md mx-auto">
-            <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6 md:p-8">
-              <div class="text-center mb-8">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-400/30 flex items-center justify-center">
-                  <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7 missions a4 4 0 00-8 0v4h8z"></path>
-                  </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-white">Récupération du compte</h2>
-                <p class="mt-2 text-slate-400">Nous vous guiderons pour réinitialiser votre mot de passe</p>
+          @if (error) {
+            <div class="mb-6 p-4 bg-red-950/30 border border-red-500/20 rounded-xl backdrop-blur-sm animate-shake">
+              <p class="text-xs font-bold text-red-500 uppercase tracking-widest text-center">{{ error }}</p>
+            </div>
+          }
+
+          @if (codeAlreadySent) {
+            <div class="space-y-8 animate-fade-in text-center lg:text-left">
+              <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/5 space-y-4">
+                 <div class="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 mx-auto lg:mx-0 border border-yellow-500/20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                 </div>
+                 <div class="space-y-2">
+                    <h3 class="text-lg font-black text-white uppercase tracking-tighter italic">Code déjà actif</h3>
+                    <p class="text-slate-500 text-xs font-medium leading-relaxed">Un signal a été envoyé vers <strong>{{ email }}</strong>. Réessayez dans {{ timeRemaining }} min ou utilisez le code reçu.</p>
+                 </div>
               </div>
 
-              <div *ngIf="error" class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-                <div class="flex items-start gap-3">
-                  <svg class="w-5 h-5 text-red-100 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <div>
-                    <h3 class="font-semibold text-red-100">Erreur</h3>
-                    <p class="text-red-100 text-sm mt-1">{{ error }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Message code déjà envoyé -->
-              <div *ngIf="codeAlreadySent" class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                <div class="flex items-start gap-3">
-                  <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <div class="flex-1">
-                    <h3 class="font-semibold text-blue-300">Code déjà envoyé</h3>
-                    <p class="text-blue-200 text-sm mt-1">
-                      Un code a déjà été envoyé à <strong>{{ email }}</strong>. 
-                      Vérifiez vos emails ou attendez <strong>{{ timeRemaining }}</strong> minutes pour en recevoir un nouveau.
-                    </p>
-                    <div class="mt-3 flex gap-2">
-                      <button 
-                        type="button"
-                        (click)="goToVerify()"
-                        class="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-sm rounded-lg transition-colors duration-200"
-                      >
-                        J'ai reçu le code
-                      </button>
-                      <button 
-                        type="button"
-                        (click)="resendCode()"
-                        class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm rounded-lg transition-colors duration-200"
-                      >
-                        Renvoyer un code
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <form class="space-y-6" (ngSubmit)="onSubmit()" *ngIf="!codeAlreadySent">
-                <div class="space-y-2">
-                  <label for="email" class="block text-sm font-medium text-slate-300">
-                    Adresse email <span class="text-red-400">*</span>
-                  </label>
-                  <div class="relative">
-                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-                    </svg>
-                    <input
-                      [(ngModel)]="email"
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      placeholder="votre@email.com"
-                      class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                      [disabled]="loading"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  class="w-full py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  [disabled]="loading || !email"
-                >
-                  <div *ngIf="loading" class="spinner-small mr-2"></div>
-                  <svg *ngIf="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                  </svg>
-                  {{ loading ? 'Traitement...' : 'Envoyer le lien' }}
+              <div class="grid grid-cols-1 gap-4">
+                <button (click)="goToVerify()" class="w-full py-4 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 active:scale-95 transition-all shadow-xl shadow-yellow-500/20">
+                  Saisir le Code
                 </button>
-
-                <div class="text-center">
-                  <a routerLink="/login" class="text-sm text-yellow-300 hover:text-yellow-400 hover:underline transition-colors duration-200">
-                    Retour à la connexion
-                  </a>
-                </div>
-              </form>
+                <button (click)="resendCode()" class="w-full py-4 bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all opacity-50 hover:opacity-100">
+                  Renvoyer_Signal
+                </button>
+              </div>
             </div>
-          </div>
-        </main>
+          } @else {
+            <form (ngSubmit)="onSubmit()" class="space-y-6">
+              <div class="space-y-1.5 group/field">
+                <label class="block text-sm font-medium text-slate-300 ml-1 group-focus-within/field:text-yellow-500 transition-colors">Adresse e-mail</label>
+                <div class="relative">
+                  <input [(ngModel)]="email" id="email" name="email" type="email" required placeholder="john@expert.com" [disabled]="loading" class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-medium focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all">
+                </div>
+              </div>
+
+              <button type="submit" [disabled]="loading || !email" class="w-full py-4 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 active:scale-[0.98] transition-all shadow-xl shadow-yellow-500/20 disabled:opacity-20 flex items-center justify-center gap-3">
+                @if (loading) {
+                  <div class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                  <span>Node_Sync...</span>
+                } @else {
+                  <span>Envoyer le code</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                }
+              </button>
+
+              <div class="text-center pt-4">
+                <a routerLink="/login" class="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                  Retour au Terminal
+                </a>
+              </div>
+            </form>
+          }
+        </div>
       </div>
     </div>
   `,
   styles: [`
-    .hero-bg {
-      background-image:
-        radial-gradient(circle at 20% 50%, rgba(234, 179, 8, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(234, 179, 8, 0.03) 0%, transparent 50%);
-    }
-
-    .spinner-small {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    :host { display: block; }
+    .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
     }
   `]
 })
-export class ForgotPasswordPage {
+export class ForgotPasswordPage implements OnDestroy {
   email = '';
   loading = false;
   error = '';
@@ -179,9 +138,9 @@ export class ForgotPasswordPage {
   private readonly router = inject(Router);
 
   constructor() {
-    this.seo.setTitle('Mot de passe oublié · La STREET');
+    this.seo.setTitle('Accès Perdu · La STREET');
     this.seo.updateTags({
-      description: 'Réinitialisez votre mot de passe La STREET en toute sécurité.'
+      description: 'Récupération sécurisée du terminal expert La STREET.'
     });
   }
 
@@ -200,7 +159,6 @@ export class ForgotPasswordPage {
         this.codeAlreadySent = true;
         this.timeRemaining = result.timeRemaining || 15;
         this.startTimer();
-        this.toast.info('Code déjà envoyé', `Un code a déjà été envoyé à ${this.email}. Vérifiez vos emails ou attendez ${this.timeRemaining} minutes pour en recevoir un nouveau.`);
       } else {
         this.toast.success('Demande envoyée', "Si un compte existe, vous recevrez un code par email.");
         setTimeout(() => {
@@ -208,22 +166,22 @@ export class ForgotPasswordPage {
         }, 2000);
       }
     } catch (e: any) {
-      const msg = e?.message || 'Connexion impossible. Réessayez.';
+      const msg = e?.error?.message || e?.message || 'Signal instable. Réessayez.';
       this.error = msg;
-      this.toast.error('Erreur', msg);
     } finally {
       this.loading = false;
     }
   }
 
   startTimer() {
+    if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(() => {
       this.timeRemaining--;
       if (this.timeRemaining <= 0) {
         clearInterval(this.timer);
         this.codeAlreadySent = false;
       }
-    }, 60000); // Chaque minute
+    }, 60000);
   }
 
   resendCode() {
@@ -232,17 +190,13 @@ export class ForgotPasswordPage {
   }
 
   goToVerify() {
-    if (this.timer) {
-      clearInterval(this.timer);
-    }
+    if (this.timer) clearInterval(this.timer);
     this.router.navigate(['/reset-verify'], { 
       queryParams: { email: this.email } 
     });
   }
 
   ngOnDestroy() {
-    if (this.timer) {
-      clearInterval(this.timer);
-    }
+    if (this.timer) clearInterval(this.timer);
   }
 }

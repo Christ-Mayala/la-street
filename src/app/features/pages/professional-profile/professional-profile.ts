@@ -14,577 +14,307 @@ import { FavoritesService } from '../../../core/services/favorites.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="min-h-screen relative overflow-hidden hero-bg">
-      <div class="absolute inset-0 -z-10 bg-black"></div>
-
-      <!-- Background elements -->
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
-        <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div class="relative z-10">
-        <!-- Hero Section -->
-        <section class="relative overflow-hidden"></section>
-
-    <!-- Main Content -->
-    <main class="container py-12">
-      <div class="max-w-4xl mx-auto">
-        <!-- Loading State -->
-        <div *ngIf="!pro && !error" class="flex justify-center py-16">
-          <div class="spinner"></div>
+    <div class="min-h-screen bg-[#0a0a0c] selection:bg-yellow-500/30">
+      
+      <!-- IMMERSIVE COVER SECTION -->
+      <section class="relative h-auto min-h-[50vh] md:h-[55vh] overflow-hidden pt-20 md:pt-0">
+        <!-- Abstract Background -->
+        <div class="absolute inset-0 z-0">
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="w-full h-full object-cover blur-3xl opacity-20 scale-125 transition-transform duration-700" alt="Background Blur">
+          <div *ngIf="!avatarUrl" class="w-full h-full bg-gradient-to-br from-yellow-500/10 to-slate-900"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/40 to-transparent"></div>
         </div>
 
-        <!-- Error State -->
-        <div *ngIf="error" class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-8 text-center">
-          <svg class="w-16 h-16 mx-auto mb-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <h2 class="text-xl font-bold text-white mb-2">Professionnel introuvable</h2>
-          <p class="text-slate-300 mb-6">Ce profil n'existe pas ou a été supprimé.</p>
-          <a routerLink="/search" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Retour à la recherche
-          </a>
-        </div>
-
-        <!-- Professional Profile -->
-        <div *ngIf="pro" class="space-y-8">
-          <!-- Header Card -->
-          <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-            <div class="flex flex-col md:flex-row gap-6">
-              <!-- Avatar -->
-              <div class="relative">
-                <div class="h-28 w-28 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-400/30 flex items-center justify-center font-bold text-2xl shadow-lg">
-                  <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro.name }}" class="h-full w-full object-cover" loading="lazy" decoding="async" />
-                  <span *ngIf="!avatarUrl" class="text-yellow-300">{{ initials }}</span>
-                </div>
-
-                <!-- Status Indicator -->
-                <div
-                  class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-black flex items-center justify-center"
-                  [ngClass]="{
-                    'bg-emerald-500': pro.availabilityStatus === 'available',
-                    'bg-amber-500': pro.availabilityStatus === 'busy',
-                    'bg-rose-500': pro.availabilityStatus === 'temporarily_unavailable',
-                    'bg-slate-500': !pro.availabilityStatus
-                  }"
-                  [title]="availabilityLabel(pro.availabilityStatus)"
-                >
-                  <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+        <div class="container mx-auto px-6 pt-6 pb-10 md:h-full flex flex-col justify-end relative z-10">
+          <!-- Mobile: Avatar centré en haut, infos en dessus -->
+          <div class="flex flex-col items-center md:flex-row md:items-end gap-6 md:gap-8">
+            <!-- Avatar Frame -->
+            <div class="relative group shrink-0">
+              <div class="absolute inset-0 bg-yellow-500 rounded-full blur-[20px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <div class="relative w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-[#0a0a0c] bg-slate-900 overflow-hidden shadow-2xl">
+                <img *ngIf="avatarUrl" [src]="avatarUrl" alt="{{ pro?.name }}" class="w-full h-full object-cover">
+                <div *ngIf="!avatarUrl" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600 text-black text-3xl md:text-4xl font-black">
+                  {{ initials }}
                 </div>
               </div>
-
-              <!-- Info -->
-              <div class="flex-1">
-                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div>
-                    <div class="flex items-center gap-3 mb-2">
-                      <h1 class="text-2xl md:text-3xl font-bold text-white">{{ pro.name }}</h1>
-                      <span
-                        class="badge px-3 py-1 rounded-full text-xs font-medium border"
-                        [ngClass]="statusBadgeClass(pro.availabilityStatus)"
-                      >
-                        {{ availabilityLabel(pro.availabilityStatus) }}
-                      </span>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3 mb-4">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        <span class="text-lg font-medium text-yellow-300">{{ tradeLabel }}</span>
-                      </div>
-
-                      <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <span class="text-slate-300">{{ pro.ville }}</span>
-                        <span *ngIf="pro.quartier" class="text-slate-400">· {{ pro.quartier }}</span>
-                      </div>
-                    </div>
-
-                    <!-- Experience -->
-                    <div *ngIf="pro.experienceRange" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20">
-                      <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span class="text-sm font-medium text-yellow-300">{{ getExperienceLabel(pro.experienceRange) }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Favorite Button -->
-                  <div class="flex items-center gap-3">
-                    <button
-                      class="p-2 rounded-lg hover:bg-slate-800/50 transition-colors duration-200 group"
-                      (click)="toggleFavorite()"
-                      [title]="isFavorite() ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-                    >
-                      <svg
-                        *ngIf="!isFavorite()"
-                        class="w-5 h-5 text-slate-400 group-hover:text-red-400 transition-colors duration-200"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                      </svg>
-                      <svg
-                        *ngIf="isFavorite()"
-                        class="w-5 h-5 text-red-500 animate-pulse"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+              <div class="absolute -bottom-2 -right-2 p-2.5 bg-[#0a0a0c] rounded-full border border-white/10 shadow-xl">
+                 <div class="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+                      [ngClass]="{
+                        'bg-emerald-500': pro?.availabilityStatus === 'available',
+                        'bg-amber-500': pro?.availabilityStatus === 'busy',
+                        'bg-rose-500': pro?.availabilityStatus === 'temporarily_unavailable'
+                      }"></div>
               </div>
             </div>
 
-            <!-- Contact Buttons -->
-            <div class="mt-8 pt-6 border-t border-slate-800">
-              <div class="flex flex-col sm:flex-row gap-3">
-                <!-- Call Button -->
-                <button
-                  *ngIf="canCall()"
-                  (click)="call()"
-                  class="flex-1 px-6 py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center gap-2"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                  </svg>
-                  Appeler
-                </button>
-
-                <!-- WhatsApp Button -->
-                <button
-                  *ngIf="canWhatsapp()"
-                  (click)="whatsapp()"
-                  class="flex-1 px-6 py-3.5 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.548 4.125 1.514 5.865L.212 23.505a.5.5 0 00.787.42l4.787-3.144A11.926 11.926 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.93 9.93 0 01-5.167-1.438l-.36-.214-3.766 1.246 1.262-3.678-.21-.36A9.93 9.93 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm5.61-13.5c-.33-.825-1.086-1.5-1.973-1.5H11.39c-.887 0-1.644.675-1.973 1.5l-.94 2.4c-.33.825-.088 1.575.54 2.1l.72.6c.628.525 1.455.6 1.973.225l.72-.45c.518-.375 1.345-.3 1.973.225l.72.6c.628.525.87 1.275.54 2.1l-.94 2.4c-.33.825-1.086 1.5-1.973 1.5h-2.246c-.887 0-1.644-.675-1.973-1.5l-.94-2.4c-.33-.825-.088-1.575.54-2.1l.72-.6c.628-.525 1.455-.6 1.973-.225l.72.45c.518.375 1.345.3 1.973-.225l.72-.6c.628-.525.87-1.275.54-2.1l-.94-2.4z"/>
-                  </svg>
-                  WhatsApp
-                </button>
-
-                <!-- Report Button -->
-                <button
-                  (click)="openReport()"
-                  class="flex-1 px-6 py-3.5 bg-black/40 border border-slate-700 text-slate-300 font-semibold rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0l-7.034 7.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                  Signaler
-                </button>
-              </div>
-
-              <!-- Login Prompt -->
-              <div *ngIf="!auth.isAuthenticated()" class="mt-4 p-4 rounded-lg bg-black/40 border border-slate-700">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <div class="text-sm font-medium text-white">Connectez-vous pour contacter ce professionnel</div>
-                    <div class="text-xs text-slate-400 mt-1">Accédez à toutes les fonctionnalités</div>
-                  </div>
-                  <a routerLink="/login" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 text-sm">
-                    Se connecter
-                  </a>
+            <!-- Profile Meta -->
+            <div class="flex-1 text-center md:text-left space-y-3 md:space-y-4">
+              <!-- Badges -->
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-3">
+                <span class="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black uppercase tracking-widest">
+                  Profil Certifié
+                </span>
+                <div class="flex items-center gap-1.5 bg-white/5 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                  <svg class="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                  <span class="text-xs font-black text-white">{{ (pro?.rating ?? 0) | number:'1.1-1' }}</span>
+                </div>
+                <!-- Mobile Actions Inline -->
+                <div class="flex lg:hidden items-center gap-2">
+                  <button (click)="toggleFavorite()" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white active:scale-90 transition-all">
+                    <svg class="w-4 h-4" [class.fill-current]="isFavorite()" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                  </button>
+                  <button (click)="shareProfile()" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white active:scale-90 transition-all">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                  </button>
                 </div>
               </div>
+              
+              <!-- Name -->
+              <h1 class="text-3xl md:text-6xl font-black text-white tracking-tighter leading-tight">{{ pro?.name }}</h1>
+              
+              <!-- Trade & Location -->
+              <div class="flex flex-col sm:flex-row items-center md:items-start gap-2 md:gap-4 text-slate-400 font-bold uppercase text-xs tracking-widest">
+                <span class="flex items-center gap-2 text-yellow-500">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  {{ tradeLabel }}
+                </span>
+                <span class="hidden sm:block w-1 h-1 rounded-full bg-slate-600"></span>
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                  {{ pro?.ville }} <span *ngIf="pro?.quartier">· {{ pro?.quartier }}</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Top Actions (Desktop only) -->
+            <div class="hidden lg:flex items-center gap-3">
+               <button (click)="toggleFavorite()" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-red-500 transition-all group active:scale-90 shadow-xl shadow-black/40">
+                 <svg class="w-6 h-6" [class.fill-current]="isFavorite()" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+               </button>
+               <button (click)="shareProfile()" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-yellow-500 hover:text-black transition-all active:scale-90 shadow-xl shadow-black/40">
+                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+               </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Content Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
-            <div class="lg:col-span-2 space-y-8">
-              <!-- About Section -->
-              <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  À propos
-                </h3>
-                <div class="prose prose-invert max-w-none">
-                  <p class="text-slate-300 leading-relaxed" *ngIf="pro.description; else noDescription">
-                    {{ pro.description }}
-                  </p>
-                  <ng-template #noDescription>
-                    <div class="text-center py-8">
-                      <svg class="w-12 h-12 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                      </svg>
-                      <p class="text-slate-400">Aucune description fournie</p>
-                    </div>
-                  </ng-template>
-                </div>
+      <!-- MAIN CONTENT GRID -->
+      <main class="container mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          <!-- LEFT: Details -->
+          <div class="lg:col-span-2 space-y-12 animate-fade-in-up">
+            
+            <!-- About Card -->
+            <div class="bg-white/[0.03] backdrop-blur-2xl border border-white/5 rounded-[3rem] p-8 md:p-12">
+              <div class="flex items-center gap-4 mb-8">
+                <div class="w-1.5 h-10 bg-yellow-500 rounded-full"></div>
+                <h3 class="text-2xl font-black text-white tracking-widest uppercase italic">L'Excellence du Service</h3>
+              </div>
+              <div class="prose prose-invert max-w-none">
+                <p class="text-slate-400 text-lg leading-relaxed font-medium">
+                  {{ pro?.description || "Ce professionnel n'a pas encore complété sa présentation détaillée. Cependant, ses qualifications ont été vérifiées par notre équipe." }}
+                </p>
               </div>
 
-              <!-- Rating Section -->
-              <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <h3 class="text-xl font-bold text-white flex items-center gap-3">
-                      <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                      </svg>
-                      Notes et avis
-                    </h3>
-                    <p class="text-sm text-slate-400 mt-1">Laissez votre avis sur ce professionnel</p>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-3xl font-bold text-white">{{ (pro.rating ?? 0) | number:'1.1-1' }}</div>
-                    <div class="text-sm text-slate-400">{{ pro.ratingCount || 0 }} avis</div>
-                  </div>
-                </div>
-
-                <!-- Rating Stars -->
-                <div class="flex items-center gap-2 mb-4">
-                  <div class="flex">
-                    <button
-                      type="button"
-                      class="p-1 cursor-pointer transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:opacity-60"
-                      *ngFor="let s of stars; let i = index"
-                      [disabled]="ratingLoading"
-                      (click)="rate(i+1)"
-                      [title]="'Noter ' + (i+1) + '/5'"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-7 w-7 transition-colors duration-200"
-                        viewBox="0 0 20 20"
-                        [attr.fill]="(i+1) <= myRating ? 'currentColor' : 'none'"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        [ngClass]="{
-                          'text-amber-400': (i+1) <= myRating,
-                          'text-slate-200 hover:text-amber-300': (i+1) > myRating
-                        }"
-                      >
-                        <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.563-.954L10 0l2.949 5.956 6.563.954-4.756 4.635 1.122 6.545z"/>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div *ngIf="ratingLoading" class="flex items-center gap-2 text-sm text-amber-400 ml-2">
-                    <div class="spinner-small"></div>
-                    <span>Envoi...</span>
-                  </div>
-                </div>
-
-                <!-- Login Prompt for Rating -->
-                <div *ngIf="!auth.isAuthenticated()" class="mt-4 p-4 rounded-lg bg-black/40 border border-slate-700">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <div class="text-sm font-medium text-white">Connectez-vous pour noter</div>
-                      <div class="text-xs text-slate-400 mt-1">Votre avis compte !</div>
-                    </div>
-                    <a routerLink="/login" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 text-sm">
-                      Se connecter
-                    </a>
-                  </div>
-                </div>
+              <!-- Tags / Skills Placeholder -->
+              <div class="mt-12 flex flex-wrap gap-3">
+                <span class="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-500">Professionnalisme</span>
+                <span class="px-4 py-2 bg-yellow-500/10 rounded-xl border border-yellow-500/20 text-[10px] font-black uppercase tracking-widest text-yellow-500">Vérifié</span>
+                <span class="px-3 py-1 bg-white/5 rounded-full border border-white/5 text-[9px] font-bold text-slate-500">{{ getExperienceLabel(pro?.experienceRange ?? '') }}</span>
               </div>
+            </div>
 
-              <!-- Images Section -->
-              <div *ngIf="pro.images?.length" class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  Photos
-                </h3>
+            <!-- Photos Grid -->
+            @if (pro?.images?.length) {
+              <div class="space-y-8">
+                <div class="flex items-center justify-between px-4">
+                  <h3 class="text-lg font-black text-white uppercase tracking-widest">Galerie de Réalisations</h3>
+                  <div class="h-px flex-1 mx-8 bg-white/5"></div>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div
-                    *ngFor="let img of pro.images"
-                    class="relative aspect-square rounded-xl overflow-hidden border border-slate-700 group cursor-pointer"
-                    (click)="viewImage(img.url)"
-                  >
-                    <img [src]="img.url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-                  </div>
+                  @for (img of pro?.images; track img.url) {
+                    <div (click)="viewImage(img.url)" class="aspect-square rounded-[2rem] overflow-hidden group cursor-pointer border border-white/10 relative">
+                       <img [src]="img.url" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Portfolio Image">
+                       <div class="absolute inset-0 bg-yellow-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                  }
                 </div>
               </div>
-            </div>
+            }
 
-            <!-- Right Column -->
-            <div class="space-y-8">
-              <!-- Details Card -->
-              <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  Détails
-                </h3>
-
-                <div class="space-y-6">
-                  <!-- Availability -->
-                  <div>
-                    <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Disponibilités
-                    </h4>
-                    <div *ngIf="(pro.daysAvailable || []).length > 0 || pro.hoursAvailable" class="space-y-2">
-                      <div *ngIf="(pro.daysAvailable || []).length > 0" class="flex flex-wrap gap-2">
-                        <span
-                          *ngFor="let day of pro.daysAvailable"
-                          class="px-3 py-1.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-sm font-medium text-yellow-300"
-                        >
-                          {{ day }}
-                        </span>
-                      </div>
-                      <div *ngIf="pro.hoursAvailable" class="text-white font-medium">
-                        {{ pro.hoursAvailable }}
-                      </div>
-                    </div>
-                    <div *ngIf="!(pro.daysAvailable || []).length && !pro.hoursAvailable" class="text-slate-400 text-sm">
-                      Non spécifié
-                    </div>
-                  </div>
-
-                  <!-- Contact Info -->
-                  <div>
-                    <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                      </svg>
-                      Contact
-                    </h4>
-                    <div class="space-y-2">
-                      <div class="text-white font-medium">{{ pro.telephone || 'Non disponible' }}</div>
-                      <div class="text-sm text-slate-400">
-                        Préfère : {{ preferredContactLabel(pro.preferredContact) }}
-                      </div>
-                      <div *ngIf="pro.whatsapp" class="text-sm text-emerald-400 flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.548 4.125 1.514 5.865L.212 23.505a.5.5 0 00.787.42l4.787-3.144A11.926 11.926 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
-                        </svg>
-                        WhatsApp disponible
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Location -->
-                  <div>
-                    <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                      Localisation
-                    </h4>
-                    <div class="space-y-1">
-                      <div class="text-white font-medium">{{ pro.ville }}</div>
-                      <div *ngIf="pro.quartier" class="text-slate-300">{{ pro.quartier }}</div>
-                      <div class="text-sm text-slate-400">République du Congo</div>
-                    </div>
-                  </div>
+            <!-- Ratings Section -->
+            <div class="bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 overflow-hidden relative">
+              <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-yellow-500/5 rounded-full blur-[80px]"></div>
+              
+              <div class="flex flex-col md:flex-row gap-12 relative z-10">
+                <div class="flex flex-col items-center justify-center p-8 bg-black/40 border border-white/5 rounded-[2.5rem] min-w-[200px]">
+                   <span class="text-6xl font-black text-white tracking-tighter mb-2">{{ (pro?.rating ?? 0) | number:'1.1-1' }}</span>
+                   <div class="flex text-yellow-500 mb-4">
+                     <svg *ngFor="let s of stars" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                   </div>
+                   <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">{{ pro?.ratingCount || 0 }} AVIS COLLECTÉS</span>
                 </div>
-              </div>
 
-              <!-- Share Card -->
-              <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                  </svg>
-                  Partager
-                </h3>
-                <p class="text-slate-300 mb-4">Partagez ce profil avec vos amis et collègues</p>
-                <div class="flex gap-3">
-                  <button
-                    (click)="shareProfile()"
-                    class="flex-1 px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                    </svg>
-                    Partager
-                  </button>
-                  <button
-                    (click)="copyProfileLink()"
-                    class="px-4 py-2.5 bg-black/40 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200"
-                    title="Copier le lien"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                  </button>
+                <div class="flex-1 space-y-8">
+                  <h3 class="text-xl font-black text-white uppercase tracking-widest">Partager votre Expérience</h3>
+                  <p class="text-slate-400 font-medium">Contribuez à la communauté en notant ce partenaire selon la qualité du travail et le professionnalisme.</p>
+                  
+                  <div class="flex items-center gap-2">
+                    <button *ngFor="let s of stars; let i = index" 
+                      (click)="rate(i+1)" 
+                      class="w-12 h-12 flex items-center justify-center rounded-2xl border transition-all active:scale-90"
+                      [class]="(i+1) <= myRating ? 'bg-yellow-500 border-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 border-white/10 text-slate-500 hover:text-yellow-500 hover:border-yellow-500/40'">
+                      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </button>
+                    @if (ratingLoading) {
+                      <div class="ml-4 w-6 h-6 border-2 border-white/10 border-t-yellow-500 rounded-full animate-spin"></div>
+                    }
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Report Modal -->
-        <div *ngIf="reportOpen" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div class="w-full max-w-lg bg-black/90 backdrop-blur-sm rounded-2xl border border-slate-800 p-6">
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-red-400/10 flex items-center justify-center">
-                  <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0l-7.034 7.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                </div>
-                <h3 class="text-xl font-bold text-white">Signaler ce profil</h3>
+          <!-- RIGHT: Sticky Contact Card -->
+          <div class="lg:col-span-1">
+            <div class="sticky top-32 space-y-8 animate-fade-in-up delay-100">
+              
+              <!-- CONTACT CARD -->
+              <div class="bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 shadow-2xl relative overflow-hidden group">
+                 <div class="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                 
+                 <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-8">Informations de Contact</h3>
+
+                 <div class="space-y-6 mb-12">
+                   <!-- Availability Info -->
+                   <div class="flex items-start gap-4">
+                     <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500">
+                       <svg class="w-5 h-5 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                     </div>
+                     <div>
+                       <span class="block text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none mb-2">Disponibilité</span>
+                       <span class="text-white font-bold">{{ pro?.hoursAvailable || "Consultation sur RDV" }}</span>
+                       <div class="mt-2 flex flex-wrap gap-1">
+                         <span *ngFor="let day of pro?.daysAvailable" class="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[9px] font-bold rounded-lg border border-yellow-500/20 uppercase tracking-tighter">{{ day }}</span>
+                       </div>
+                     </div>
+                   </div>
+
+                   <!-- Preferred Reach -->
+                   <div class="flex items-start gap-4">
+                     <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500">
+                       <svg class="w-5 h-5 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                     </div>
+                     <div>
+                       <span class="block text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none mb-2">Canal Préféré</span>
+                       <span class="text-white font-bold">{{ preferredContactLabel(pro?.preferredContact) }}</span>
+                     </div>
+                   </div>
+                 </div>
+
+                 <!-- BUTTONS -->
+                 <div class="space-y-3">
+                   <button *ngIf="canCall()" (click)="call()" 
+                           class="w-full py-5 bg-yellow-500 text-black text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:scale-[1.02] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-yellow-500/10">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                      Appeler Maintenant
+                   </button>
+                   <button *ngIf="canWhatsapp()" (click)="whatsapp()" 
+                           class="w-full py-5 bg-emerald-500 text-white text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-400 hover:scale-[1.02] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-emerald-500/10">
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.548 4.125 1.514 5.865L.212 23.505a.5.5 0 00.787.42l4.787-3.144A11.926 11.926 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                      Contacter sur WhatsApp
+                   </button>
+                 </div>
+
+                 <!-- Login Lock Overlay -->
+                 @if (!auth.isAuthenticated()) {
+                   <div class="mt-8 p-6 rounded-2xl bg-black/60 border border-white/5 backdrop-blur-sm">
+                      <p class="text-xs font-bold text-slate-400 mb-4 leading-relaxed">Veuillez vous authentifier pour accéder aux cordonnées complètes et à la messagerie.</p>
+                      <a routerLink="/login" class="block w-full text-center py-3 bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-colors">Se Connecter</a>
+                   </div>
+                 }
               </div>
-              <button
-                (click)="closeReport()"
-                class="p-2 rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
-              >
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+
+              <!-- Report & Security -->
+              <div class="px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+                 <button (click)="openReport()" class="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-red-500 transition-colors">Signaler un abus</button>
+                 <div class="flex items-center gap-2">
+                   <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                   <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Paiement Sécurisé Main à Main</span>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- REPORT MODAL (Premium Overlay) -->
+      <div *ngIf="reportOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+        <div class="w-full max-w-xl bg-[#0a0a0c] border border-white/10 rounded-[3rem] p-10 shadow-2xl animate-slide-up relative overflow-hidden">
+          <div class="absolute -top-20 -left-20 w-40 h-40 bg-red-500/10 rounded-full blur-[80px]"></div>
+          
+          <div class="flex items-center justify-between mb-10 relative z-10">
+            <h3 class="text-3xl font-black text-white tracking-tighter italic">Signalement</h3>
+            <button (click)="closeReport()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <div class="space-y-6 relative z-10">
+            <p class="text-slate-400 font-medium text-sm leading-relaxed">Aidez-nous à maintenir l'excellence sur La STREET. Si ce profil ne respecte pas nos standards, veuillez spécifier le motif.</p>
+            
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2">Motif d'alerte</label>
+              <select [(ngModel)]="reportReason" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold focus:ring-2 focus:ring-red-500/50 appearance-none">
+                <option value="FAUX_PROFIL">Profil Non Authentique</option>
+                <option value="ARNAQUE">Tentative d'Arnaque</option>
+                <option value="COMPORTEMENT_DEPLACE">Comportement Incivique</option>
+                <option value="AUTRE">Autre Raison</option>
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2">Description</label>
+              <textarea [(ngModel)]="reportMessage" rows="3" placeholder="Veuillez détailler..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold focus:ring-2 focus:ring-red-500/50 resize-none"></textarea>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+              <button (click)="closeReport()" class="flex-1 py-4 bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-white/10">Annuler</button>
+              <button (click)="submitReport()" [disabled]="reportLoading" class="flex-[2] py-4 bg-red-500 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-red-400 shadow-xl shadow-red-500/10">
+                {{ reportLoading ? 'Traitement...' : 'Soumettre le Dossier' }}
               </button>
             </div>
-
-            <!-- Report Error -->
-            <div *ngIf="reportError" class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <div class="text-red-200 text-sm">{{ reportError }}</div>
-              </div>
-            </div>
-
-            <!-- Report Form -->
-            <div class="space-y-6">
-              <!-- Reason -->
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-slate-300">Motif du signalement</label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0l-7.034 7.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                  <select
-                    [(ngModel)]="reportReason"
-                    name="reportReason"
-                    class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all duration-200 appearance-none"
-                  >
-                    <option value="FAUX_PROFIL">Faux profil</option>
-                    <option value="ARNAQUE">Arnaque ou escroquerie</option>
-                    <option value="COMPORTEMENT_DEPLACE">Comportement déplacé</option>
-                    <option value="INFORMATION_INCORRECTE">Information incorrecte</option>
-                    <option value="AUTRE">Autre raison</option>
-                  </select>
-                  <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Message -->
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-slate-300">
-                  Détails (optionnel)
-                  <span class="float-right text-xs text-slate-500">{{ reportMessage.length }}/500</span>
-                </label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-4 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                  </svg>
-                  <textarea
-                    [(ngModel)]="reportMessage"
-                    name="reportMessage"
-                    rows="4"
-                    maxlength="500"
-                    placeholder="Expliquez brièvement la raison de votre signalement..."
-                    class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all duration-200 resize-none"
-                  ></textarea>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex gap-3 pt-4">
-                <button
-                  (click)="closeReport()"
-                  class="flex-1 px-6 py-3 bg-black/40 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200"
-                >
-                  Annuler
-                </button>
-                <button
-                  (click)="submitReport()"
-                  [disabled]="reportLoading"
-                  class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <div *ngIf="reportLoading" class="spinner-small"></div>
-                  {{ reportLoading ? 'Envoi en cours...' : 'Envoyer le signalement' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Image Viewer -->
-        <div *ngIf="viewingImage" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-          <div class="relative max-w-4xl max-h-[90vh]">
-            <button
-              (click)="viewingImage = ''"
-              class="absolute -top-12 right-0 p-2 rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
-            >
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-            <img [src]="viewingImage" class="max-w-full max-h-[80vh] object-contain rounded-lg" />
           </div>
         </div>
       </div>
-    </main>
+
+      <!-- IMAGE VIEWER (Premium) -->
+      <div *ngIf="viewingImage" (click)="viewingImage = ''" class="fixed inset-0 z-[150] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 animate-fade-in group">
+        <button class="absolute top-10 right-10 text-white/50 hover:text-white transition-colors group-hover:scale-110">
+          <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <img [src]="viewingImage" (click)="$event.stopPropagation()" class="max-w-full max-h-[85vh] object-contain rounded-[3rem] shadow-2xl border border-white/10" alt="Full Preview">
+        <span class="mt-8 text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Aperçu Haute Définition</span>
       </div>
+
     </div>
   `,
   styles: [`
-    .hero-bg {
-      background-image:
-        radial-gradient(circle at 20% 50%, rgba(234, 179, 8, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(234, 179, 8, 0.03) 0%, transparent 50%);
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(234, 179, 8, 0.2);
-      border-radius: 50%;
-      border-top-color: #eab308;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    .spinner-small {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 1;
-      white-space: nowrap;
-    }
+    :host { display: block; }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out both; }
+    .animate-fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(234,179,8,0.5); }
   `]
 })
 export class ProProfilePage implements OnInit {

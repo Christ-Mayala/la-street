@@ -1,373 +1,304 @@
-<!-- Bandeau flottant pour inscription/connexion (visible seulement si non connecté) -->
+<!-- Notification Bar -->
 @if (!isLoggedIn() && !isNotificationHidden()) {
-  <div class="notification-bar fixed top-0 left-0 right-0 z-50 px-4 py-3 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto gap-3 sm:gap-0">
+  <div class="fixed top-0 inset-x-0 z-[110] bg-yellow-500 text-black px-4 py-2.5 shadow-[0_0_20px_rgba(234,179,8,0.3)] animate-fade-in-down">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 flex-shrink-0">
-          <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-          </svg>
+        <span class="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </span>
-        <p class="text-sm font-medium text-white text-center sm:text-left">
-          <span class="hidden sm:inline">Rejoignez la communauté des professionnels du Congo. </span>
-          <span class="font-bold">Inscrivez-vous gratuitement</span> ou connectez-vous pour accéder à tous les talents.
+        <p class="text-sm font-bold tracking-tight text-center sm:text-left leading-tight">
+          Rejoignez l'élite des professionnels du Congo. Créez votre compte gratuitement !
         </p>
       </div>
-      <div class="flex gap-2 items-center">
-        <a
-          [routerLink]="['/login']"
-          class="px-4 py-2 text-sm font-medium text-white bg-transparent border border-white/30 rounded-lg hover:bg-white/10 transition-colors duration-200 whitespace-nowrap"
-        >
-          Connexion
-        </a>
-        <a
-          [routerLink]="['/register']"
-          class="px-4 py-2 text-sm font-medium text-black bg-yellow-400 rounded-lg hover:bg-yellow-300 transition-colors duration-200 pulse-glow whitespace-nowrap"
-        >
-          S'inscrire
-        </a>
-        <button
-          (click)="hideNotificationBar()"
-          class="p-2 ml-2 text-white rounded-full hover:bg-white/10 transition-colors duration-200 flex-shrink-0"
-          aria-label="Fermer la notification"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <a [routerLink]="['/register']" class="flex-1 sm:flex-none px-4 py-2 bg-black text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-slate-900 transition-all text-center">Rejoindre</a>
+        <button (click)="hideNotificationBar()" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/10 transition-colors shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
     </div>
   </div>
 }
 
-<div class="min-h-screen relative overflow-hidden hero-bg">
-  <div class="absolute inset-0 -z-10 bg-black"></div>
-
-  <!-- Animated background elements -->
-  <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden pointer-events-none">
-    <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
-  </div>
-
-  <div class="relative z-10">
-    <!-- Hero Section avec fond doré -->
-    <section class="relative overflow-hidden" [class.pt-20]="!isLoggedIn() && !isNotificationHidden()">
-  <!-- Background avec effet doré -->
-  <div class="absolute inset-0 -z-10 bg-black"></div>
-
-  <!-- Éléments d'arrière-plan dorés -->
-  <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden">
-    <div class="absolute top-10 left-10 w-72 h-72 bg-yellow-400/5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-10 right-10 w-96 h-96 bg-yellow-400/3 rounded-full blur-3xl"></div>
-    <div class="absolute top-1/2 left-1/4 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl"></div>
-  </div>
-
-  <div class="container relative z-10 py-12 md:py-24">
-    <div class="max-w-3xl mx-auto lg:mx-0">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 mb-6">
-        <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-        <span class="text-sm font-medium text-yellow-300">Plateforme République du Congo</span>
-      </div>
-
-      <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white text-center lg:text-left">
-        La <span class="text-yellow-400 relative inline-block">STREET
-          <span class="absolute -bottom-1 left-0 w-full h-1 bg-yellow-400/50 rounded-full"></span>
-        </span>
-      </h1>
-      <p class="mt-4 text-xl md:text-3xl font-bold text-slate-200 text-center lg:text-left">
-        Les talents visibles, le travail valorisé.
-      </p>
-      <p class="mt-6 text-base md:text-lg text-slate-300 text-center lg:text-left">
-        Trouvez un professionnel par métier et localité (République du Congo).
-      </p>
-
-      <!-- Stats -->
-      <div class="mt-10 flex flex-wrap gap-6 md:gap-8 justify-center lg:justify-start">
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-yellow-400">{{ totalProfessionals }}</div>
-          <div class="text-sm text-slate-400">Professionnels</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-yellow-400">{{ totalTrades }}</div>
-          <div class="text-sm text-slate-400">Métiers</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-yellow-400">{{ totalCities }}</div>
-          <div class="text-sm text-slate-400">Villes</div>
-        </div>
-      </div>
+<div class="min-h-screen bg-[#0a0a0c] selection:bg-yellow-500/30 selection:text-yellow-200">
+  
+  <!-- HERO SECTION - Massive, Dark & Premium -->
+  <section class="relative min-h-[90vh] flex flex-col justify-center pt-24 pb-16 overflow-hidden">
+    <!-- Abstract Background -->
+    <div class="absolute inset-0 z-0">
+       <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-20 mix-blend-luminosity"></div>
+       <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0c]/80 via-[#0a0a0c]/95 to-[#0a0a0c]"></div>
+       <!-- Glows -->
+       <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-yellow-500/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
+       <div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-slate-500/10 rounded-full blur-[150px] pointer-events-none"></div>
     </div>
 
-    <!-- Formulaire de recherche amélioré -->
-    <div class="mt-12 bg-black/30 backdrop-blur-sm rounded-xl border border-slate-800 p-4 md:p-6 max-w-6xl mx-auto">
-      <h2 class="text-lg md:text-xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-        Trouvez le professionnel parfait
-      </h2>
-
-      <form class="space-y-4" (ngSubmit)="onSearch()">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="relative">
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-            <input
-              [(ngModel)]="q"
-              name="q"
-              type="text"
-              placeholder="Métier (ex: Plombier)"
-              class="w-full pl-10 md:pl-12 pr-4 py-3 md:py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 text-sm md:text-base"
-            />
-          </div>
-
-          <div class="relative">
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-            <input
-              [(ngModel)]="ville"
-              name="ville"
-              type="text"
-              placeholder="Ville (ex: Brazzaville)"
-              class="w-full pl-10 md:pl-12 pr-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 text-sm md:text-base"
-            />
-          </div>
-
-          <button
-            type="submit"
-            class="w-full md:w-auto px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center gap-2 text-sm md:text-base"
-          >
-            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Rechercher
-          </button>
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="max-w-4xl mx-auto text-center space-y-8">
+        
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 shadow-inner backdrop-blur-md mx-auto">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+          </span>
+          <span class="text-xs font-bold text-white tracking-widest uppercase opacity-80">Plateforme N°1 en RDC</span>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between pt-2 gap-2 sm:gap-0">
-          <p class="text-xs md:text-sm text-slate-400 text-center sm:text-left">
-            <span class="text-yellow-300 font-medium">Conseil :</span> Laissez un champ vide pour étendre votre recherche
-          </p>
-          <a [routerLink]="['/search']" class="text-xs md:text-sm text-yellow-300 hover:text-yellow-400 hover:underline transition-colors duration-200 whitespace-nowrap">
-            Recherche avancée →
-          </a>
-        </div>
-      </form>
-    </div>
-
-    <!-- Scroll indicator -->
-    <div class="mt-8 md:mt-12 flex justify-center">
-      <div class="animate-bounce">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-</section>
-
-<main class="container py-8 md:py-12">
-  <!-- Section Recommandés (seulement ceux avec 4-5 étoiles) -->
-  <section class="mb-12 md:mb-16">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-4 sm:gap-0">
-      <div>
-        <h2 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">Professionnels recommandés</h2>
-        <p class="mt-1 md:mt-2 text-sm md:text-base text-slate-400">Les meilleurs professionnels avec 4 à 5 étoiles</p>
-      </div>
-      <a
-        [routerLink]="['/search']"
-        class="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 bg-black/40 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 text-sm md:text-base whitespace-nowrap"
-      >
-        Voir tout
-        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-        </svg>
-      </a>
-    </div>
-
-    <!-- Loading state -->
-    @if (loadingRecommended()) {
-      <div class="flex justify-center py-8 md:py-12">
-        <div class="spinner"></div>
-      </div>
-    }
-
-    <!-- Content -->
-    @if (!loadingRecommended() && recommended().length > 0) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        @for (p of recommended(); track p._id) {
-          <app-professional-card [pro]="p" />
-        }
-      </div>
-    }
-
-    <!-- Empty state -->
-    @if (!loadingRecommended() && recommended().length === 0) {
-      <div class="text-center py-8 md:py-12 bg-black/20 rounded-xl border border-slate-800">
-        <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-        </svg>
-        <h3 class="text-base md:text-lg font-semibold text-white mb-1 md:mb-2">Aucune recommandation pour le moment</h3>
-        <p class="text-xs md:text-sm text-slate-400">Les professionnels avec 4 à 5 étoiles apparaîtront ici</p>
-      </div>
-    }
-  </section>
-
-  <!-- Section Nouveaux profils (limité aux 3 derniers) -->
-  <section>
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-4 sm:gap-0">
-      <div>
-        <h2 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">Nouveaux profils</h2>
-        <p class="mt-1 md:mt-2 text-sm md:text-base text-slate-400">Les 3 derniers professionnels inscrits</p>
-      </div>
-      <a
-        [routerLink]="['/search']"
-        class="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 bg-black/40 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-black/60 hover:border-slate-600 hover:text-white transition-all duration-200 text-sm md:text-base whitespace-nowrap"
-      >
-        Explorer tous les profils
-        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-        </svg>
-      </a>
-    </div>
-
-    <!-- Loading state -->
-    @if (loadingPros()) {
-      <div class="flex justify-center py-8 md:py-12">
-        <div class="spinner"></div>
-      </div>
-    }
-
-    <!-- Content - Limité à 3 profils -->
-    @if (!loadingPros() && pros().length > 0) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        @for (p of getLastThreeProfessionals(); track p._id) {
-          <app-professional-card [pro]="p" />
-        }
-      </div>
-    }
-
-    <!-- Error state -->
-    @if (error()) {
-      <div class="mt-6 p-4 md:p-6 bg-red-500/10 border border-red-500/30 rounded-xl">
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 md:w-6 md:h-6 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <h3 class="text-sm md:text-base font-semibold text-red-300 mb-1">Erreur de chargement</h3>
-            <p class="text-xs md:text-sm text-red-200">{{ error() }}</p>
-            <button
-              (click)="retryLoading()"
-              class="mt-2 md:mt-3 text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-300 transition-colors duration-200"
-            >
-              Réessayer
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Empty state -->
-    @if (!loadingPros() && !error() && pros().length === 0) {
-      <div class="text-center py-8 md:py-12 bg-black/20 rounded-xl border border-slate-800">
-        <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-        </svg>
-        <h3 class="text-base md:text-lg font-semibold text-white mb-1 md:mb-2">Aucun profil disponible</h3>
-        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6">Soyez le premier à rejoindre notre plateforme</p>
-        <a
-          [routerLink]="['/register']"
-          class="inline-flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 text-sm md:text-base"
-        >
-          <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Inscrivez-vous gratuitement
-        </a>
-      </div>
-    }
-  </section>
-
-  <!-- CTA Section -->
-  @if (!isLoggedIn()) {
-    <section class="mt-12 md:mt-20">
-      <div class="bg-black/30 rounded-xl border border-slate-800 p-6 md:p-8 lg:p-12 text-center">
-        <h2 class="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-3 md:mb-4">Vous êtes professionnel ?</h2>
-        <p class="text-sm md:text-base text-slate-300 mb-6 md:mb-8 max-w-2xl mx-auto">
-          Rejoignez notre communauté et augmentez votre visibilité. Des milliers de clients vous attendent.
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.1]">
+          Trouvez l'<span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Excellence</span> près de chez vous.
+        </h1>
+        
+        <p class="text-lg md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          La STREET connecte vos ambitions aux meilleurs talents locaux. Explorez un réseau exclusif de professionnels qualifiés.
         </p>
-        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-          <a
-            [routerLink]="['/register']"
-            class="px-6 md:px-8 py-2.5 md:py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 text-sm md:text-base"
-          >
-            Créer mon profil gratuitement
-          </a>
-          <a
-            [routerLink]="['/about']"
-            class="px-6 md:px-8 py-2.5 md:py-3.5 bg-black/60 border border-slate-700 text-white font-semibold rounded-lg hover:bg-black/80 hover:border-slate-600 transition-all duration-200 text-sm md:text-base"
-          >
-            En savoir plus
-          </a>
+
+        <!-- Premium Search Bar -->
+        <div class="mt-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-3 md:p-4 max-w-4xl mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+           <form class="flex flex-col md:flex-row gap-3" (ngSubmit)="onSearch()">
+             
+             <!-- What -->
+             <div class="flex-1 relative group">
+               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                 <svg class="w-5 h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+               </div>
+               <input [(ngModel)]="q" name="q" type="text" placeholder="Métier, service, mot-clé..." class="w-full bg-black/40 border-none rounded-2xl py-4 pr-5 pl-14 text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
+             </div>
+
+             <!-- Where -->
+             <div class="flex-1 relative group">
+               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                 <svg class="w-5 h-5 text-slate-500 group-focus-within:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+               </div>
+               <input [(ngModel)]="ville" name="ville" type="text" placeholder="Où ? (ex: Brazzaville)" class="w-full bg-black/40 border-none rounded-2xl py-4 pr-5 pl-14 text-white placeholder-slate-500 focus:ring-2 focus:ring-yellow-500/50 transition-all font-medium">
+             </div>
+
+             <!-- Submit -->
+             <button type="submit" class="md:w-auto px-10 py-4 bg-yellow-500 text-black text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all active:scale-95 flex items-center justify-center shrink-0 gap-2">
+               Explorer 
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+             </button>
+           </form>
+           
+           <div class="mt-4 flex flex-col sm:flex-row justify-between items-center px-4 gap-2">
+             <div class="flex items-center gap-4 text-sm text-slate-400">
+               <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> {{ totalProfessionals || '100+' }} Pros</span>
+               <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> {{ totalTrades || '50+' }} Métiers</span>
+             </div>
+             <a [routerLink]="['/search']" class="text-xs font-bold text-yellow-500 hover:text-yellow-400 uppercase tracking-widest">Recherche Avancée</a>
+           </div>
         </div>
+      </div>
+    </div>
+    
+    <!-- Scrolldown indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce flex flex-col items-center gap-2 text-slate-500">
+       <span class="text-[10px] uppercase tracking-widest font-bold">Découvrir</span>
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <main class="container mx-auto px-6 py-24 space-y-32 relative z-10">
+    
+    <!-- RECOMMENDED SECTION -->
+    <section>
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 border-b border-white/5 pb-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-yellow-500 mb-3">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            <span class="text-xs font-black uppercase tracking-widest">Le Choix de La STREET</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Professionnels Recommandés</h2>
+        </div>
+        <a [routerLink]="['/search']" class="shrink-0 px-6 py-2.5 rounded-xl border border-white/10 text-white text-sm font-bold hover:bg-white/5 transition-all text-center">Voir l'élite</a>
+      </div>
+
+      <!-- Loading State -->
+      @if (loadingRecommended()) {
+        <div class="flex justify-center py-20">
+          <div class="w-12 h-12 border-4 border-white/10 border-t-yellow-500 rounded-full animate-spin"></div>
+        </div>
+      }
+
+      <!-- Grid -->
+      @if (!loadingRecommended() && recommended().length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          @for (p of recommended(); track p._id) {
+            <app-professional-card [pro]="p" />
+          }
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loadingRecommended() && recommended().length === 0) {
+        <div class="p-16 rounded-3xl bg-white/[0.02] border border-white/5 text-center flex flex-col items-center">
+          <div class="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
+            <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Aucune recommandation disponible</h3>
+          <p class="text-slate-400">Revenez plus tard pour découvrir notre sélection.</p>
+        </div>
+      }
+    </section>
+    
+    <!-- CATEGORIES NAVIGATOR - Visual Experience -->
+    <section class="relative">
+      <!-- Section Glow -->
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 relative z-10">
+        <div>
+          <div class="inline-flex items-center gap-2 text-slate-500 mb-3">
+            <span class="w-8 h-px bg-white/10"></span>
+            <span class="text-[10px] font-black uppercase tracking-[0.3em]">Exploration par métier</span>
+          </div>
+          <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter">Parcourir par Secteur</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 relative z-10">
+        @for (cat of categories(); track cat._id) {
+          <a [routerLink]="['/search']" [queryParams]="{ categoryId: cat._id }" 
+             class="group relative flex flex-col items-center justify-center p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden text-center">
+            
+            <!-- Hover Glow -->
+            <div class="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/[0.03] transition-colors"></div>
+            
+            <div class="w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/[0.03] flex items-center justify-center mb-3 sm:mb-6 group-hover:scale-110 group-hover:bg-yellow-500/10 transition-all duration-500">
+               <!-- Dynamic Icons based on common names or just a premium placeholder -->
+               @if (cat.name.includes('BTP') || cat.name.includes('Construction')) {
+                 <svg class="w-5 h-5 sm:w-8 sm:h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+               } @else if (cat.name.includes('Numérique') || cat.name.includes('IT')) {
+                 <svg class="w-5 h-5 sm:w-8 sm:h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+               } @else if (cat.name.includes('Santé') || cat.name.includes('Bien')) {
+                 <svg class="w-5 h-5 sm:w-8 sm:h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+               } @else {
+                 <svg class="w-5 h-5 sm:w-8 sm:h-8 text-slate-500 group-hover:text-yellow-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+               }
+            </div>
+
+            <h3 class="text-xs sm:text-sm font-black text-white uppercase tracking-wider group-hover:text-yellow-500 transition-colors mb-0.5 sm:mb-1 truncate w-full">{{ cat.name }}</h3>
+            <span class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest">{{ cat.trades?.length || 0 }} Métiers</span>
+          </a>
+        }
       </div>
     </section>
-  }
-</main>
 
-<!-- Modale d'inscription/connexion (seulement si non connecté et pas déjà fermée) -->
-@if (showAuthModal && !isLoggedIn() && !isModalDismissed()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="max-w-md w-full bg-black/90 rounded-2xl border border-yellow-500/20 overflow-hidden shadow-2xl shadow-yellow-500/10">
-      <div class="p-6 md:p-8 text-center">
-        <div class="mx-auto w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-yellow-500/20 mb-3 md:mb-4">
-          <svg class="w-6 h-6 md:w-8 md:h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-          </svg>
+    <!-- RECENT PROFILES SECTION -->
+    <section>
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 border-b border-white/5 pb-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-white/50 mb-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="text-xs font-black uppercase tracking-widest">Nouvelles pépites</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Derniers Inscrits</h2>
         </div>
-        <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Rejoignez La STREET</h3>
-        <p class="text-sm md:text-base text-slate-300 mb-4 md:mb-6">
-          Créez votre profil gratuitement et accédez à des milliers de professionnels vérifiés en République du Congo.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-          <a
-            [routerLink]="['/register']"
-            (click)="closeModal()"
-            class="px-4 md:px-6 py-2.5 md:py-3 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-colors duration-200 spotlight text-sm md:text-base"
-          >
-            S'inscrire
-          </a>
-          <a
-            [routerLink]="['/login']"
-            (click)="closeModal()"
-            class="px-4 md:px-6 py-2.5 md:py-3 bg-transparent border border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors duration-200 text-sm md:text-base"
-          >
-            Connexion
-          </a>
+      </div>
+
+      <!-- Loading State -->
+      @if (loadingPros()) {
+        <div class="flex justify-center py-20">
+          <div class="w-12 h-12 border-4 border-white/10 border-t-white/50 rounded-full animate-spin"></div>
         </div>
-        <button
-          (click)="dismissModal()"
-          class="absolute top-2 md:top-4 right-2 md:right-4 p-2 text-white rounded-full hover:bg-white/10 transition-colors duration-200"
-          aria-label="Fermer la modale"
-        >
-          <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+      }
+
+      <!-- Grid -->
+      @if (!loadingPros() && pros().length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          @for (p of getLastThreeProfessionals(); track p._id) {
+            <app-professional-card [pro]="p" />
+          }
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error()) {
+        <div class="p-8 rounded-3xl bg-red-500/10 border border-red-500/20 text-center flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-4 text-red-500">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <p class="text-red-400 font-medium mb-6">{{ error() }}</p>
+          <button (click)="retryLoading()" class="px-6 py-2.5 rounded-xl bg-red-500/20 text-red-400 font-bold hover:bg-red-500/30 transition-colors">Réessayer</button>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loadingPros() && !error() && pros().length === 0) {
+        <div class="p-16 rounded-3xl bg-white/[0.02] border border-white/5 text-center flex flex-col items-center">
+          <div class="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
+            <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Aucun professionnel en vue</h3>
+          <p class="text-slate-400">Le réseau se construit. Soyez le premier !</p>
+        </div>
+      }
+    </section>
+
+    <!-- PREMIUM CALL TO ACTION -->
+    @if (!isLoggedIn()) {
+      <section class="relative rounded-[2.5rem] overflow-hidden">
+        <div class="absolute inset-0 bg-yellow-500"></div>
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center mix-blend-multiply opacity-50"></div>
+        
+        <div class="relative z-10 p-12 md:p-20 flex flex-col items-center text-center">
+          <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter mb-6 max-w-3xl leading-[1.1]">
+            Propulsez Votre Activité au Sommet.
+          </h2>
+          <p class="text-lg md:text-xl text-black/80 font-medium mb-12 max-w-2xl">
+            Des milliers de particuliers et entreprises recherchent vos compétences tous les jours sur La STREET. Rejoignez-nous et transformez votre talent en opportunités concrètes.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <a [routerLink]="['/register']" class="px-8 py-4 bg-black text-white text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-slate-900 transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">
+              Créer Mon Espace Pro
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    }
+
+  </main>
+
+  <!-- AUTH MODAL (Guest Only) -->
+  @if (showAuthModal && !isLoggedIn() && !isModalDismissed()) {
+    <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div class="relative w-full max-w-md bg-[#0a0a0c] border border-white/10 rounded-[2rem] p-8 shadow-2xl overflow-hidden animate-slide-up">
+        
+        <!-- Glow -->
+        <div class="absolute top-0 inset-x-0 h-40 bg-yellow-500/20 blur-[50px] rounded-full pointer-events-none -translate-y-1/2"></div>
+        
+        <button (click)="dismissModal()" class="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
-        <div class="mt-4 md:mt-6">
-          <label class="flex items-center justify-center gap-2 text-xs md:text-sm text-slate-400">
-            <input type="checkbox" [checked]="isModalDismissed()" (change)="toggleModalDismiss($event)" class="w-3 h-3 md:w-4 md:h-4" />
-            Ne plus afficher
+
+        <div class="text-center relative z-10 mt-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 p-[1px] mx-auto mb-6">
+            <div class="w-full h-full bg-black rounded-[15px] flex items-center justify-center">
+              <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+            </div>
+          </div>
+          <h3 class="text-3xl font-black text-white tracking-tighter mb-4">L'expérience<br>Premium</h3>
+          <p class="text-slate-400 mb-8 leading-relaxed">
+            Créez un compte pour contacter les professionnels, publier des requêtes et enregistrer vos favoris.
+          </p>
+          
+          <div class="space-y-3">
+            <a [routerLink]="['/register']" (click)="closeModal()" class="flex w-full py-4 bg-yellow-500 text-black text-sm font-black tracking-widest uppercase rounded-xl hover:bg-yellow-400 justify-center transition-colors">S'inscrire</a>
+            <a [routerLink]="['/login']" (click)="closeModal()" class="flex w-full py-4 bg-white/5 text-white text-sm font-black tracking-widest uppercase rounded-xl hover:bg-white/10 border border-white/5 justify-center transition-colors">Se connecter</a>
+          </div>
+
+          <label class="mt-8 flex items-center justify-center gap-3 cursor-pointer group">
+            <div class="relative w-5 h-5 flex items-center justify-center">
+              <input type="checkbox" [checked]="isModalDismissed()" (change)="toggleModalDismiss($event)" class="peer sr-only">
+              <div class="w-5 h-5 rounded border-2 border-white/20 peer-checked:bg-yellow-500 peer-checked:border-yellow-500 transition-all"></div>
+              <svg class="absolute w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <span class="text-sm font-semibold tracking-wide text-slate-500 group-hover:text-slate-300 transition-colors">Ne plus afficher</span>
           </label>
         </div>
       </div>
     </div>
-  </div>
-}
-
-  </div>
+  }
 </div>
+

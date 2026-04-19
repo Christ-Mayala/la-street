@@ -12,129 +12,94 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <section class="relative overflow-hidden hero-bg">
-      <div class="absolute inset-0 -z-10 bg-black"></div>
-
-      <div class="absolute top-0 left-0 w-full h-full -z-5 overflow-hidden">
-        <div class="absolute -top-10 left-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 right-1/4 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div class="container relative z-10 py-16">
-        <div class="max-w-md mx-auto text-center">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 mb-6">
-            <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-            <span class="text-sm font-medium text-yellow-300">Sécurité</span>
+    <div class="min-h-screen flex text-slate-300 font-sans selection:bg-yellow-400/30">
+      <!-- Left Side (Image Cover) -->
+      <div class="hidden lg:flex lg:w-1/2 relative bg-black">
+        <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop"
+             class="absolute inset-0 w-full h-full object-cover opacity-70 mix-blend-luminosity hover:mix-blend-normal transition-all duration-1000"
+             alt="Urban Verification">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0a0a0c]"></div>
+        <div class="absolute bottom-16 left-12 right-12 z-10 text-white animate-fade-in">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md">
+            <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]"></span>
+            <span class="text-sm font-medium text-slate-200">Vérification · La STREET</span>
           </div>
-
-          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
-            Vérifier le <span class="text-yellow-400">code</span>
+          <h1 class="text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+            Code de<br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Vérification.</span>
           </h1>
-          <p class="mt-4 text-lg text-slate-300">
-            Entrez le code reçu par email pour continuer.
+          <p class="text-lg text-slate-300 opacity-90 max-w-lg mt-4 font-light leading-relaxed">
+            Saisissez le code secret transmis à votre adresse e-mail pour valider votre identité.
           </p>
         </div>
       </div>
-    </section>
 
-    <main class="container py-12 md:py-16">
-      <div class="max-w-md mx-auto">
-        <div class="bg-black/30 backdrop-blur-sm rounded-2xl border border-slate-800 p-6 md:p-8">
-          <div class="text-center mb-8">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-400/30 flex items-center justify-center">
-              <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+      <!-- Right Side (Form) -->
+      <div class="flex-1 flex flex-col pt-32 lg:justify-center px-6 sm:px-12 lg:px-24 bg-[#0a0a0c] relative overflow-hidden">
+        <div class="absolute -top-32 -right-32 w-64 h-64 bg-yellow-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-yellow-900/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <div class="w-full max-w-md mx-auto relative z-10">
+          <!-- Header -->
+          <div class="text-center lg:text-left mb-10">
+            <div class="w-16 h-16 lg:mx-0 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border border-yellow-400/20 shadow-inner flex items-center justify-center backdrop-blur-sm">
+              <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
               </svg>
             </div>
-            <h2 class="text-2xl font-bold text-white">Code de réinitialisation</h2>
-            <p class="mt-2 text-slate-400">Vérifions votre code avant de changer le mot de passe</p>
+            <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Vérification du code</h2>
+            <p class="text-slate-400 text-sm">Entrez le code à 6 chiffres reçu par e-mail.</p>
           </div>
 
-          <div *ngIf="error" class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-            <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <div>
-                <h3 class="font-semibold text-red-300">Erreur</h3>
-                <p class="text-red-200 text-sm mt-1">{{ error }}</p>
-              </div>
+          @if (error) {
+            <div class="mb-6 p-4 bg-red-950/30 border border-red-500/20 rounded-xl backdrop-blur-sm animate-shake">
+              <p class="text-xs font-bold text-red-500 uppercase tracking-widest text-center">{{ error }}</p>
             </div>
-          </div>
+          }
 
-          <form class="space-y-6" (ngSubmit)="onSubmit()">
-            <div class="space-y-2">
-              <label for="email" class="block text-sm font-medium text-slate-300">
-                Adresse email <span class="text-red-400">*</span>
-              </label>
-              <input
-                [(ngModel)]="email"
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="votre@email.com"
-                class="w-full px-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                [disabled]="loading"
-              />
+          <form (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="space-y-1.5">
+              <label class="block text-sm font-medium text-slate-400 ml-1">Email de destination</label>
+              <input [(ngModel)]="email" id="email" name="email" type="email" required readonly
+                     class="w-full bg-white/5 border border-slate-800 rounded-xl py-4 px-5 text-slate-500 font-medium outline-none cursor-not-allowed italic">
             </div>
 
-            <div class="space-y-2">
-              <label for="code" class="block text-sm font-medium text-slate-300">
-                Code de réinitialisation <span class="text-red-400">*</span>
-              </label>
-              <input
-                [(ngModel)]="code"
-                id="code"
-                name="code"
-                type="text"
-                required
-                placeholder="123456"
-                class="w-full px-4 py-3.5 rounded-lg border border-slate-700 bg-black/40 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                [disabled]="loading"
-              />
+            <div class="space-y-1.5 group/field">
+              <label class="block text-sm font-medium text-slate-300 ml-1 group-focus-within/field:text-yellow-500 transition-colors">Code secret</label>
+              <input [(ngModel)]="code" id="code" name="code" type="text" required placeholder="XXXXXX" [disabled]="loading"
+                     class="w-full bg-[#13141a] border border-slate-800 rounded-xl py-4 px-5 text-white font-black text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all placeholder:text-slate-700">
             </div>
 
-            <button
-              type="submit"
-              class="w-full py-3.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              [disabled]="loading || !email || !code"
-            >
-              <div *ngIf="loading" class="spinner-small mr-2"></div>
-              <svg *ngIf="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
-              </svg>
-              {{ loading ? 'Vérification...' : 'Continuer' }}
+            <button type="submit" [disabled]="loading || !email || !code"
+                    class="w-full py-4 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 active:scale-[0.98] transition-all shadow-xl shadow-yellow-500/20 disabled:opacity-20 flex items-center justify-center gap-3">
+              @if (loading) {
+                <div class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                <span>Validation...</span>
+              } @else {
+                <span>Valider l'accès</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              }
             </button>
 
-            <div class="text-center">
-              <a routerLink="/forgot-password" class="text-sm text-yellow-300 hover:text-yellow-400 hover:underline transition-colors duration-200">
-                Renvoyer un code
+            <div class="text-center pt-2">
+              <a routerLink="/forgot-password" class="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-yellow-500 transition-colors">
+                Renvoyer un nouveau code
               </a>
             </div>
           </form>
         </div>
       </div>
-    </main>
+    </div>
   `,
   styles: [`
-    .hero-bg {
-      background-image:
-        radial-gradient(circle at 20% 50%, rgba(234, 179, 8, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(234, 179, 8, 0.03) 0%, transparent 50%);
-    }
-
-    .spinner-small {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    :host { display: block; }
+    .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
     }
   `]
 })
@@ -151,7 +116,7 @@ export class ResetVerifyPage {
   loading = false;
 
   constructor() {
-    this.seo.setTitle('Vérification du code · La STREET');
+    this.seo.setTitle('Validation_Check · La STREET');
     this.seo.updateTags({
       description: 'Vérifiez votre code de réinitialisation de mot de passe La STREET.'
     });
@@ -164,11 +129,11 @@ export class ResetVerifyPage {
     this.error = '';
 
     if (!this.email) {
-      this.error = 'Veuillez entrer votre email.';
+      this.error = 'Identifiant email manquant.';
       return;
     }
     if (!this.code) {
-      this.error = 'Veuillez entrer le code de réinitialisation.';
+      this.error = 'Veuillez saisir le code secret.';
       return;
     }
 
@@ -176,14 +141,13 @@ export class ResetVerifyPage {
     try {
       const v = await firstValueFrom(this.api.verifyResetCode(this.email, this.code));
       if (!v?.valid && !v?.success) {
-        this.error = 'Code invalide ou expiré.';
+        this.error = 'Signal corrompu : Code invalide ou expiré.';
         return;
       }
 
       await this.router.navigate(['/reset-password'], { queryParams: { email: this.email, code: this.code } });
     } catch (e: any) {
-      this.error = e?.message || 'Connexion impossible. Réessayez.';
-      this.toast.error('Erreur', this.error);
+      this.error = e?.error?.message || e?.message || 'Connexion instable. Réessayez.';
     } finally {
       this.loading = false;
     }

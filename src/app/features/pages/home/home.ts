@@ -39,6 +39,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   readonly pros = signal<Professional[]>([]);
   readonly recommended = signal<Professional[]>([]);
+  readonly categories = signal<any[]>([]);
   readonly isLoggedIn = signal<boolean>(false);
   readonly isNotificationHidden = signal<boolean>(false);
   readonly isModalDismissed = signal<boolean>(false);
@@ -73,6 +74,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.loadRecommended();
     this.loadProfessionals();
     this.loadStats();
+    this.loadCategories();
 
     // Configuration SEO
     this.seo.setTitle('La STREET · Plateforme des métiers');
@@ -165,6 +167,16 @@ export class HomePage implements OnInit, OnDestroy {
         this.pros.set([]);
         this.loadingPros.set(false);
       },
+    });
+  }
+
+  loadCategories() {
+    this.api.categories().subscribe({
+      next: (list) => {
+        // Obtenir seulement les 6 premières catégories pour l'affichage Home
+        this.categories.set((list || []).slice(0, 6));
+      },
+      error: () => this.categories.set([])
     });
   }
 
