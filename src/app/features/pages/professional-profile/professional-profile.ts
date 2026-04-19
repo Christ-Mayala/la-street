@@ -17,17 +17,17 @@ import { FavoritesService } from '../../../core/services/favorites.service';
     <div class="min-h-screen bg-[#0a0a0c] selection:bg-yellow-500/30">
       
       <!-- IMMERSIVE COVER SECTION -->
-      <section class="relative h-auto min-h-[50vh] md:h-[55vh] overflow-hidden pt-20 md:pt-0">
+      <section class="relative h-auto min-h-[45vh] md:min-h-[50vh] overflow-hidden pt-28 md:pt-32">
         <!-- Abstract Background -->
         <div class="absolute inset-0 z-0">
           <img *ngIf="avatarUrl" [src]="avatarUrl" class="w-full h-full object-cover blur-3xl opacity-20 scale-125 transition-transform duration-700" alt="Background Blur">
           <div *ngIf="!avatarUrl" class="w-full h-full bg-gradient-to-br from-yellow-500/10 to-slate-900"></div>
-          <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/40 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/40 to-transparent pointer-events-none"></div>
         </div>
 
-        <div class="container mx-auto px-6 pt-6 pb-10 md:h-full flex flex-col justify-end relative z-10">
+        <div class="container mx-auto px-6 pb-12 relative z-10">
           <!-- Mobile: Avatar centré en haut, infos en dessus -->
-          <div class="flex flex-col items-center md:flex-row md:items-end gap-6 md:gap-8">
+          <div class="flex flex-col items-center md:flex-row md:items-end gap-10 md:gap-12">
             <!-- Avatar Frame -->
             <div class="relative group shrink-0">
               <div class="absolute inset-0 bg-yellow-500 rounded-full blur-[20px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
@@ -137,7 +137,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
                   @for (img of pro?.images; track img.url) {
                     <div (click)="viewImage(img.url)" class="aspect-square rounded-[2rem] overflow-hidden group cursor-pointer border border-white/10 relative">
                        <img [src]="img.url" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Portfolio Image">
-                       <div class="absolute inset-0 bg-yellow-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                       <div class="absolute inset-0 bg-yellow-500/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     </div>
                   }
                 </div>
@@ -183,7 +183,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
               
               <!-- CONTACT CARD -->
               <div class="bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 shadow-2xl relative overflow-hidden group">
-                 <div class="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                 <div class="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                  
                  <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-8">Informations de Contact</h3>
 
@@ -215,16 +215,16 @@ import { FavoritesService } from '../../../core/services/favorites.service';
                  </div>
 
                  <!-- BUTTONS -->
-                 <div class="space-y-3">
+                 <div class="space-y-4 relative z-30">
                    <button *ngIf="canCall()" (click)="call()" 
-                           class="w-full py-5 bg-yellow-500 text-black text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:scale-[1.02] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-yellow-500/10">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                      Appeler Maintenant
+                           class="group w-full py-4 px-6 bg-yellow-500 text-black text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:scale-[1.02] flex items-center justify-center gap-4 transition-all active:scale-95 shadow-xl shadow-yellow-500/10 cursor-pointer pointer-events-auto">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                      <span class="flex-1 text-center pr-6">Appeler Maintenant</span>
                    </button>
                    <button *ngIf="canWhatsapp()" (click)="whatsapp()" 
-                           class="w-full py-5 bg-emerald-500 text-white text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-400 hover:scale-[1.02] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-emerald-500/10">
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.548 4.125 1.514 5.865L.212 23.505a.5.5 0 00.787.42l4.787-3.144A11.926 11.926 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
-                      Contacter sur WhatsApp
+                           class="group w-full py-4 px-6 bg-emerald-500 text-white text-sm font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-400 hover:scale-[1.02] flex items-center justify-center gap-4 transition-all active:scale-95 shadow-xl shadow-emerald-500/10 cursor-pointer pointer-events-auto">
+                      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.548 4.125 1.514 5.865L.212 23.505a.5.5 0 00.787.42l4.787-3.144A11.926 11.926 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                      <span class="flex-1 text-center pr-6">Contacter sur WhatsApp</span>
                    </button>
                  </div>
 
@@ -471,14 +471,18 @@ export class ProProfilePage implements OnInit {
     const user = this.auth.user() as any;
     const userName = user?.name || 'Un client';
     const userCity = user?.ville || '';
+    const userPhone = user?.telephone || '';
     
     const clean = tel.replace(/\s+/g, '').replace(/^\+/, '');
     
-    let messageText = `Bonjour ${this.pro?.name},\n\n`;
-    messageText += `Je suis *${userName}* ${userCity ? 'de ' + userCity : ''}, et j'ai trouvé votre profil sur *La STREET*.\n\n`;
-    messageText += `Je souhaiterais vous contacter concernant vos services de *${this.tradeLabel}*.\n\n`;
-    messageText += `Seriez-vous disponible pour en discuter ?\n\n`;
-    messageText += `_Envoyé via La STREET · Talents du Congo_`;
+    let messageText = `*DEMANDE DE SERVICE - LA STREET*\n\n`;
+    messageText += `Bonjour *${this.pro?.name}*,\n\n`;
+    messageText += `Je suis *${userName}* ${userCity ? '(basé à ' + userCity + ')' : ''}.\n`;
+    messageText += `J'ai consulté votre profil de *${this.tradeLabel}* sur la plateforme *La STREET* et votre expertise m'intéresse vivement.\n\n`;
+    messageText += `Seriez-vous disponible pour une intervention ou un devis ?\n\n`;
+    if (userPhone) messageText += `Vous pouvez aussi me joindre au : ${userPhone}\n\n`;
+    messageText += `Dans l'attente de votre retour.\n\n`;
+    messageText += `_— Envoyé via La STREET · Talents du Congo_`;
 
     const message = encodeURIComponent(messageText);
     window.open(`https://wa.me/${clean}?text=${message}`, '_blank');

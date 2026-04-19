@@ -120,27 +120,64 @@ export class ProfessionalCardComponent {
     this.favorites.toggle(id);
   }
 
+  // Contact methods
+  canCall(): boolean {
+    const p = this.pro;
+    if (!p?.telephone) return false;
+    return (p.preferredContact || 'both') !== 'whatsapp';
+  }
+
+  canWhatsapp(): boolean {
+    const p = this.pro;
+    if (!p?.telephone) return false;
+    if (!p.whatsapp) return false;
+    return (p.preferredContact || 'both') !== 'call';
+  }
+
   call() {
     if (!this.auth.isAuthenticated()) {
-      alert('Créez un compte pour contacter les professionnels.');
-      this.router.navigate(['/register']);
+      this.toast.info('Veuillez vous connecter pour voir le numéro et appeler');
       return;
     }
 
     const tel = this.pro.telephone;
     if (!tel) {
-      alert('Aucun numéro disponible.');
-      return;
-    }
-
-    const pref: any = (this.pro as any).preferredContact || 'both';
-
-    if (pref === 'whatsapp' && this.pro.whatsapp) {
-      const clean = tel.replace(/\s+/g, '').replace(/^\+/, '');
-      window.open(`https://wa.me/${clean}`, '_blank');
+      this.toast.warning('Numéro de téléphone non disponible');
       return;
     }
 
     window.location.href = `tel:${tel}`;
+  }
+
+  whatsapp() {
+    if (!this.auth.isAuthenticated()) {
+      this.toast.info('Veuillez vous connecter pour contacter ce professionnel via WhatsApp');
+      return;
+    }
+
+    const tel = this.pro.telephone;
+    if (!tel) {
+      this.toast.warning('Numéro de téléphone non disponible');
+      return;
+    }
+
+    const user = this.auth.user() as any;
+    const userName = user?.name || 'Un client';
+    const userCity = user?.ville || '';
+    const userPhone = user?.telephone || '';
+    
+    const clean = tel.replace(/\s+/g, '').replace(/^\+/, '');
+    
+    let messageText = `*DEMANDE DE SERVICE - LA STREET*\n\n`;
+    messageText += `Bonjour *${this.pro.name}*,\n\n`;
+    messageText += `Je suis *${userName}* ${userCity ? '(basé à ' + userCity + ')' : ''}.\n`;
+    messageText += `J'ai consulté votre profil de *${this.tradeLabel()}* sur la plateforme *La STREET* et votre expertise m'intéresse vivement.\n\n`;
+    messageText += `Seriez-vous disponible pour une intervention ou un devis ?\n\n`;
+    if (userPhone) messageText += `Vous pouvez aussi me joindre au : ${userPhone}\n\n`;
+    messageText += `Dans l'attente de votre retour.\n\n`;
+    messageText += `_— Envoyé via La STREET · Talents du Congo_`;
+
+    const message = encodeURIComponent(messageText);
+    window.open(`https://wa.me/${clean}?text=${message}`, '_blank');
   }
 }
