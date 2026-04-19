@@ -444,7 +444,7 @@ export class ProProfilePage implements OnInit {
 
   call() {
     if (!this.auth.isAuthenticated()) {
-      this.toast.info('Connectez-vous pour contacter ce professionnel');
+      this.toast.info('Veuillez vous connecter pour voir le numéro et appeler');
       return;
     }
 
@@ -458,7 +458,7 @@ export class ProProfilePage implements OnInit {
 
   whatsapp() {
     if (!this.auth.isAuthenticated()) {
-      this.toast.info('Connectez-vous pour contacter ce professionnel');
+      this.toast.info('Veuillez vous connecter pour contacter ce professionnel via WhatsApp');
       return;
     }
 
@@ -467,8 +467,20 @@ export class ProProfilePage implements OnInit {
       this.toast.warning('Numéro de téléphone non disponible');
       return;
     }
+    
+    const user = this.auth.user() as any;
+    const userName = user?.name || 'Un client';
+    const userCity = user?.ville || '';
+    
     const clean = tel.replace(/\s+/g, '').replace(/^\+/, '');
-    const message = encodeURIComponent(`Bonjour ${this.pro?.name}, je suis intéressé par vos services.`);
+    
+    let messageText = `Bonjour ${this.pro?.name},\n\n`;
+    messageText += `Je suis *${userName}* ${userCity ? 'de ' + userCity : ''}, et j'ai trouvé votre profil sur *La STREET*.\n\n`;
+    messageText += `Je souhaiterais vous contacter concernant vos services de *${this.tradeLabel}*.\n\n`;
+    messageText += `Seriez-vous disponible pour en discuter ?\n\n`;
+    messageText += `_Envoyé via La STREET · Talents du Congo_`;
+
+    const message = encodeURIComponent(messageText);
     window.open(`https://wa.me/${clean}?text=${message}`, '_blank');
   }
 
