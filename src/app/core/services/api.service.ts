@@ -79,6 +79,11 @@ export class ApiService {
     return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/categories/${id}`).pipe(map(unwrap));
   }
 
+  trades(): Observable<{ items: any[] }> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<{ items: any[] }>();
+    return this.http.get<DryResponse<{ items: any[] }>>(`${base}${this.prefix}/categories/trades`).pipe(map(unwrap));
+  }
 
   createTrade(payload: any): Observable<any> {
     const base = this.safeBaseUrl();
@@ -98,7 +103,7 @@ export class ApiService {
     return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/categories/trades/${id}`).pipe(map(unwrap));
   }
 
-  professionals(params?: { ville?: string; quartier?: string; categoryId?: string; tradeId?: string; q?: string }): Observable<Professional[]> {
+  professionals(params?: { ville?: string; quartier?: string; categoryId?: string; tradeId?: string; q?: string; serviceType?: string; limit?: number }): Observable<Professional[]> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<Professional[]>();
 
@@ -108,6 +113,8 @@ export class ApiService {
     if (params?.categoryId) httpParams = httpParams.set('categoryId', params.categoryId);
     if (params?.tradeId) httpParams = httpParams.set('tradeId', params.tradeId);
     if (params?.q) httpParams = httpParams.set('q', params.q);
+    if (params?.serviceType) httpParams = httpParams.set('serviceType', params.serviceType);
+    if (params?.limit) httpParams = httpParams.set('limit', String(params.limit));
 
     return this.http
       .get<DryResponse<{ items: Professional[] }>>(`${base}${this.prefix}/professionals`, { params: httpParams })
@@ -254,11 +261,15 @@ export class ApiService {
     return this.http.post<DryResponse<{ attempted: number; sent: number; failed: number }>>(`${base}${this.prefix}/admin/email/broadcast`, payload).pipe(map(unwrap));
   }
 
-  adminAudits(): Observable<any[]> {
+  adminAudits(params?: { page?: number; limit?: number }): Observable<{ items: any[]; pagination: any }> {
     const base = this.safeBaseUrl();
-    if (!base) return this.baseOrError<any[]>();
+    if (!base) return this.baseOrError<{ items: any[]; pagination: any }>();
 
-    return this.http.get<DryResponse<any[]>>(`${base}${this.prefix}/admin/audits`).pipe(map(unwrap));
+    let httpParams = new HttpParams();
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.limit) httpParams = httpParams.set('limit', String(params.limit));
+
+    return this.http.get<DryResponse<{ items: any[]; pagination: any }>>(`${base}${this.prefix}/admin/audits`, { params: httpParams }).pipe(map(unwrap));
   }
 
   recommendations(params?: { ville?: string; limit?: number }): Observable<Professional[]> {
@@ -368,7 +379,7 @@ export class ApiService {
     return this.http.get<DryResponse<any>>(`${base}${this.prefix}/leads/${leadId}`).pipe(map(unwrap));
   }
 
-  createLead(payload: { serviceType: string; description: string; location?: string; estimatedPrice?: number }): Observable<any> {
+  createLead(payload: { serviceType: string; description: string; location?: string; estimatedPrice?: number; urgency?: string }): Observable<any> {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<any>();
     return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads`, payload).pipe(map(unwrap));
@@ -385,6 +396,12 @@ export class ApiService {
     const base = this.safeBaseUrl();
     if (!base) return this.baseOrError<any>();
     return this.http.post<DryResponse<any>>(`${base}${this.prefix}/leads/assign`, { leadId, professionalId }).pipe(map(unwrap));
+  }
+
+  deleteLead(id: string): Observable<any> {
+    const base = this.safeBaseUrl();
+    if (!base) return this.baseOrError<any>();
+    return this.http.delete<DryResponse<any>>(`${base}${this.prefix}/leads/${id}`).pipe(map(unwrap));
   }
 
   // ==========================================

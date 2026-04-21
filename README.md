@@ -1,59 +1,93 @@
-# FusionAngularTailwindStarter
+# LA STREET — PLAN D’ÉXÉCUTION PRIORITAIRE
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.2
+**Objectif : créer une boucle active**
+Client poste → Pros répondent vite → Resultat → Retour utilisateur
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 PHASE 1 — DÉCLENCHEMENT DES LEADS (PRIORITÉ ABSOLUE)
 
+### 1.1. Repositionner l’action “poster un lead”
+**Action** : Remplacer partout :
+- “Publier une annonce” par :
+  - “Recevoir des propositions de professionnels”
+  - “Obtenir des réponses rapides”
+
+### 1.2. Simplifier le formulaire (critique)
+**À faire** : Limiter à 5 champs :
+1. Service (ex: plombier)
+2. Localisation
+3. Urgence (aujourd’hui / demain / flexible)
+4. Description courte
+5. Coux estimé
+**Bouton** : “Recevoir des propositions”
+
+### 1.3. Feedback immédiat (obligatoire)
+Dès soumission, afficher :
+- “Votre demande a été envoyée à 12 professionnels”
+- “Les premières réponses arrivent…”
+
+### 1.4. Simulation de dynamique (réelle, pas fake)
+Après 30–60 sec :
+- “Des professionnels consultent votre demande”
+- “Soyez prêt à recevoir des appels”
+
+---
+
+## ⚡ PHASE 2 — ACTIVATION DES PROFESSIONNELS
+
+### 2.1. Refonte du message email
+**Objectif** : Créer urgence + compétition
+- **Titre** : “Nouveau client dans votre zone”
+- **Ajout obligatoire** : “Soyez parmi les premiers à répondre”
+
+### 2.2. Pression concurrentielle réelle
+Afficher dans l’email ou dashboard :
+- “Lead envoyé à X professionnels”
+- “Les premiers à répondre sont favorisés”
+
+### 2.3. Classement des réponses
+- Top 3 visibles côté client
+- Ordre basé sur : rapidité, abonnement (premium)
+
+---
+
+## 🎯 PHASE 3 — MATCHING AUTOMATIQUE
+
+### 3.1. Fonction clé
+Dès qu’un lead est posté, afficher immédiatement :
+- 3 professionnels recommandés
+
+### 3.2. Critères de sélection
+- Localisation, Métier, Disponibilité, Note
+
+---
+
+## 🔄 PHASE 4 — CRÉATION DE LA BOUCLE
+User poste → Pros notifiés → Pros répondent → User choisit → Expérience positive → Retour naturel
+
+---
+
+## 💰 PHASE 5 — MONÉTISATION SIMPLE (APRÈS ACTIVATION)
+- Introduire le “boost pro” (priorité dans les leads)
+- Limitation gratuite limitée à 1 lead par mois (pour free)
+- Accès complet pour premium
+
+
+---
+
+## 🛒 PHASE 6 — EXTENSION MARKETPLACE (APRÈS TRACTION)
+- Mise en relation client ↔ vendeur de matériel (Matériaux BTP, outils, etc.)
+
+---
+
+## 🛠️ INFOS TECHNIQUES (DEVELOPPEMENT)
+
+Pour lancer le serveur de développement :
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+*Note : Ce document sert de guide stratégique pour les prochaines étapes de développement.*

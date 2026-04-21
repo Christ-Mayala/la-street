@@ -88,7 +88,7 @@ import { SeoService } from '../../../core/services/seo.service';
                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Protocol Verified 2025</span>
                     </div>
-                    <a routerLink="/" class="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white hover:text-yellow-500 transition-all uppercase tracking-[0.2em]">Retour_Accueil</a>
+                    <a routerLink="/" class="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white hover:text-yellow-500 transition-all uppercase tracking-[0.2em]">Retour à l'accueil</a>
                  </div>
               </div>
            </div>

@@ -1,103 +1,163 @@
 <div class="min-h-screen bg-[#050505] text-slate-200 selection:bg-yellow-400/30 overflow-hidden pt-24 pb-32">
   <!-- Ambient Background -->
-  <div class="fixed inset-0 pointer-events-none">
-    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-yellow-400/5 rounded-full blur-[120px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-white/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
+  <div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-yellow-400/5 rounded-full blur-[60px]"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-white/5 rounded-full blur-[60px]"></div>
   </div>
 
   <div class="container relative z-10 px-6 mx-auto">
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-2xl mx-auto">
       
       <!-- Header Section -->
-      <div class="mb-16 animate-fade-in-up">
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
-          <div class="space-y-6">
-            <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-2">
-              <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              <span class="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Nouvel Appel d'Offres</span>
+      <div class="mb-10 animate-fade-in-up">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
+          <div class="space-y-4">
+            <div class="inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-1">
+              <svg class="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <span class="text-[9px] font-black text-yellow-500 uppercase tracking-[0.3em]">Nouvel Appel d'Offres</span>
             </div>
-            <h1 class="text-5xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-none">
-              Publier une <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Demande</span>
+            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
+              Recevoir des <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Propositions</span>
             </h1>
           </div>
-          <a routerLink="/leads" class="group flex items-center gap-3 text-slate-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest pb-1">
-            <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <a routerLink="/leads" class="group flex items-center gap-3 text-slate-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest pb-1">
+            <svg class="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Retour au Flux
           </a>
         </div>
-        <p class="text-slate-400 text-lg font-medium leading-relaxed">Articulez votre besoin pour recevoir des propositions de nos meilleurs talents locaux.</p>
+        <p class="text-slate-400 text-base font-medium leading-relaxed">Articulez votre besoin pour obtenir des réponses rapides de nos meilleurs talents locaux.</p>
       </div>
 
       <!-- Form Container: Ultra Glass -->
-      <div class="relative group p-1 border border-white/5 rounded-[3.5rem] bg-white/[0.02] backdrop-blur-3xl shadow-2xl animate-fade-in-up" style="animation-delay: 0.2s">
-        <div class="absolute inset-0 bg-yellow-500/5 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+      <div class="relative group p-1 border border-white/5 rounded-[2.5rem] bg-white/[0.02] backdrop-blur-lg shadow-2xl animate-fade-in">
         
-        <form (ngSubmit)="onSubmit()" #leadForm="ngForm" class="relative rounded-[3.3rem] bg-black/40 p-8 md:p-14 space-y-10">
-          
-          <!-- Service Selection -->
-          <div class="space-y-4 group/field">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Nature de l'Expertise Requise</label>
-            <div class="relative">
-              <select id="serviceType" name="serviceType" [(ngModel)]="formData.serviceType" required class="w-full bg-[#0a0a0c] border border-white/20 rounded-2xl py-5 px-6 text-white font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05] appearance-none cursor-pointer">
-                <option value="" disabled class="bg-[#0a0a0c]">Sélectionnez un métier</option>
-                @for (trade of trades(); track trade._id) {
-                  <option [value]="trade.name" class="bg-[#0a0a0c] text-white">{{ trade.name }}</option>
-                }
-              </select>
-              <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+        @if (step() === 'form') {
+          <form (ngSubmit)="onSubmit()" #leadForm="ngForm" class="relative rounded-[2.3rem] bg-black/40 p-6 md:p-8 space-y-6">
+            
+            <!-- Service Selection -->
+            <div class="space-y-3 group/field">
+              <label for="serviceType" class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Service souhaité (ex: plombier)</label>
+              <div class="relative">
+                <select id="serviceType" name="serviceType" [(ngModel)]="formData.serviceType" required title="Sélectionnez le type de service" class="w-full bg-[#0a0a0c] border border-white/20 rounded-xl py-3 px-4 text-white text-xs font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05] appearance-none cursor-pointer">
+                  <option value="" disabled class="bg-[#0a0a0c]">Sélectionnez un métier</option>
+                  @for (trade of trades(); track trade._id) {
+                    <option [value]="trade.name" class="bg-[#0a0a0c] text-white">{{ trade.name }}</option>
+                  }
+                </select>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Description -->
-          <div class="space-y-4 group/field">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Détails de la Mission</label>
-            <textarea id="description" name="description" [(ngModel)]="formData.description" required rows="6" placeholder="Décrivez votre besoin avec précision pour attirer les bons experts..." class="w-full bg-[#050505]/60 border border-white/10 rounded-2xl py-5 px-6 text-white font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none resize-none group-hover:bg-white/[0.05]"></textarea>
-          </div>
-
-          <!-- Location & Budget Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div class="space-y-4 group/field">
-              <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Localisation Précise</label>
-              <input id="location" name="location" [(ngModel)]="formData.location" type="text" required placeholder="Ex: Pointe-Noire, Grand Marché" class="w-full bg-[#050505]/60 border border-white/10 rounded-2xl py-5 px-6 text-white font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05]">
+            <!-- Location & Urgency Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-3 group/field">
+                <label for="location" class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Localisation</label>
+                <input id="location" name="location" [(ngModel)]="formData.location" type="text" required placeholder="Ex: Pointe-Noire" class="w-full bg-[#050505]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-xs font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05]">
+              </div>
+              <div class="space-y-3 group/field">
+                <label for="urgency" class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Urgence</label>
+                <div class="relative">
+                  <select id="urgency" name="urgency" [(ngModel)]="formData.urgency" required title="Sélectionnez le niveau d'urgence" class="w-full bg-[#0a0a0c] border border-white/20 rounded-xl py-3 px-4 text-white text-xs font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05] appearance-none cursor-pointer">
+                    <option value="aujourd-hui" class="bg-[#0a0a0c] text-white">Aujourd'hui</option>
+                    <option value="demain" class="bg-[#0a0a0c] text-white">Demain</option>
+                    <option value="flexible" class="bg-[#0a0a0c] text-white">Flexible</option>
+                  </select>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="space-y-4 group/field relative">
-              <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Budget Estimé (Optionnel)</label>
-              <input id="estimatedPrice" name="estimatedPrice" [(ngModel)]="formData.estimatedPrice" type="number" min="0" placeholder="0" class="w-full bg-[#050505]/60 border border-white/10 rounded-2xl py-5 px-6 text-white font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05]">
-              <div class="absolute right-6 top-[52px] text-xs font-black text-slate-600 uppercase tracking-widest">FCFA</div>
+
+            <!-- Description -->
+            <div class="space-y-3 group/field">
+              <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Description courte</label>
+              <textarea id="description" name="description" [(ngModel)]="formData.description" required rows="3" placeholder="Décrivez votre besoin..." class="w-full bg-[#050505]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-xs font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none resize-none group-hover:bg-white/[0.05]"></textarea>
+            </div>
+
+            <!-- Budget Row -->
+            <div class="space-y-3 group/field relative">
+              <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 group-focus-within/field:text-yellow-500 transition-colors italic">Coût estimé (Optionnel)</label>
+              <div class="relative">
+                <input id="estimatedPrice" name="estimatedPrice" [(ngModel)]="formData.estimatedPrice" type="number" min="0" placeholder="0" class="w-full bg-[#050505]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-xs font-bold focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all outline-none group-hover:bg-white/[0.05]">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-600 uppercase tracking-widest">FCFA</div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+              <button type="submit" [disabled]="submitting() || !leadForm.form.valid" class="w-full px-10 py-5 bg-yellow-500 text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-yellow-400 active:scale-[0.98] transition-all shadow-2xl shadow-yellow-500/20 disabled:opacity-20 flex items-center justify-center gap-4">
+                @if (submitting()) {
+                  <div class="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                  <span>Envoi en cours...</span>
+                } @else {
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                  <span>Recevoir des propositions</span>
+                }
+              </button>
+            </div>
+
+            <!-- Alert Context -->
+            @if (message() && isError()) {
+              <div class="p-4 rounded-xl animate-fade-in border bg-red-500/10 border-red-500/20 text-red-400">
+                <span class="text-[10px] font-black uppercase tracking-widest">{{ message() }}</span>
+              </div>
+            }
+          </form>
+        } @else {
+          <div class="relative rounded-[2.3rem] bg-black/40 p-8 md:p-12 space-y-10 text-center animate-fade-in">
+            <div class="w-20 h-20 rounded-[2rem] bg-yellow-500/10 border-2 border-yellow-500/20 flex items-center justify-center mx-auto mb-6">
+              <svg class="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            
+            <div class="space-y-3">
+              <h2 class="text-2xl font-black text-white uppercase tracking-tighter italic">Demande envoyée !</h2>
+              <p class="text-slate-400 text-base font-medium">{{ message() }}</p>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+              <div class="flex items-center justify-center gap-3">
+                <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"></div>
+                <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">{{ dynamicFeedback() || 'Traitement du signal...' }}</span>
+              </div>
+              <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest">Soyez prêt à recevoir des appels</p>
+            </div>
+
+            @if (recommendedPros().length > 0) {
+              <div class="pt-6 space-y-5">
+                <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">Professionnels recommandés</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  @for (pro of recommendedPros(); track pro._id) {
+                    <a [routerLink]="['/professionals', pro._id]" class="p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-yellow-500/30 transition-all group text-center">
+                      <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 mx-auto mb-2 overflow-hidden flex items-center justify-center">
+                        @if (pro.avatarUrl) { <img [src]="pro.avatarUrl" class="w-full h-full object-cover" alt="Avatar de {{ pro.name }}" title="{{ pro.name }}"> }
+                        @else { <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> }
+                      </div>
+                      <h4 class="text-[9px] font-black text-white uppercase tracking-tighter truncate">{{ pro.name }}</h4>
+                      <p class="text-[7px] text-slate-500 uppercase font-bold">{{ pro.ville }}</p>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
+              <button type="button" (click)="reset()" class="px-6 py-4 bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all">Nouvelle Demande</button>
+              <a routerLink="/leads" class="px-6 py-4 bg-yellow-500 text-black text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all">Voir mes demandes</a>
             </div>
           </div>
-
-          <!-- Submit Button -->
-          <div class="pt-8">
-            <button type="submit" [disabled]="submitting() || !leadForm.form.valid" class="w-full px-12 py-6 bg-yellow-500 text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-yellow-400 active:scale-[0.98] transition-all shadow-2xl shadow-yellow-500/20 disabled:opacity-20 flex items-center justify-center gap-4">
-              @if (submitting()) {
-                <div class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                <span>Traitement en cours...</span>
-              } @else {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                <span>Diffuser l'Appel d'Offres</span>
-              }
-            </button>
-          </div>
-
-          <!-- Alert Context -->
-          @if (message()) {
-            <div class="p-6 rounded-2xl animate-fade-in border" [class]="isError() ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-green-500/10 border-green-500/20 text-emerald-400'">
-              <span class="text-xs font-black uppercase tracking-widest">{{ message() }}</span>
-            </div>
-          }
-        </form>
+        }
       </div>
 
       <!-- Guidelines Summary -->
-      <div class="mt-12 p-8 rounded-[2.5rem] bg-white/[0.01] border border-white/5 backdrop-blur-3xl animate-fade-in-up" style="animation-delay: 0.4s">
-        <div class="flex items-start gap-6">
-           <div class="w-1.5 h-12 bg-yellow-500 shrink-0"></div>
+      <div class="mt-10 p-6 rounded-[2rem] bg-white/[0.01] border border-white/5 backdrop-blur-xl animate-fade-in-up [animation-delay:200ms]">
+        <div class="flex items-start gap-4">
+           <div class="w-1 h-10 bg-yellow-500 shrink-0"></div>
            <div>
-              <h3 class="text-xl font-black text-white uppercase tracking-tighter italic mb-2">Protocole de Confidentialité</h3>
-              <p class="text-slate-400 text-sm font-medium leading-relaxed">
+              <h3 class="text-lg font-black text-white uppercase tracking-tighter italic mb-1">Protocole de Confidentialité</h3>
+              <p class="text-slate-400 text-xs font-medium leading-relaxed">
                  Votre demande sera transmise instantanément au flux public. Seuls les <span class="text-yellow-500">membres certifiés Premium</span> pourront initier un contact direct pour garantir votre tranquillité.
               </p>
            </div>

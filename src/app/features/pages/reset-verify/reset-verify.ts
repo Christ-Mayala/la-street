@@ -116,7 +116,7 @@ export class ResetVerifyPage {
   loading = false;
 
   constructor() {
-    this.seo.setTitle('Validation_Check · La STREET');
+    this.seo.setTitle('Vérification · La STREET');
     this.seo.updateTags({
       description: 'Vérifiez votre code de réinitialisation de mot de passe La STREET.'
     });

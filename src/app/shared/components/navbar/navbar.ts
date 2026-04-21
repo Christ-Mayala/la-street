@@ -146,7 +146,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
             </div>
 
             <!-- Bottom Auth Actions -->
-            <div class="mt-auto grid grid-cols-2 gap-3 pt-8 pb-8 border-t border-white/5 mt-6">
+            <div class="mt-auto grid grid-cols-2 gap-3 pb-8 border-t border-white/5 pt-6">
                @if (auth.user(); as u) {
                  <!-- Logged in user -->
                  <div class="col-span-2 flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 mb-2">
@@ -205,14 +205,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.isAdmin(u)) return [
       { label: 'Admin', path: '/admin' },
       { label: 'Missions', path: '/leads' },
-      { label: 'Postuler', path: '/leads/new' },
+      { label: 'Propositions', path: '/leads/new' },
       { label: 'Profil', path: '/profile' }
     ];
     return [
       { label: 'Accueil', path: '/' },
       { label: 'Recherche', path: '/search' },
       { label: 'Missions', path: '/leads' },
-      { label: 'Postuler', path: '/leads/new' },
+      { label: 'Propositions', path: '/leads/new' },
       { label: 'Profil', path: '/profile' }
     ];
   });
@@ -226,7 +226,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     ];
     const u = this.auth.user();
     if (u) {
-       base.push({ label: 'Publier', path: '/leads/new', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>') });
+       base.push({ label: 'Propositions', path: '/leads/new', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>') });
        base.push({ label: 'Mon Profil', path: '/profile', icon: this.trustIcon('<svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>') });
     }
     return base;

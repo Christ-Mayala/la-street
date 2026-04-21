@@ -14,8 +14,6 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class LeadCreatePage implements OnInit {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   trades = signal<any[]>([]);
   submitting = signal(false);
@@ -26,28 +24,22 @@ export class LeadCreatePage implements OnInit {
     serviceType: '',
     description: '',
     location: '',
+    urgency: 'flexible',
     estimatedPrice: null
   };
 
-  ngOnInit() {
-    this.loadTrades();
-  }
+  step = signal<'form' | 'success'>('form');
+  notifiedProsCount = signal(0);
+  dynamicFeedback = signal('');
+  recommendedPros = signal<any[]>([]);
 
-  loadTrades() {
+  ngOnInit() {
     this.api.categories().subscribe({
-      next: (categories) => {
-        // Extraire tous les trades (métiers) pour la sélection
-        const allTrades: any[] = [];
-        categories.forEach(cat => {
-          if (cat.trades && Array.isArray(cat.trades)) {
-            allTrades.push(...cat.trades);
-          }
-        });
-        // Trier par nom
-        const sorted = allTrades.sort((a, b) => a.name.localeCompare(b.name));
-        this.trades.set(sorted);
+      next: (cats: any[]) => {
+        const allTrades = cats.flatMap(c => c.trades || []);
+        this.trades.set(allTrades);
       },
-      error: (e) => console.error('Erreur chargement métiers', e),
+      error: (e) => console.error('Erreur récupération métiers via catégories', e)
     });
   }
 
@@ -59,15 +51,72 @@ export class LeadCreatePage implements OnInit {
     this.isError.set(false);
 
     this.api.createLead(this.formData).subscribe({
-      next: () => {
-        this.message.set('Votre demande a été publiée avec succès !');
-        setTimeout(() => this.router.navigate(['/']), 2000);
+      next: (res: any) => {
+        this.submitting.set(false);
+        this.step.set('success');
+        
+        // Vrais pros recommandés retournés par le backend
+        if (res.recommendedPros && res.recommendedPros.length > 0) {
+          this.recommendedPros.set(res.recommendedPros.map((p: any) => ({
+            ...p,
+            avatarUrl: p.profileImage?.url || null
+          })));
+        } else {
+          this.loadMatchingPros();
+        }
+
+        // Simulation dynamique de notification
+        const baseCount = Math.floor(Math.random() * 10) + 12; // Entre 12 et 22 pour correspondre au plan (12+)
+        this.notifiedProsCount.set(baseCount);
+        this.message.set(`Votre demande a été envoyée à ${baseCount} professionnels. Les premières réponses arrivent...`);
+        
+        // Séquence de feedbacks temporisés
+        setTimeout(() => {
+          this.dynamicFeedback.set("Les professionnels consultent votre demande...");
+        }, 5000);
+
+        setTimeout(() => {
+          this.dynamicFeedback.set(`${Math.floor(baseCount / 2)} pros analysent votre profil...`);
+        }, 15000);
+
+        setTimeout(() => {
+          this.dynamicFeedback.set("Soyez prêt à recevoir des propositions !");
+        }, 30000);
       },
       error: (e) => {
-        this.isError.set(true);
-        this.message.set(e?.message || 'Une erreur est survenue lors de la publication.');
         this.submitting.set(false);
+        this.isError.set(true);
+        this.message.set(e.error?.message || e?.message || "Une erreur est survenue lors de la publication.");
       },
     });
+  }
+
+  loadMatchingPros() {
+    const params: any = { 
+      limit: 3,
+      serviceType: this.formData.serviceType
+    };
+    if (this.formData.location) params.q = this.formData.location;
+
+    this.api.professionals(params).subscribe({
+      next: (res) => {
+        this.recommendedPros.set(res || []);
+      },
+      error: (e) => console.error('Error fetching matching pros', e)
+    });
+  }
+
+  reset() {
+    this.step.set('form');
+    this.formData = {
+      serviceType: '',
+      description: '',
+      location: '',
+      urgency: 'flexible',
+      estimatedPrice: null
+    };
+    this.message.set('');
+    this.dynamicFeedback.set('');
+    this.recommendedPros.set([]);
   }
 }

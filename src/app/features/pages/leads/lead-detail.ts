@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +24,21 @@ export class LeadDetailPage implements OnInit {
   lead = signal<any>(null);
   isLoading = signal(true);
   isSubmitting = signal(false);
+
+  rankedResponses = computed(() => {
+    const l = this.lead();
+    if (!l || !l.responses) return [];
+    
+    // Trier : Premium d'abord, puis par date de création (plus ancien = plus rapide)
+    return [...l.responses].sort((a, b) => {
+      const aPremium = a.professionalId?.isPremium ? 1 : 0;
+      const bPremium = b.professionalId?.isPremium ? 1 : 0;
+      
+      if (aPremium !== bPremium) return bPremium - aPremium;
+      
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+  });
 
   responseMessage: string = '';
 

@@ -133,7 +133,7 @@ export class ResetPasswordPage {
   showPassword = false;
 
   constructor() {
-    this.seo.setTitle('Reset_Key · La STREET');
+    this.seo.setTitle('Réinitialisation · La STREET');
     this.seo.updateTags({
       description: 'Réinitialisez votre mot de passe La STREET en toute sécurité.'
     });
@@ -156,7 +156,7 @@ export class ResetPasswordPage {
       return;
     }
     if (this.password !== this.confirm) {
-      this.error = 'Erreur_Sync : Les mots de passe ne correspondent pas.';
+      this.error = 'Erreur de synchronisation : Les mots de passe ne correspondent pas.';
       return;
     }
 

@@ -8,6 +8,7 @@ export interface Lead {
   assignedTo?: string;
   createdByRole: 'client' | 'professional';
   createdAt: string;
+  urgency?: 'aujourd-hui' | 'demain' | 'flexible';
   isLocked?: boolean;
   isOwner?: boolean;
   isPremiumCreator?: boolean;

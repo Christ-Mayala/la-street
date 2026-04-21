@@ -79,7 +79,7 @@ import { ToastService } from '../../../core/services/toast.service';
                   Saisir le Code
                 </button>
                 <button (click)="resendCode()" class="w-full py-4 bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all opacity-50 hover:opacity-100">
-                  Renvoyer_Signal
+                  Renvoyer le Signal
                 </button>
               </div>
             </div>
@@ -95,7 +95,7 @@ import { ToastService } from '../../../core/services/toast.service';
               <button type="submit" [disabled]="loading || !email" class="w-full py-4 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 active:scale-[0.98] transition-all shadow-xl shadow-yellow-500/20 disabled:opacity-20 flex items-center justify-center gap-3">
                 @if (loading) {
                   <div class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                  <span>Node_Sync...</span>
+                  <span>Synchronisation...</span>
                 } @else {
                   <span>Envoyer le code</span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
